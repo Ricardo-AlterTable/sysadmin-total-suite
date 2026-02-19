@@ -1,0 +1,133 @@
+<?php
+if (!defined('ABSPATH')) exit;
+
+$history = get_option('wps_profiling_history', []);
+
+if (empty($history)) {
+    echo '<div class="wrap"><h1>Profiling</h1><p>No hay datos aún. Usa el botón de abajo para forzar una prueba:</p>';
+    ?>
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin: 20px 0;">
+        <?php wp_nonce_field('wps_reset_profiling_nonce', 'wps_reset_profiling'); ?>
+        <input type="hidden" name="action" value="wps_reset_profiling">
+        <button type="submit" class="button button-secondary">Reset histórico</button>
+    </form>
+    <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
+    <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
+    <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.getElementById("wpsRunTest");
+        const iframe = document.getElementById("wpsTestFrame");
+        const spinner = document.getElementById("wpsSpinner");
+
+        btn.addEventListener("click", function () {
+            spinner.style.display = "inline";
+            iframe.onload = function () {
+                window.location.reload();
+            };
+            iframe.src = "<?php echo esc_url(home_url('/')); ?>?wps_profiling_test=1&t=" + Date.now();
+        });
+    });
+    </script>
+    <?php
+    return;
+}
+
+$last = end($history);
+
+$profile_data = [
+    'Core'     => round($last['core']*1000, 2),
+    'Plugins'  => round($last['plugins']*1000, 2),
+    'Tema'     => round($last['theme']*1000, 2),
+    'MySQL'    => round($last['sql_time']*1000, 2),
+    'Externas' => 0,
+    'Total'    => round($last['total']*1000, 2),
+];
+
+$timestamps = array_map(fn($d) => date('H:i:s', $d['timestamp']), $history);
+$totals = array_map(fn($d) => round($d['total']*1000,2), $history);
+?>
+<div class="wrap">
+    <h1>Profiling del Home</h1>
+
+    <?php if (isset($_GET['reset_done'])): ?>
+        <div class="notice notice-success is-dismissible"><p>✅ Histórico borrado correctamente.</p></div>
+    <?php endif; ?>
+
+    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin: 20px 0;">
+        <?php wp_nonce_field('wps_reset_profiling_nonce', 'wps_reset_profiling'); ?>
+        <input type="hidden" name="action" value="wps_reset_profiling">
+        <button type="submit" class="button button-secondary">Reset histórico</button>
+    </form>
+
+    <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
+    <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
+    <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+
+    <h2>Última medición</h2>
+    <div class="wps-chart-container">
+        <canvas id="wpsProfilingChart"></canvas>
+    </div>
+
+    <ul>
+        <?php foreach ($profile_data as $k => $v): ?>
+            <li><strong><?php echo esc_html($k); ?>:</strong> <?php echo $v; ?> ms</li>
+        <?php endforeach; ?>
+        <li><strong>Consultas SQL:</strong> <?php echo intval($last['sql_count']); ?></li>
+        <li><strong>Llamadas HTTP:</strong> <?php echo intval($last['http_count']); ?></li>
+    </ul>
+
+    <h2>Evolución (últimas visitas)</h2>
+    <div class="wps-chart-container">
+        <canvas id="wpsHistoryChart"></canvas>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const btn = document.getElementById("wpsRunTest");
+        const iframe = document.getElementById("wpsTestFrame");
+        const spinner = document.getElementById("wpsSpinner");
+
+        btn.addEventListener("click", function () {
+            spinner.style.display = "inline";
+            iframe.onload = function () {
+                window.location.reload();
+            };
+            iframe.src = "<?php echo esc_url(home_url('/')); ?>?wps_profiling_test=1&t=" + Date.now();
+        });
+
+        const ctx1 = document.getElementById('wpsProfilingChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode(array_keys($profile_data)); ?>,
+                datasets: [{
+                    label: 'Tiempo (ms)',
+                    data: <?php echo json_encode(array_values($profile_data)); ?>,
+                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const ctx2 = document.getElementById('wpsHistoryChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode($timestamps); ?>,
+                datasets: [{
+                    label: 'Tiempo total (ms)',
+                    data: <?php echo json_encode($totals); ?>,
+                    fill: false,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    });
+    </script>
+</div>
