@@ -78,7 +78,7 @@ add_action('wp_ajax_wps_restore_file', function () {
     if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
     }
-    check_ajax_referer('wps_diff_nonce', 'nonce');
+    check_ajax_referer('wps_restore_file', 'nonce');
 
     $rel = isset($_POST['path']) ? sanitize_text_field(wp_unslash($_POST['path'])) : '';
     if (!$rel || strpos($rel, '..') !== false) {
@@ -122,7 +122,7 @@ add_action('wp_ajax_wps_restore_all_files', function () {
     if (!current_user_can('manage_options')) {
         wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
     }
-    check_ajax_referer('wps_diff_nonce', 'nonce');
+    check_ajax_referer('wps_restore_all', 'nonce');
 
     $files = isset($_POST['files']) && is_array($_POST['files']) ? array_map('sanitize_text_field', wp_unslash($_POST['files'])) : [];
     if (empty($files)) {
@@ -178,43 +178,51 @@ add_action('wp_ajax_wps_restore_all_files', function () {
 function wps_fetch_core_file_from_zip(string $version, string $relative_path): ?array {
     global $wps_fetch_last_error;
     $wps_fetch_last_error = '';
+
+    // Sanitize version to prevent security issues
+    $version = preg_replace('/[^0-9.]/', '', $version);
     $relative_path = ltrim($relative_path, '/');
 
     $zip_url = "https://downloads.wordpress.org/release/wordpress-{$version}.zip";
     $tmpfile = wp_tempnam($zip_url);
     if ($tmpfile === false) $tmpfile = tempnam(sys_get_temp_dir(), 'wpszip_');
 
-    $res = wp_remote_get($zip_url, ['timeout' => 60, 'stream' => true, 'filename' => $tmpfile]);
-    if (is_wp_error($res) || wp_remote_retrieve_response_code($res) !== 200) {
-        $wps_fetch_last_error = 'No se pudo descargar ZIP oficial: ' . (is_wp_error($res) ? $res->get_error_message() : wp_remote_retrieve_response_code($res));
-        @unlink($tmpfile);
-        return null;
-    }
+    $content = false;
 
-    if (!class_exists('ZipArchive')) {
-        $wps_fetch_last_error = 'ZipArchive no disponible en PHP.';
-        @unlink($tmpfile);
-        return null;
-    }
+    // Use a try/finally block to ensure the temporary file is always deleted
+    try {
+        $res = wp_remote_get($zip_url, ['timeout' => 60, 'stream' => true, 'filename' => $tmpfile]);
+        if (is_wp_error($res) || wp_remote_retrieve_response_code($res) !== 200) {
+            $wps_fetch_last_error = 'No se pudo descargar ZIP oficial: ' . (is_wp_error($res) ? $res->get_error_message() : wp_remote_retrieve_response_code($res));
+            return null;
+        }
 
-    $zip = new ZipArchive();
-    if ($zip->open($tmpfile) !== true) {
-        $wps_fetch_last_error = 'No se pudo abrir ZIP descargado.';
-        @unlink($tmpfile);
-        return null;
-    }
+        if (!class_exists('ZipArchive')) {
+            $wps_fetch_last_error = 'La clase ZipArchive no está disponible en tu versión de PHP.';
+            return null;
+        }
 
-    $internal = 'wordpress/' . $relative_path;
-    $content = $zip->getFromName($internal);
-    if ($content === false) {
-        $content = $zip->getFromName($relative_path);
-    }
-    $zip->close();
-    @unlink($tmpfile);
+        $zip = new ZipArchive();
+        if ($zip->open($tmpfile) !== true) {
+            $wps_fetch_last_error = 'No se pudo abrir el archivo ZIP descargado.';
+            return null;
+        }
 
-    if ($content === false) {
-        $wps_fetch_last_error = "Archivo $relative_path no encontrado dentro del ZIP.";
-        return null;
+        $internal = 'wordpress/' . $relative_path;
+        $content = $zip->getFromName($internal);
+        if ($content === false) {
+            $content = $zip->getFromName($relative_path); // Fallback for root files
+        }
+        $zip->close();
+
+        if ($content === false) {
+            $wps_fetch_last_error = "Archivo {$relative_path} no encontrado dentro del ZIP.";
+            return null;
+        }
+    } finally {
+        if (file_exists($tmpfile)) {
+            @unlink($tmpfile);
+        }
     }
 
     return ['body' => $content, 'url' => $zip_url];

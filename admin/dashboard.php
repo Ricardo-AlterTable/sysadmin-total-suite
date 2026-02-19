@@ -45,7 +45,7 @@ $analysis = get_transient('wps_last_analysis');
                         <strong style="color:#b35;">[Modificado]</strong>
                         <code><?php echo esc_html($file); ?></code>
                         <button class="button show-diff" data-path="<?php echo esc_attr($file); ?>">Mostrar cambios</button>
-                        <button class="button restore-file" data-path="<?php echo esc_attr($file); ?>">Restaurar</button>
+                        <button class="button restore-file" data-path="<?php echo esc_attr($file); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
                     </li>
                 <?php endforeach; ?>
 
@@ -53,12 +53,12 @@ $analysis = get_transient('wps_last_analysis');
                     <li>
                         <strong style="color:#b35;">[Faltante]</strong>
                         <code><?php echo esc_html($file); ?></code>
-                        <button class="button restore-file" data-path="<?php echo esc_attr($file); ?>">Restaurar</button>
+                        <button class="button restore-file" data-path="<?php echo esc_attr($file); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
                     </li>
                 <?php endforeach; ?>
             </ul>
 
-            <button class="button button-secondary restore-all">Restaurar todos los modificados/faltantes</button>
+            <button class="button button-secondary restore-all" data-nonce="<?php echo wp_create_nonce('wps_restore_all'); ?>">Restaurar todos los modificados/faltantes</button>
         <?php else: ?>
             <p>No se han detectado archivos modificados ni faltantes.</p>
         <?php endif; ?>
