@@ -183,46 +183,48 @@ function wps_fetch_core_file_from_zip(string $version, string $relative_path): ?
     $version = preg_replace('/[^0-9.]/', '', $version);
     $relative_path = ltrim($relative_path, '/');
 
+    $upload_dir = wp_upload_dir();
+    $cache_dir = $upload_dir['basedir'] . '/wp-profiler-security-cache/';
+    wp_mkdir_p($cache_dir);
+    $zip_path = $cache_dir . "wordpress-{$version}.zip";
     $zip_url = "https://downloads.wordpress.org/release/wordpress-{$version}.zip";
-    $tmpfile = wp_tempnam($zip_url);
-    if ($tmpfile === false) $tmpfile = tempnam(sys_get_temp_dir(), 'wpszip_');
 
-    $content = false;
-
-    // Use a try/finally block to ensure the temporary file is always deleted
-    try {
-        $res = wp_remote_get($zip_url, ['timeout' => 60, 'stream' => true, 'filename' => $tmpfile]);
+    // Download the zip file if it's not cached
+    if (!file_exists($zip_path)) {
+        $res = wp_remote_get($zip_url, ['timeout' => 120, 'stream' => true, 'filename' => $zip_path]);
         if (is_wp_error($res) || wp_remote_retrieve_response_code($res) !== 200) {
             $wps_fetch_last_error = 'No se pudo descargar ZIP oficial: ' . (is_wp_error($res) ? $res->get_error_message() : wp_remote_retrieve_response_code($res));
+            if (file_exists($zip_path)) {
+                @unlink($zip_path);
+            }
             return null;
         }
+    }
 
-        if (!class_exists('ZipArchive')) {
-            $wps_fetch_last_error = 'La clase ZipArchive no está disponible en tu versión de PHP.';
-            return null;
-        }
+    if (!class_exists('ZipArchive')) {
+        $wps_fetch_last_error = 'La clase ZipArchive no está disponible en tu versión de PHP.';
+        return null;
+    }
 
-        $zip = new ZipArchive();
-        if ($zip->open($tmpfile) !== true) {
-            $wps_fetch_last_error = 'No se pudo abrir el archivo ZIP descargado.';
-            return null;
-        }
+    $zip = new ZipArchive();
+    if ($zip->open($zip_path) !== true) {
+        $wps_fetch_last_error = 'No se pudo abrir el archivo ZIP cacheado.';
+        // If the cached file is corrupt, delete it and try again once.
+        @unlink($zip_path);
+        return null;
+    }
+    
+    $content = false;
+    $internal = 'wordpress/' . $relative_path;
+    $content = $zip->getFromName($internal);
+    if ($content === false) {
+        $content = $zip->getFromName($relative_path); // Fallback for root files
+    }
+    $zip->close();
 
-        $internal = 'wordpress/' . $relative_path;
-        $content = $zip->getFromName($internal);
-        if ($content === false) {
-            $content = $zip->getFromName($relative_path); // Fallback for root files
-        }
-        $zip->close();
-
-        if ($content === false) {
-            $wps_fetch_last_error = "Archivo {$relative_path} no encontrado dentro del ZIP.";
-            return null;
-        }
-    } finally {
-        if (file_exists($tmpfile)) {
-            @unlink($tmpfile);
-        }
+    if ($content === false) {
+        $wps_fetch_last_error = "Archivo {$relative_path} no encontrado dentro del ZIP.";
+        return null;
     }
 
     return ['body' => $content, 'url' => $zip_url];
