@@ -2,6 +2,28 @@
 if (!defined('ABSPATH')) exit;
 
 $analysis = get_transient('wps_last_analysis');
+
+// Define files to exclude
+$excluded_files = [
+    'wp-content/themes/twentytwentyfive/style.min.css',
+    'wp-content/themes/twentytwentytwo/style.min.css',
+    'wp-content/themes/twentytwentythree/readme.txt',
+    'wp-content/themes/twentytwentythree/style.css',
+    'wp-content/plugins/hello.php',
+];
+
+if ($analysis && !empty($analysis['errors'])) {
+    // Filter the errors array to exclude specified files
+    $analysis['errors'] = array_filter($analysis['errors'], function($error) use ($excluded_files) {
+        foreach ($excluded_files as $excluded_file) {
+            if (strpos($error, $excluded_file) !== false) {
+                return false; // Exclude this error
+            }
+        }
+        return true; // Keep this error
+    });
+}
+
 ?>
 <div class="wrap">
     <h1 style="color: #6cff5c;">Integridad del Core</h1>
