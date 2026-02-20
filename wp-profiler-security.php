@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 1.3
+ * Version: 1.4
  * Author: Tu Nombre
  */
 
@@ -53,8 +53,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.3');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.3', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.4');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.4', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -86,6 +86,17 @@ add_action('admin_post_wps_run_analysis', function () {
         wp_die('Permisos insuficientes', 403);
     }
 
+    // Define files to exclude from the analysis
+    $excluded_files = [
+        'wp-content/themes/twentytwentyfive/style.min.css',
+        'wp-content/themes/twentytwentytwo/style.min.css',
+        'wp-content/themes/twentytwentythree/readme.txt',
+        'wp-content/themes/twentytwentythree/style.css',
+        'wp-content/plugins/hello.php',
+        // WordPress' own config file is not part of the checksums
+        'wp-config.php',
+    ];
+
     global $wpdb;
     $start = microtime(true);
 
@@ -108,6 +119,9 @@ add_action('admin_post_wps_run_analysis', function () {
             $checksums = $data['checksums'];
 
             foreach ($checksums as $file => $md5) {
+                if (in_array($file, $excluded_files)) {
+                    continue;
+                }
                 $path = ABSPATH . $file;
                 if (file_exists($path)) {
                     if (@md5_file($path) !== $md5) {
@@ -129,6 +143,9 @@ add_action('admin_post_wps_run_analysis', function () {
                 );
                 foreach ($iterator as $fileinfo) {
                     $rel = str_replace('\\', '/', str_replace(ABSPATH, '', $fileinfo->getPathname()));
+                    if (in_array($rel, $excluded_files)) {
+                        continue;
+                    }
                     if (!isset($checksums[$rel])) {
                         $errors[] = "Extra: $rel";
                     }
