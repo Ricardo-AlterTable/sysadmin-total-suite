@@ -3,36 +3,29 @@ if (!defined('ABSPATH')) exit;
 
 $analysis = get_transient('wps_last_analysis');
 
-// Define files to exclude
-$excluded_files = [
-    'wp-content/themes/twentytwentyfive/style.min.css',
-    'wp-content/themes/twentytwentytwo/style.min.css',
-    'wp-content/themes/twentytwentythree/readme.txt',
-    'wp-content/themes/twentytwentythree/style.css',
-    'wp-content/plugins/hello.php',
-];
-
-if ($analysis && !empty($analysis['errors'])) {
-    // Filter the errors array to exclude specified files
-    $analysis['errors'] = array_filter($analysis['errors'], function($error) use ($excluded_files) {
-        foreach ($excluded_files as $excluded_file) {
-            if (strpos($error, $excluded_file) !== false) {
-                return false; // Exclude this error
-            }
-        }
-        return true; // Keep this error
-    });
-}
-
 ?>
 <div class="wrap">
     <h1 style="color: #6cff5c;">Integridad del Core</h1>
 
-    <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
-        <?php wp_nonce_field('wps_run_analysis_nonce'); ?>
-        <input type="hidden" name="action" value="wps_run_analysis">
-        <button type="submit" class="button button-primary">Analizar ahora</button>
-    </form>
+    <?php if (isset($_GET['cache_purged']) && $_GET['cache_purged'] === '1'): ?>
+        <div id="message" class="updated notice is-dismissible">
+            <p>Caché del plugin purgada. El próximo análisis será desde cero.</p>
+        </div>
+    <?php endif; ?>
+
+    <div style="display: flex; gap: 10px; margin-bottom: 1em;">
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field('wps_run_analysis_nonce'); ?>
+            <input type="hidden" name="action" value="wps_run_analysis">
+            <button type="submit" class="button button-primary">Analizar ahora</button>
+        </form>
+
+        <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+            <?php wp_nonce_field('wps_purge_cache_nonce', 'wps_purge_cache'); ?>
+            <input type="hidden" name="action" value="wps_purge_cache">
+            <button type="submit" class="button button-secondary">Purgar Caché</button>
+        </form>
+    </div>
 
     <?php if ($analysis): ?>
         <h2 style="color: #6cff5c;">Resultado</h2>

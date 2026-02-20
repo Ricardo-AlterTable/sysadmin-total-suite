@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 1.4
+ * Version: 1.5
  * Author: Tu Nombre
  */
 
@@ -53,8 +53,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.4');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.4', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.5');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.5', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -93,7 +93,6 @@ add_action('admin_post_wps_run_analysis', function () {
         'wp-content/themes/twentytwentythree/readme.txt',
         'wp-content/themes/twentytwentythree/style.css',
         'wp-content/plugins/hello.php',
-        // WordPress' own config file is not part of the checksums
         'wp-config.php',
     ];
 
@@ -171,6 +170,36 @@ add_action('admin_post_wps_run_analysis', function () {
     wp_redirect(admin_url('admin.php?page=wp-profiler-security'));
     exit;
 });
+
+// =============================
+// Acción para purgar la caché
+// =============================
+add_action('admin_post_wps_purge_cache', function () {
+    if (!current_user_can('manage_options')) {
+        wp_die('Permisos insuficientes', 403);
+    }
+    check_admin_referer('wps_purge_cache_nonce', 'wps_purge_cache');
+
+    // Borrar el transitorio de análisis
+    delete_transient('wps_last_analysis');
+
+    // Borrar la caché de archivos ZIP
+    $upload_dir = wp_upload_dir();
+    $cache_dir = $upload_dir['basedir'] . '/wp-profiler-security-cache/';
+    if (is_dir($cache_dir)) {
+        $files = glob($cache_dir . '/*'); 
+        foreach($files as $file){ 
+            if(is_file($file)) {
+                @unlink($file); 
+            }
+        }
+        @rmdir($cache_dir);
+    }
+
+    wp_redirect(admin_url('admin.php?page=wp-profiler-security&cache_purged=1'));
+    exit;
+});
+
 
 // =============================
 // Reset histórico profiling
