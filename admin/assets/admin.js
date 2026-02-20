@@ -24,19 +24,27 @@ jQuery(document).ready(function ($) {
         $("#wpsDiffContent").html("<em>Cargando diff...</em>");
         $("#wpsDiffModal").fadeIn();
 
-        $.post(WPS_AJAX.ajax_url, {
-            action: 'wps_show_diff',
-            nonce: WPS_AJAX.nonce,
-            path: path
-        }, function (res) {
-            if (res && res.success) {
-                $("#wpsDiffContent").html(formatDiff(res.data.diff));
-            } else {
-                const msg = res && res.data && res.data.message ? res.data.message : 'Respuesta inválida';
-                $("#wpsDiffContent").text("Error: " + msg);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_show_diff',
+                nonce: WPS_AJAX.nonce,
+                path: path
+            },
+            timeout: 300000, // 5 minutes
+            success: function (res) {
+                if (res && res.success) {
+                    $("#wpsDiffContent").html(formatDiff(res.data.diff));
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'Respuesta inválida';
+                    $("#wpsDiffContent").text("Error: " + msg);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
+                $("#wpsDiffContent").text(errorMsg);
             }
-        }).fail(function () {
-            $("#wpsDiffContent").text("Error de comunicación con el servidor.");
         });
     });
 
@@ -45,21 +53,34 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         if (!confirm("¿Seguro que deseas restaurar este archivo desde el core original?")) return;
 
-        const path = $(this).data('path');
-        $.post(WPS_AJAX.ajax_url, {
-            action: 'wps_restore_file',
-            nonce: WPS_AJAX.nonce,
-            path: path
-        }, function (res) {
-            if (res && res.success) {
-                alert("Archivo restaurado: " + path);
-                location.reload();
-            } else {
-                const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar';
-                alert("Error: " + msg);
+        const button = $(this);
+        const path = button.data('path');
+        button.prop('disabled', true).text('Restaurando...');
+
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_restore_file',
+                nonce: WPS_AJAX.nonce,
+                path: path
+            },
+            timeout: 300000, // 5 minutes
+            success: function (res) {
+                if (res && res.success) {
+                    alert("Archivo restaurado: " + path);
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Restaurar');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
+                alert(errorMsg);
+                button.prop('disabled', false).text('Restaurar');
             }
-        }).fail(function () {
-            alert("Error de comunicación con el servidor.");
         });
     });
 
@@ -68,19 +89,55 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         if (!confirm("¿Seguro que deseas restaurar TODOS los archivos modificados/faltantes?")) return;
 
-        $.post(WPS_AJAX.ajax_url, {
-            action: 'wps_restore_all_files',
-            nonce: WPS_AJAX.nonce
-        }, function (res) {
-            if (res && res.success) {
-                alert("Todos los archivos restaurados.");
-                location.reload();
-            } else {
-                const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar todos';
-                alert("Error: " + msg);
+        const button = $(this);
+        button.prop('disabled', true).text('Restaurando...');
+
+        const files = $('.restore-file').map(function() {
+            return $(this).data('path');
+        }).get();
+
+        if (files.length === 0) {
+            alert("No hay archivos para restaurar. Si hay archivos marcados como faltantes, es posible que deba corregir el plugin para incluirlos en la restauración masiva.");
+            button.prop('disabled', false).text('Restaurar Todos');
+            return;
+        }
+
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_restore_all_files',
+                nonce: WPS_AJAX.nonce,
+                files: files
+            },
+            timeout: 600000, // 10 minutes for all files
+            success: function (res) {
+                if (res && res.success) {
+                    let message = "Operación completada.\n\n";
+                    if (res.data.restored && res.data.restored.length > 0) {
+                        message += "Archivos restaurados (" + res.data.restored.length + "):\n" + res.data.restored.join("\n");
+                    }
+                    
+                    const errorKeys = Object.keys(res.data.errors);
+                    if (errorKeys.length > 0) {
+                        message += "\n\nArchivos con errores ("+ errorKeys.length +"):\n";
+                        errorKeys.forEach(function(file) {
+                            message += file + ": " + res.data.errors[file] + "\n";
+                        });
+                    }
+                    alert(message);
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar todos';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Restaurar Todos');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
+                alert(errorMsg);
+                button.prop('disabled', false).text('Restaurar Todos');
             }
-        }).fail(function () {
-            alert("Error de comunicación con el servidor.");
         });
     });
 
