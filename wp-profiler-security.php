@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 2.0
+ * Version: 2.1
  * Author: Tu Nombre
  */
 
@@ -67,8 +67,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.0');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.0', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.1');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.1', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {

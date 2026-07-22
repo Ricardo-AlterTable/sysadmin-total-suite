@@ -148,6 +148,42 @@ body {
     color: #6cff5c; /* Green accent color */
 }
 
+/* Botones dentro de los modales.
+   Por defecto blancos (Aplicar, Cerrar); los de eliminar en rojo. */
+.wps-modal .button,
+.wps-modal input[type="submit"].button {
+    background: #2b2b2b;
+    border-color: #cccccc;
+    color: #ffffff;
+    text-shadow: none;
+}
+
+.wps-modal .button:hover,
+.wps-modal .button:focus,
+.wps-modal input[type="submit"].button:hover,
+.wps-modal input[type="submit"].button:focus {
+    background: #3a3a3a;
+    border-color: #ffffff;
+    color: #ffffff;
+}
+
+/* Botones de eliminar: rojo (acción destructiva) */
+.wps-modal .wps-delete-extra,
+.wps-modal .wps-delete-all-extras {
+    background: #2b2b2b;
+    border-color: #ff5c5c;
+    color: #ff5c5c;
+}
+
+.wps-modal .wps-delete-extra:hover,
+.wps-modal .wps-delete-all-extras:hover,
+.wps-modal .wps-delete-extra:focus,
+.wps-modal .wps-delete-all-extras:focus {
+    background: #5a2d2d;
+    border-color: #ff8a8a;
+    color: #ff8a8a;
+}
+
 .wps-diff-output {
     font-family: 'Courier New', Courier, monospace;
     font-size: 13px;
