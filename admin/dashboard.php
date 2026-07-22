@@ -28,13 +28,6 @@ $analysis = get_transient('wps_last_analysis');
     </div>
 
     <?php if ($analysis): ?>
-        <h2 style="color: #6cff5c;">Resultado</h2>
-        <?php if (empty($analysis['errors'])): ?>
-            <p style="color:#6cff5c;">✔ Core verificado correctamente</p>
-        <?php else: ?>
-            <p style="color:#ff5c5c;">⚠ Se detectaron problemas en el core de WordPress</p>
-        <?php endif; ?>
-
         <?php
         // Clasificar errores en modificados / faltantes / extras
         $modificados = [];
@@ -50,6 +43,23 @@ $analysis = get_transient('wps_last_analysis');
                 $extras[] = preg_replace('/^Extra:\s*/', '', $err);
             }
         }
+
+        // Los "problemas del core" son solo modificados/faltantes; los extras
+        // (archivos no reconocidos) se informan por separado.
+        $core_issues = count($modificados) + count($faltantes);
+        ?>
+
+        <h2 style="color: #6cff5c;">Resultado</h2>
+        <?php if ($core_issues > 0): ?>
+            <p style="color:#ff5c5c;">⚠ Se detectaron problemas en el core de WordPress</p>
+        <?php else: ?>
+            <p style="color:#6cff5c;">✔ No se detectaron problemas en el core de WordPress</p>
+        <?php endif; ?>
+        <?php if (!empty($extras)): ?>
+            <p style="color:#ffb84d;">⚠ Se detectaron archivos no reconocidos por WordPress</p>
+        <?php endif; ?>
+
+        <?php
 
         // Pagination for modified/missing files
         if (!empty($modificados) || !empty($faltantes)) {
@@ -161,7 +171,8 @@ $analysis = get_transient('wps_last_analysis');
     <div class="wps-modal">
         <span class="wps-close">&times;</span>
         <h2>Archivos extra detectados</h2>
-        <p>Estos archivos no pertenecen al core oficial.</p>
+        <p>Estos archivos no pertenecen al core oficial de WordPress.</p>
+        <p style="color:#ff9c9c;">⚠ Eliminar un archivo es <strong>irreversible</strong>: se borra de forma permanente y no se puede deshacer.</p>
 
         <?php if (!empty($paged_extras)): ?>
             <div class="tablenav top">
@@ -202,9 +213,13 @@ $analysis = get_transient('wps_last_analysis');
             </div>
             <ul id="wpsExtrasList">
                 <?php foreach ($paged_extras as $file): ?>
-                    <li><code><?php echo esc_html($file); ?></code></li>
+                    <li>
+                        <code class="wps-file-path"><?php echo esc_html($file); ?></code>
+                        <button class="button wps-delete-extra" data-path="<?php echo esc_attr($file); ?>" data-nonce="<?php echo wp_create_nonce('wps_delete_extra'); ?>">Eliminar</button>
+                    </li>
                 <?php endforeach; ?>
             </ul>
+            <button class="button button-secondary wps-delete-all-extras" data-nonce="<?php echo wp_create_nonce('wps_delete_all_extras'); ?>">Eliminar todos los archivos extra</button>
         <?php endif; ?>
         <button class="button button-secondary" id="wps-extras-modal-close">Cerrar</button>
     </div>

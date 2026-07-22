@@ -184,6 +184,88 @@ jQuery(document).ready(function ($) {
         $("#wpsExtrasModal").css('display', 'flex');
     });
 
+    // Eliminar un archivo extra (IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-extra', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const path = button.data('path');
+        if (!confirm(
+            "¿Eliminar este archivo?\n\n" + path + "\n\n" +
+            "⚠ Esta acción es IRREVERSIBLE: el archivo se borra de forma permanente y no se puede deshacer."
+        )) return;
+
+        button.prop('disabled', true).text('Eliminando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_delete_extra',
+                nonce: button.data('nonce'),
+                path: path
+            },
+            timeout: 60000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('li').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Eliminar');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Eliminar');
+            }
+        });
+    });
+
+    // Eliminar TODOS los archivos extra (IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-all-extras', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        if (!confirm(
+            "¿Eliminar TODOS los archivos no reconocidos por WordPress?\n\n" +
+            "⚠ Esta acción es IRREVERSIBLE: los archivos se borran de forma permanente y no se pueden deshacer."
+        )) return;
+
+        button.prop('disabled', true).text('Eliminando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_delete_all_extras',
+                nonce: button.data('nonce')
+            },
+            timeout: 300000,
+            success: function (res) {
+                if (res && res.success) {
+                    let message = "Operación completada.\n\n";
+                    if (res.data.deleted && res.data.deleted.length > 0) {
+                        message += "Eliminados (" + res.data.deleted.length + "):\n" + res.data.deleted.join("\n");
+                    }
+                    const errorKeys = Object.keys(res.data.errors || {});
+                    if (errorKeys.length > 0) {
+                        message += "\n\nCon errores (" + errorKeys.length + "):\n";
+                        errorKeys.forEach(function (file) {
+                            message += file + ": " + res.data.errors[file] + "\n";
+                        });
+                    }
+                    alert(message);
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Eliminar todos los archivos extra');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Eliminar todos los archivos extra');
+            }
+        });
+    });
+
     // Cerrar modales (botón X y botón "Cerrar")
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');

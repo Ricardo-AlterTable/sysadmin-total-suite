@@ -196,6 +196,114 @@ add_action('wp_ajax_wps_restore_all_files', function () {
 });
 
 /**
+ * Devuelve la lista de rutas marcadas como "Extra" en el último análisis.
+ */
+function wps_get_extra_files(): array {
+    $analysis = get_transient('wps_last_analysis');
+    $extras = [];
+    if ($analysis && !empty($analysis['errors']) && is_array($analysis['errors'])) {
+        foreach ($analysis['errors'] as $err) {
+            if (strpos($err, 'Extra:') === 0) {
+                $extras[] = trim(preg_replace('/^Extra:\s*/', '', $err));
+            }
+        }
+    }
+    return $extras;
+}
+
+/**
+ * Elimina de la lista de errores del transient las rutas "Extra" indicadas,
+ * para que la interfaz quede coherente tras un borrado.
+ */
+function wps_remove_extras_from_analysis(array $rels): void {
+    $analysis = get_transient('wps_last_analysis');
+    if (!$analysis || empty($analysis['errors'])) return;
+
+    $analysis['errors'] = array_values(array_filter($analysis['errors'], function ($err) use ($rels) {
+        if (strpos($err, 'Extra:') === 0) {
+            $p = trim(preg_replace('/^Extra:\s*/', '', $err));
+            return !in_array($p, $rels, true);
+        }
+        return true;
+    }));
+
+    set_transient('wps_last_analysis', $analysis, 5 * MINUTE_IN_SECONDS);
+}
+
+/**
+ * Ajax: eliminar un archivo "extra" (no reconocido por el core). IRREVERSIBLE.
+ * Solo se permite borrar rutas que el último análisis marcó como "Extra".
+ */
+add_action('wp_ajax_wps_delete_extra', function () {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+    }
+    check_ajax_referer('wps_delete_extra', 'nonce');
+
+    $rel = isset($_POST['path']) ? sanitize_text_field(wp_unslash($_POST['path'])) : '';
+    if (!$rel || strpos($rel, '..') !== false) {
+        wp_send_json_error(['message' => 'Ruta no válida'], 400);
+    }
+
+    // Salvaguarda: solo se borran ficheros marcados como "Extra" en el análisis.
+    if (!in_array($rel, wps_get_extra_files(), true)) {
+        wp_send_json_error(['message' => 'El archivo no está en la lista de extras del último análisis. Vuelve a analizar.'], 400);
+    }
+
+    $absRoot = wp_normalize_path(realpath(ABSPATH));
+    $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
+    if (!$absFile || strpos($absFile, $absRoot) !== 0 || !is_file($absFile)) {
+        wp_send_json_error(['message' => 'Archivo no encontrado: ' . $rel], 404);
+    }
+
+    if (!@unlink($absFile)) {
+        wp_send_json_error(['message' => 'No se pudo eliminar el archivo. Revisa permisos.'], 500);
+    }
+
+    wps_remove_extras_from_analysis([$rel]);
+    wp_send_json_success(['message' => 'Archivo eliminado: ' . $rel, 'deleted' => $rel]);
+});
+
+/**
+ * Ajax: eliminar TODOS los archivos "extra" del último análisis. IRREVERSIBLE.
+ */
+add_action('wp_ajax_wps_delete_all_extras', function () {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+    }
+    check_ajax_referer('wps_delete_all_extras', 'nonce');
+
+    $extras = wps_get_extra_files();
+    if (empty($extras)) {
+        wp_send_json_error(['message' => 'No hay archivos extra para eliminar.'], 400);
+    }
+
+    $absRoot = wp_normalize_path(realpath(ABSPATH));
+    $deleted = [];
+    $errors  = [];
+
+    foreach ($extras as $rel) {
+        if (!$rel || strpos($rel, '..') !== false) {
+            $errors[$rel] = 'Ruta no válida';
+            continue;
+        }
+        $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
+        if (!$absFile || strpos($absFile, $absRoot) !== 0 || !is_file($absFile)) {
+            $errors[$rel] = 'No encontrado';
+            continue;
+        }
+        if (@unlink($absFile)) {
+            $deleted[] = $rel;
+        } else {
+            $errors[$rel] = 'No se pudo eliminar (permisos)';
+        }
+    }
+
+    wps_remove_extras_from_analysis($deleted);
+    wp_send_json_success(['deleted' => $deleted, 'errors' => $errors]);
+});
+
+/**
  * Descargar el ZIP oficial de WordPress y extraer solo el archivo solicitado.
  *
  * Para instalaciones traducidas (locale != en_US) los builds localizados
