@@ -66,6 +66,12 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         if (!confirm("¿Seguro que deseas restaurar este archivo desde el core original?")) return;
 
+        const doBackup = confirm(
+            "¿Quieres guardar una copia de seguridad del archivo actual antes de sobrescribirlo?\n\n" +
+            "Aceptar = sí, hacer copia\n" +
+            "Cancelar = restaurar sin copia"
+        );
+
         const button = $(this);
         const path = button.data('path');
         button.prop('disabled', true).text('Restaurando...');
@@ -76,12 +82,19 @@ jQuery(document).ready(function ($) {
             data: {
                 action: 'wps_restore_file',
                 nonce: button.data('nonce'),
-                path: path
+                path: path,
+                backup: doBackup ? '1' : '0'
             },
             timeout: 300000, // 5 minutes
             success: function (res) {
                 if (res && res.success) {
-                    alert("Archivo restaurado: " + path);
+                    let msg = "Archivo restaurado: " + path;
+                    if (res.data && res.data.backup) {
+                        msg += "\n\nCopia de seguridad guardada en:\n" + res.data.backup;
+                    } else {
+                        msg += "\n\n(No se creó copia de seguridad)";
+                    }
+                    alert(msg);
                     location.reload();
                 } else {
                     const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar';
@@ -102,7 +115,6 @@ jQuery(document).ready(function ($) {
         if (!confirm("¿Seguro que deseas restaurar TODOS los archivos modificados/faltantes?")) return;
 
         const button = $(this);
-        button.prop('disabled', true).text('Restaurando...');
 
         const files = $('.restore-file').map(function() {
             return $(this).data('path');
@@ -110,9 +122,16 @@ jQuery(document).ready(function ($) {
 
         if (files.length === 0) {
             alert("No hay archivos para restaurar. Si hay archivos marcados como faltantes, es posible que deba corregir el plugin para incluirlos en la restauración masiva.");
-            button.prop('disabled', false).text('Restaurar Todos');
             return;
         }
+
+        const doBackup = confirm(
+            "¿Quieres guardar una copia de seguridad de los archivos actuales antes de sobrescribirlos?\n\n" +
+            "Aceptar = sí, hacer copia\n" +
+            "Cancelar = restaurar sin copia"
+        );
+
+        button.prop('disabled', true).text('Restaurando...');
 
         $.ajax({
             url: WPS_AJAX.ajax_url,
@@ -120,7 +139,8 @@ jQuery(document).ready(function ($) {
             data: {
                 action: 'wps_restore_all_files',
                 nonce: button.data('nonce'),
-                files: files
+                files: files,
+                backup: doBackup ? '1' : '0'
             },
             timeout: 600000, // 10 minutes for all files
             success: function (res) {
@@ -129,7 +149,13 @@ jQuery(document).ready(function ($) {
                     if (res.data.restored && res.data.restored.length > 0) {
                         message += "Archivos restaurados (" + res.data.restored.length + "):\n" + res.data.restored.join("\n");
                     }
-                    
+
+                    if (res.data.backup_dir) {
+                        message += "\n\nCopia de seguridad guardada en:\n" + res.data.backup_dir;
+                    } else {
+                        message += "\n\n(No se creó copia de seguridad)";
+                    }
+
                     const errorKeys = Object.keys(res.data.errors);
                     if (errorKeys.length > 0) {
                         message += "\n\nArchivos con errores ("+ errorKeys.length +"):\n";

@@ -101,13 +101,18 @@ add_action('wp_ajax_wps_restore_file', function () {
         wp_send_json_error(['message' => 'No se pudo obtener el archivo original.', 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
     }
 
-    // === Backup en carpeta raíz ===
-    $backup_root = ABSPATH . 'backup_wp-profiler-security/' . time() . '/';
-    $backup_path = $backup_root . $rel;
-    wp_mkdir_p(dirname($backup_path));
+    // === Copia de seguridad opcional (a petición del usuario) ===
+    $do_backup  = isset($_POST['backup']) && $_POST['backup'] === '1';
+    $backup_rel = null;
 
-    if (is_file($absFile)) {
-        @copy($absFile, $backup_path);
+    if ($do_backup && is_file($absFile)) {
+        $backup_rel  = 'backup_wp-profiler-security/' . time() . '/' . $rel;
+        $backup_path = ABSPATH . $backup_rel;
+        wp_mkdir_p(dirname($backup_path));
+        if (!@copy($absFile, $backup_path)) {
+            // Si se pidió copia y no se puede crear, abortamos sin sobrescribir.
+            wp_send_json_error(['message' => 'No se pudo crear la copia de seguridad. Revisa permisos; el archivo NO se ha restaurado.'], 500);
+        }
     }
 
     // Restaurar
@@ -116,7 +121,10 @@ add_action('wp_ajax_wps_restore_file', function () {
         wp_send_json_error(['message' => 'No se pudo escribir el archivo local. Revisa permisos.'], 500);
     }
 
-    wp_send_json_success(['message' => 'Archivo restaurado correctamente: ' . $rel, 'backup' => $backup_path]);
+    wp_send_json_success([
+        'message' => 'Archivo restaurado correctamente: ' . $rel,
+        'backup'  => $backup_rel, // ruta relativa a la raíz de WordPress, o null si no se pidió copia
+    ]);
 });
 
 /**
@@ -139,8 +147,10 @@ add_action('wp_ajax_wps_restore_all_files', function () {
     $restored = [];
     $errors = [];
 
-    // Crear carpeta de backups por lote
-    $batch_root = ABSPATH . 'backup_wp-profiler-security/' . time() . '/';
+    // Copia de seguridad opcional: una carpeta por lote.
+    $do_backup  = isset($_POST['backup']) && $_POST['backup'] === '1';
+    $batch_rel  = 'backup_wp-profiler-security/' . time() . '/';
+    $batch_root = ABSPATH . $batch_rel;
 
     foreach ($files as $rel) {
         if (!$rel || strpos($rel, '..') !== false) {
@@ -159,11 +169,14 @@ add_action('wp_ajax_wps_restore_all_files', function () {
             continue;
         }
 
-        // Backup
-        $backup_path = $batch_root . $rel;
-        wp_mkdir_p(dirname($backup_path));
-        if (is_file($absFile)) {
-            @copy($absFile, $backup_path);
+        // Copia de seguridad (solo si se pidió).
+        if ($do_backup && is_file($absFile)) {
+            $backup_path = $batch_root . $rel;
+            wp_mkdir_p(dirname($backup_path));
+            if (!@copy($absFile, $backup_path)) {
+                $errors[$rel] = 'No se pudo crear la copia de seguridad; no se restauró';
+                continue;
+            }
         }
 
         // Restaurar
@@ -175,7 +188,11 @@ add_action('wp_ajax_wps_restore_all_files', function () {
         $restored[] = $rel;
     }
 
-    wp_send_json_success(['restored' => $restored, 'errors' => $errors]);
+    wp_send_json_success([
+        'restored'   => $restored,
+        'errors'     => $errors,
+        'backup_dir' => ($do_backup && !empty($restored)) ? $batch_rel : null,
+    ]);
 });
 
 /**
