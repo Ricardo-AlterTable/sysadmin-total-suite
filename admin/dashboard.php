@@ -210,67 +210,13 @@ $analysis = get_transient('wps_last_analysis');
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const diffModal = document.getElementById('wpsDiffModal');
-    const extrasModal = document.getElementById('wpsExtrasModal');
-
-    // Function to close modals
-    function closeModal(modal) {
-        if (modal) {
-            modal.style.display = 'none';
-        }
+// Los clics de diff / restaurar / cerrar los gestiona admin.js.
+// Aquí solo abrimos el modal de extras automáticamente cuando venimos de su paginación.
+document.addEventListener('DOMContentLoaded', function () {
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('open_extras_modal') === 'true') {
+        var extrasModal = document.getElementById('wpsExtrasModal');
+        if (extrasModal) extrasModal.style.display = 'flex';
     }
-
-    // Close buttons
-    const closeButtons = document.querySelectorAll('.wps-close');
-    closeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            closeModal(this.closest('.wps-modal-overlay'));
-        });
-    });
-    
-    // Show diff modal
-    const showDiffButtons = document.querySelectorAll('.show-diff');
-    showDiffButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const path = this.dataset.path;
-            // AJAX call to get diff
-            // ... (existing logic)
-            if(diffModal) diffModal.style.display = 'block';
-        });
-    });
-
-    // Extras modal
-    if (extrasModal) {
-        const viewExtrasButton = document.querySelector('.view-extras');
-        const closeExtrasModalButton = document.getElementById('wps-extras-modal-close');
-
-        function openExtrasModal() {
-            extrasModal.style.display = 'block';
-        }
-
-        if (viewExtrasButton) {
-            viewExtrasButton.addEventListener('click', openExtrasModal);
-        }
-
-        if (closeExtrasModalButton) {
-            closeExtrasModalButton.addEventListener('click', function() {
-                closeModal(extrasModal);
-            });
-        }
-        
-        // Open modal if query param is set
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('open_extras_modal') === 'true') {
-            openExtrasModal();
-        }
-    }
-
-    // Close modal on overlay click
-    window.addEventListener('click', function(event) {
-        if (event.target.classList.contains('wps-modal-overlay')) {
-            closeModal(event.target);
-        }
-    });
 });
 </script>

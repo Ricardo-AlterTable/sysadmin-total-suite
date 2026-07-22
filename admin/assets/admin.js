@@ -22,7 +22,7 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         const path = $(this).data('path');
         $("#wpsDiffContent").html("<em>Cargando diff...</em>");
-        $("#wpsDiffModal").fadeIn();
+        $("#wpsDiffModal").css('display', 'flex');
 
         $.ajax({
             url: WPS_AJAX.ajax_url,
@@ -62,7 +62,7 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             data: {
                 action: 'wps_restore_file',
-                nonce: WPS_AJAX.nonce,
+                nonce: button.data('nonce'),
                 path: path
             },
             timeout: 300000, // 5 minutes
@@ -107,7 +107,7 @@ jQuery(document).ready(function ($) {
             type: 'POST',
             data: {
                 action: 'wps_restore_all_files',
-                nonce: WPS_AJAX.nonce,
+                nonce: button.data('nonce'),
                 files: files
             },
             timeout: 600000, // 10 minutes for all files
@@ -144,11 +144,18 @@ jQuery(document).ready(function ($) {
     // Ver extras
     $(document).on('click', '.view-extras', function (e) {
         e.preventDefault();
-        $("#wpsExtrasModal").fadeIn();
+        $("#wpsExtrasModal").css('display', 'flex');
     });
 
-    // Cerrar modales
-    $(document).on('click', '.wps-close', function () {
-        $(this).closest('.wps-modal-content').parent().fadeOut();
+    // Cerrar modales (botón X y botón "Cerrar")
+    $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
+        $(this).closest('.wps-modal-overlay').css('display', 'none');
+    });
+
+    // Cerrar al hacer clic en el fondo del overlay
+    $(document).on('click', '.wps-modal-overlay', function (e) {
+        if (e.target === this) {
+            $(this).css('display', 'none');
+        }
     });
 });

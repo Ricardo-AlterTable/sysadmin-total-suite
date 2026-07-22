@@ -36,12 +36,15 @@ if (empty($history)) {
 
 $last = end($history);
 
+$sql_time_ms  = isset($last['sql_time']) && $last['sql_time'] !== null ? round($last['sql_time'] * 1000, 2) : null;
+$http_time_ms = round(($last['http_time'] ?? 0) * 1000, 2);
+
 $profile_data = [
     'Core'     => round($last['core']*1000, 2),
     'Plugins'  => round($last['plugins']*1000, 2),
     'Tema'     => round($last['theme']*1000, 2),
-    'MySQL'    => round($last['sql_time']*1000, 2),
-    'Externas' => 0,
+    'MySQL'    => $sql_time_ms ?? 0,
+    'Externas' => $http_time_ms,
     'Total'    => round($last['total']*1000, 2),
 ];
 
@@ -72,7 +75,14 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
 
     <ul>
         <?php foreach ($profile_data as $k => $v): ?>
-            <li><strong><?php echo esc_html($k); ?>:</strong> <?php echo $v; ?> ms</li>
+            <li>
+                <strong><?php echo esc_html($k); ?>:</strong>
+                <?php if ($k === 'MySQL' && $sql_time_ms === null): ?>
+                    N/A <em>(activa <code>define('SAVEQUERIES', true);</code> en wp-config.php para medir el tiempo SQL)</em>
+                <?php else: ?>
+                    <?php echo esc_html($v); ?> ms
+                <?php endif; ?>
+            </li>
         <?php endforeach; ?>
         <li><strong>Consultas SQL:</strong> <?php echo intval($last['sql_count']); ?></li>
         <li><strong>Llamadas HTTP:</strong> <?php echo intval($last['http_count']); ?></li>
