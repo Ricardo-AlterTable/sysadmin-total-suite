@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 1.6
+ * Version: 1.7
  * Author: Tu Nombre
  */
 
@@ -13,6 +13,20 @@ define('WPS_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 require_once WPS_PLUGIN_DIR . 'includes/diff.php';
 require_once WPS_PLUGIN_DIR . 'includes/profiler.php';
+
+/**
+ * Indica si una ruta relativa pertenece realmente al core de WordPress.
+ * Solo wp-admin/, wp-includes/ y los ficheros sueltos de la raíz forman parte
+ * del ZIP oficial. wp-content/ (temas y plugins) queda fuera: no se puede
+ * verificar contra los checksums del core ni restaurar desde él.
+ */
+function wps_is_core_path($rel) {
+    $rel = ltrim(str_replace('\\', '/', $rel), '/');
+    if (strpos($rel, 'wp-admin/') === 0) return true;
+    if (strpos($rel, 'wp-includes/') === 0) return true;
+    if (strpos($rel, '/') === false) return true; // fichero suelto en la raíz
+    return false;
+}
 
 // =============================
 // Menús del admin
@@ -53,8 +67,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.6');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.6', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '1.7');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '1.7', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -87,14 +101,11 @@ add_action('admin_post_wps_run_analysis', function () {
     }
     check_admin_referer('wps_run_analysis_nonce');
 
-    // Define files to exclude from the analysis
+    // Ficheros de la raíz que no forman parte del core y no deben marcarse como "Extra".
     $excluded_files = [
-        'wp-content/themes/twentytwentyfive/style.min.css',
-        'wp-content/themes/twentytwentytwo/style.min.css',
-        'wp-content/themes/twentytwentythree/readme.txt',
-        'wp-content/themes/twentytwentythree/style.css',
-        'wp-content/plugins/hello.php',
         'wp-config.php',
+        '.htaccess',
+        'robots.txt',
     ];
 
     global $wpdb;
@@ -118,8 +129,11 @@ add_action('admin_post_wps_run_analysis', function () {
         if (isset($data['checksums']) && is_array($data['checksums'])) {
             $checksums = $data['checksums'];
 
+            // Verificar solo los ficheros que pertenecen de verdad al core
+            // (wp-admin/, wp-includes/ y ficheros sueltos de la raíz). Los archivos
+            // de wp-content/ no están en el ZIP del core, así que se ignoran.
             foreach ($checksums as $file => $md5) {
-                if (in_array($file, $excluded_files)) {
+                if (!wps_is_core_path($file) || in_array($file, $excluded_files, true)) {
                     continue;
                 }
                 $path = ABSPATH . $file;
@@ -134,21 +148,30 @@ add_action('admin_post_wps_run_analysis', function () {
                 }
             }
 
-            $core_dirs = ['wp-admin', 'wp-includes', ''];
-            foreach ($core_dirs as $dir) {
+            // Detección de "Extra": wp-admin y wp-includes se recorren completos;
+            // la raíz solo a primer nivel (sin entrar en wp-content ni en uploads).
+            foreach (['wp-admin', 'wp-includes'] as $dir) {
                 $base = ABSPATH . $dir;
                 if (!is_dir($base)) continue;
                 $iterator = new RecursiveIteratorIterator(
                     new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS)
                 );
                 foreach ($iterator as $fileinfo) {
+                    if (!$fileinfo->isFile()) continue;
                     $rel = str_replace('\\', '/', str_replace(ABSPATH, '', $fileinfo->getPathname()));
-                    if (in_array($rel, $excluded_files)) {
-                        continue;
-                    }
+                    if (in_array($rel, $excluded_files, true)) continue;
                     if (!isset($checksums[$rel])) {
                         $errors[] = "Extra: $rel";
                     }
+                }
+            }
+
+            foreach (new DirectoryIterator(ABSPATH) as $fileinfo) {
+                if (!$fileinfo->isFile()) continue;
+                $rel = $fileinfo->getFilename();
+                if (in_array($rel, $excluded_files, true)) continue;
+                if (!isset($checksums[$rel])) {
+                    $errors[] = "Extra: $rel";
                 }
             }
 

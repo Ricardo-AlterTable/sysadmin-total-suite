@@ -3,6 +3,20 @@ jQuery(document).ready(function ($) {
         console.warn('WPS_AJAX no definido. Asegúrate de que wp_localize_script() se ejecutó.');
     }
 
+    // Extraer el mensaje de error real del servidor.
+    // wp_send_json_error() responde con códigos 4xx/5xx, así que jQuery entra en
+    // el callback "error" y el cuerpo JSON queda en jqXHR.responseJSON.
+    function serverErrorMessage(jqXHR, textStatus) {
+        if (textStatus === 'timeout') {
+            return "La operación ha superado el tiempo de espera.";
+        }
+        const data = jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.data;
+        if (data && data.message) {
+            return data.message + (data.details ? " (" + data.details + ")" : "");
+        }
+        return "Error de comunicación con el servidor.";
+    }
+
     // Función para colorear diff
     function formatDiff(text) {
         if (!text) return '';
@@ -42,8 +56,7 @@ jQuery(document).ready(function ($) {
                 }
             },
             error: function (jqXHR, textStatus) {
-                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
-                $("#wpsDiffContent").text(errorMsg);
+                $("#wpsDiffContent").text("Error: " + serverErrorMessage(jqXHR, textStatus));
             }
         });
     });
@@ -77,8 +90,7 @@ jQuery(document).ready(function ($) {
                 }
             },
             error: function (jqXHR, textStatus) {
-                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
-                alert(errorMsg);
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
                 button.prop('disabled', false).text('Restaurar');
             }
         });
@@ -134,8 +146,7 @@ jQuery(document).ready(function ($) {
                 }
             },
             error: function (jqXHR, textStatus) {
-                const errorMsg = textStatus === 'timeout' ? "Error: La operación ha superado el tiempo de espera." : "Error de comunicación con el servidor.";
-                alert(errorMsg);
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
                 button.prop('disabled', false).text('Restaurar Todos');
             }
         });

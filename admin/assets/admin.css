@@ -110,37 +110,17 @@ body {
 /* ============================= */
 /* Terminal style modal diff     */
 /* ============================= */
+/* El overlay hereda posición/centrado de .wps-modal-overlay; aquí solo
+   ajustamos el fondo. La visibilidad la controla el JS (display:flex/none). */
 #wpsDiffModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.85) !important;
-    display: none;
-    align-items: center;
-    justify-content: center;
+    background: rgba(0, 0, 0, 0.85);
     z-index: 200001;
-    display: flex;
 }
 
-#wpsDiffModal .wps-modal-content {
-    background: #1e1e1e !important;
-    color: #f2f2f2 !important;
-    padding: 15px;
-    border-radius: 8px;
-    max-width: 90%;
-    max-height: 80vh;
+#wpsDiffModal .wps-modal {
+    background: #1e1e1e;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.7);
-    border: 1px solid #444;
-}
-
-#wpsDiffModal .wps-modal-content h2 {
-    color: #6cff5c !important; /* Green accent color */
-    margin-top: 0;
-    margin-bottom: 10px;
 }
 
 #wpsDiffContent {
