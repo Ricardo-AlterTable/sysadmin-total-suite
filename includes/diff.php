@@ -54,8 +54,10 @@ add_action('wp_ajax_wps_show_diff', function () {
         wp_send_json_error(['message' => 'No se pudo leer el archivo actual: ' . $rel], 500);
     }
 
-    $version = get_transient('wps_last_analysis')['version'] ?? get_bloginfo('version');
-    $fetch = wps_fetch_core_file_from_zip($version, $rel);
+    $analysis = get_transient('wps_last_analysis');
+    $version  = $analysis['version'] ?? get_bloginfo('version');
+    $locale   = $analysis['locale'] ?? get_locale();
+    $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
 
     if (!is_array($fetch) || empty($fetch['body'])) {
         wp_send_json_error(['message' => 'No se pudo obtener el archivo original.', 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
@@ -91,8 +93,10 @@ add_action('wp_ajax_wps_restore_file', function () {
         wp_send_json_error(['message' => 'Archivo fuera del sitio: ' . $rel], 403);
     }
 
-    $version = get_transient('wps_last_analysis')['version'] ?? get_bloginfo('version');
-    $fetch = wps_fetch_core_file_from_zip($version, $rel);
+    $analysis = get_transient('wps_last_analysis');
+    $version  = $analysis['version'] ?? get_bloginfo('version');
+    $locale   = $analysis['locale'] ?? get_locale();
+    $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
     if (!is_array($fetch) || empty($fetch['body'])) {
         wp_send_json_error(['message' => 'No se pudo obtener el archivo original.', 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
     }
@@ -129,7 +133,9 @@ add_action('wp_ajax_wps_restore_all_files', function () {
         wp_send_json_error(['message' => 'No se especificaron archivos a restaurar.'], 400);
     }
 
-    $version = get_transient('wps_last_analysis')['version'] ?? get_bloginfo('version');
+    $analysis = get_transient('wps_last_analysis');
+    $version  = $analysis['version'] ?? get_bloginfo('version');
+    $locale   = $analysis['locale'] ?? get_locale();
     $restored = [];
     $errors = [];
 
@@ -147,7 +153,7 @@ add_action('wp_ajax_wps_restore_all_files', function () {
             $errors[$rel] = 'Archivo fuera del sitio';
             continue;
         }
-        $fetch = wps_fetch_core_file_from_zip($version, $rel);
+        $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
         if (!is_array($fetch) || empty($fetch['body'])) {
             $errors[$rel] = 'No se pudo obtener original: ' . ($GLOBALS['wps_fetch_last_error'] ?? '');
             continue;
@@ -173,59 +179,73 @@ add_action('wp_ajax_wps_restore_all_files', function () {
 });
 
 /**
- * Descargar ZIP oficial y extraer solo el archivo solicitado
+ * Descargar el ZIP oficial de WordPress y extraer solo el archivo solicitado.
+ *
+ * Para instalaciones traducidas (locale != en_US) los builds localizados
+ * modifican algunos ficheros del core (p. ej. version.php lleva
+ * $wp_local_package). Por eso se prueba primero el paquete del idioma —que es
+ * coherente con los checksums usados en el análisis— y, si falla, se recurre
+ * al paquete internacional.
  */
-function wps_fetch_core_file_from_zip(string $version, string $relative_path): ?array {
+function wps_fetch_core_file_from_zip(string $version, string $relative_path, string $locale = ''): ?array {
     global $wps_fetch_last_error;
     $wps_fetch_last_error = '';
 
-    // Sanitize version to prevent security issues
+    // Saneado de entradas.
     $version = preg_replace('/[^0-9.]/', '', $version);
+    $locale  = preg_replace('/[^a-zA-Z_]/', '', $locale ?: get_locale());
     $relative_path = ltrim($relative_path, '/');
-
-    $upload_dir = wp_upload_dir();
-    $cache_dir = $upload_dir['basedir'] . '/wp-profiler-security-cache/';
-    wp_mkdir_p($cache_dir);
-    $zip_path = $cache_dir . "wordpress-{$version}.zip";
-    $zip_url = "https://downloads.wordpress.org/release/wordpress-{$version}.zip";
-
-    // Download the zip file if it's not cached
-    if (!file_exists($zip_path)) {
-        $res = wp_remote_get($zip_url, ['timeout' => 120, 'stream' => true, 'filename' => $zip_path]);
-        if (is_wp_error($res) || wp_remote_retrieve_response_code($res) !== 200) {
-            $wps_fetch_last_error = 'No se pudo descargar ZIP oficial: ' . (is_wp_error($res) ? $res->get_error_message() : wp_remote_retrieve_response_code($res));
-            if (file_exists($zip_path)) {
-                @unlink($zip_path);
-            }
-            return null;
-        }
-    }
 
     if (!class_exists('ZipArchive')) {
         $wps_fetch_last_error = 'La clase ZipArchive no está disponible en tu versión de PHP.';
         return null;
     }
 
-    $zip = new ZipArchive();
-    if ($zip->open($zip_path) !== true) {
-        $wps_fetch_last_error = 'No se pudo abrir el archivo ZIP cacheado.';
-        // If the cached file is corrupt, delete it and try again once.
-        @unlink($zip_path);
-        return null;
-    }
-    
-    $content = false;
-    $internal = 'wordpress/' . $relative_path;
-    $content = $zip->getFromName($internal);
-    if ($content === false) {
-        $content = $zip->getFromName($relative_path); // Fallback for root files
-    }
-    $zip->close();
+    $upload_dir = wp_upload_dir();
+    $cache_dir  = trailingslashit($upload_dir['basedir']) . 'wp-profiler-security-cache/';
+    wp_mkdir_p($cache_dir);
 
-    if ($content === false) {
-        $wps_fetch_last_error = "Archivo {$relative_path} no encontrado dentro del ZIP.";
-        return null;
+    // Lista de ZIP a intentar en orden de preferencia.
+    $urls = [];
+    if ($locale && strpos($locale, 'en_US') !== 0) {
+        $sub = strtolower(substr($locale, 0, 2)); // es_ES -> es, fr_FR -> fr, ...
+        $urls[] = "https://{$sub}.wordpress.org/wordpress-{$version}-{$locale}.zip";
+    }
+    $urls[] = "https://downloads.wordpress.org/release/wordpress-{$version}.zip";
+
+    $errors = [];
+    foreach ($urls as $zip_url) {
+        // Nombre de caché único por URL (localizado e internacional no colisionan).
+        $zip_path = $cache_dir . 'wps-' . md5($zip_url) . '.zip';
+
+        if (!file_exists($zip_path) || filesize($zip_path) === 0) {
+            $res = wp_remote_get($zip_url, ['timeout' => 120, 'stream' => true, 'filename' => $zip_path]);
+            if (is_wp_error($res) || wp_remote_retrieve_response_code($res) !== 200) {
+                $errors[] = basename($zip_url) . ': ' . (is_wp_error($res) ? $res->get_error_message() : wp_remote_retrieve_response_code($res));
+                if (file_exists($zip_path)) @unlink($zip_path);
+                continue;
+            }
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($zip_path) !== true) {
+            $errors[] = basename($zip_url) . ': ZIP corrupto';
+            @unlink($zip_path);
+            continue;
+        }
+
+        $content = $zip->getFromName('wordpress/' . $relative_path);
+        if ($content === false) {
+            $content = $zip->getFromName($relative_path); // Fallback para ficheros de la raíz.
+        }
+        $zip->close();
+
+        if ($content !== false) {
+            return ['body' => $content, 'url' => $zip_url];
+        }
+        $errors[] = basename($zip_url) . ": no contiene {$relative_path}";
     }
 
-    return ['body' => $content, 'url' => $zip_url];
+    $wps_fetch_last_error = 'No se pudo obtener el archivo original. ' . implode(' | ', $errors);
+    return null;
 }

@@ -5,6 +5,119 @@ body {
     font-family: 'Courier New', Courier, monospace;
 }
 
+/* ============================================================= */
+/* Legibilidad: forzar contraste del texto de WordPress sobre    */
+/* el fondo oscuro (solo se carga en las páginas del plugin).    */
+/* ============================================================= */
+.wrap,
+.wrap p,
+.wrap li,
+.wrap ul,
+.wrap td,
+.wrap th,
+.wrap label,
+.wrap span,
+.wrap strong,
+.wrap dt,
+.wrap dd {
+    color: #f2f2f2;
+}
+
+.wrap h1,
+.wrap h2,
+.wrap h3,
+.wrap h4 {
+    color: #6cff5c;
+}
+
+.wrap em {
+    color: #cfcfcf;
+}
+
+.wrap a:not(.button):not(.button-primary):not(.button-secondary) {
+    color: #7db9ff;
+}
+
+.wrap code,
+.wrap .wps-file-path {
+    background: #2b2b2b;
+    color: #ffd479;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+/* Botones con estética coherente y texto legible */
+.wrap .button,
+.wrap .button-secondary {
+    background: #2b2b2b;
+    border-color: #6cff5c;
+    color: #6cff5c;
+    text-shadow: none;
+}
+
+.wrap .button:hover,
+.wrap .button-secondary:hover,
+.wrap .button:focus,
+.wrap .button-secondary:focus {
+    background: #333;
+    border-color: #8affff;
+    color: #8affff;
+}
+
+.wrap .button-primary {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+}
+
+.wrap .button-primary:hover,
+.wrap .button-primary:focus {
+    background: #135e96;
+    border-color: #135e96;
+    color: #fff;
+}
+
+/* Controles de formulario (select de paginación, etc.) */
+.wrap select,
+.wrap input[type="text"],
+.wrap input[type="search"] {
+    background: #2b2b2b;
+    color: #f2f2f2;
+    border: 1px solid #555;
+}
+
+/* Paginación y cabeceras de tabla */
+.wrap .tablenav,
+.wrap .tablenav .displaying-num,
+.wrap .tablenav-pages,
+.wrap .tablenav-pages .tablenav-pages-navspan {
+    color: #cfcfcf;
+}
+
+.wrap .tablenav-pages a.page-numbers,
+.wrap .tablenav-pages span.page-numbers {
+    background: #2b2b2b;
+    border: 1px solid #444;
+    color: #f2f2f2 !important;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+.wrap .tablenav-pages a.page-numbers:hover {
+    background: #3a3a3a;
+    border-color: #6cff5c;
+}
+
+/* Pie del admin (queda oscuro sobre oscuro por defecto) */
+#wpfooter,
+#wpfooter p,
+#footer-left,
+#footer-upgrade,
+#footer-left a,
+#footer-upgrade a {
+    color: #cfcfcf !important;
+}
+
 /* Modal overlay & dialog */
 .wps-modal-overlay {
     position: fixed;
