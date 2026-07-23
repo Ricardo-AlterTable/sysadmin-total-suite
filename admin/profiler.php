@@ -11,9 +11,11 @@ if (empty($history)) {
         <input type="hidden" name="action" value="wps_reset_profiling">
         <button type="submit" class="button button-secondary">Reset histórico</button>
     </form>
-    <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
-    <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
-    <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+    <div class="wps-actions">
+        <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
+        <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
+        <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+    </div>
 
     <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -64,9 +66,11 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
         <button type="submit" class="button button-secondary">Reset histórico</button>
     </form>
 
-    <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
-    <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
-    <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+    <div class="wps-actions">
+        <button id="wpsRunTest" class="button button-primary">Lanzar prueba</button>
+        <span id="wpsSpinner" style="display:none;margin-left:10px;">⏳ Ejecutando prueba...</span>
+        <iframe id="wpsTestFrame" style="display:none;width:1px;height:1px;"></iframe>
+    </div>
 
     <h2>Última medición</h2>
     <div class="wps-chart-container">
