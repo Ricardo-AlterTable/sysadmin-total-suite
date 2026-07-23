@@ -3,7 +3,10 @@
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
  * Version: 2.7
- * Author: Tu Nombre
+ * Author: Ricardo Morales
+ * Author URI: https://github.com/Ricardo-AlterTable
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
 
 if (!defined('ABSPATH')) exit;
