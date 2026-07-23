@@ -6,6 +6,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 2. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
 3. **Comprobar usuarios WP** — lista los usuarios (nombre, alta, rol) y permite eliminarlos con doble confirmación.
 4. **Tunning** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
+5. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
 
 > ⚠️ Herramienta de administración. Todas las acciones requieren capacidades de administrador y están protegidas con nonces. Varias operaciones son **destructivas** (borrado de usuarios, archivos extra y tareas cron); úsalas con conocimiento de causa.
 
@@ -40,6 +41,12 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **WP-Cron**: modo (interno vs `DISABLE_WP_CRON`), tareas programadas, **atrasadas** y **huérfanas** (de plugins retirados), con limpieza segura (solo hooks sin acción registrada).
 - **Caché**: detecta plugins de caché conocidos y el estado real de **LiteSpeed** (caché a nivel de servidor), además de caché de página (PHP) y de objetos.
 - **Versiones del entorno**: PHP, MySQL/MariaDB (cadena real del servidor) y WordPress.
+
+### 🤖 Bloqueo de bots de IA
+- **Opt-out en `robots.txt`** (vía filtro `robots_txt`) para los rastreadores de IA que lo respetan: GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended, Applebot-Extended, Amazonbot, Bytespider, Meta, etc.
+- **Bloqueo real por User-Agent (403)** en el front para forzar el bloqueo de los que ignoran `robots.txt`.
+- Cabecera `X-Robots-Tag: noai, noimageai` como señal adicional de opt-out.
+- Interruptores independientes (robots.txt / 403), lista de bots cubiertos y avisos (UA falsificable, `robots.txt` físico, compatibilidad con caché de página).
 
 ---
 
@@ -98,11 +105,13 @@ includes/
   profiler.php             # Medición de tiempos y guardado del histórico
   users.php                # AJAX: eliminar usuario
   tunning.php              # Helpers de rendimiento + AJAX: limpiar transitorios / cron
+  aibots.php               # robots.txt + bloqueo 403 por User-Agent de bots de IA
 admin/
   dashboard.php            # Página Integridad
   profiler.php             # Página Profiling (gráficas)
   users.php                # Página Comprobar usuarios WP
   tunning.php              # Página Tunning
+  aibots.php               # Página Bloqueo de bots de IA
   assets/
     admin.css              # Tema del panel (paleta en variables CSS)
     admin.js               # Lógica de UI (AJAX, modales, confirmaciones)
@@ -122,6 +131,7 @@ El tema visual está centralizado en variables CSS al inicio de `admin/assets/ad
 
 ## Changelog
 
+- **2.8** — Nueva sección **Bloqueo de bots de IA** (robots.txt + 403 por User-Agent).
 - **2.6 – 2.7** — Rediseño completo de la interfaz a panel moderno (estética terminal conservada solo en el diff); ajustes de espaciado.
 - **2.5** — Detección de la caché de LiteSpeed a nivel de servidor.
 - **2.4** — Comprobación y limpieza de WP-Cron (tareas huérfanas) en Tunning.

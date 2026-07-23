@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 2.7
+ * Version: 2.8
  * Author: Ricardo Morales
  * Author URI: https://github.com/Ricardo-AlterTable
  * License: GPLv2 or later
@@ -18,6 +18,7 @@ require_once WPS_PLUGIN_DIR . 'includes/diff.php';
 require_once WPS_PLUGIN_DIR . 'includes/profiler.php';
 require_once WPS_PLUGIN_DIR . 'includes/users.php';
 require_once WPS_PLUGIN_DIR . 'includes/tunning.php';
+require_once WPS_PLUGIN_DIR . 'includes/aibots.php';
 
 /**
  * Indica si una ruta relativa pertenece realmente al core de WordPress.
@@ -82,6 +83,15 @@ add_action('admin_menu', function () {
         'wp-profiler-tunning',
         'wps_profiler_tunning_page'
     );
+
+    add_submenu_page(
+        'wp-profiler-security',
+        'Bloqueo bots IA',
+        'Bloqueo bots IA',
+        'manage_options',
+        'wp-profiler-aibots',
+        'wps_profiler_aibots_page'
+    );
 });
 
 // =============================
@@ -90,8 +100,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.7');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.7', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.8');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.8', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -121,6 +131,10 @@ function wps_profiler_users_page() {
 
 function wps_profiler_tunning_page() {
     include WPS_PLUGIN_DIR . 'admin/tunning.php';
+}
+
+function wps_profiler_aibots_page() {
+    include WPS_PLUGIN_DIR . 'admin/aibots.php';
 }
 
 // =============================
