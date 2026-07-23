@@ -240,8 +240,9 @@ body {
     vertical-align: middle;
 }
 
-/* Tabla de usuarios (sección Comprobar usuarios WP) */
-.wps-users-table {
+/* Tablas oscuras (usuarios y tunning) */
+.wps-users-table,
+.wps-tunning-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
@@ -250,7 +251,9 @@ body {
 }
 
 .wps-users-table th,
-.wps-users-table td {
+.wps-users-table td,
+.wps-tunning-table th,
+.wps-tunning-table td {
     text-align: left;
     padding: 10px 12px;
     border-bottom: 1px solid #3a3a3a;
@@ -258,19 +261,53 @@ body {
     vertical-align: middle;
 }
 
-.wps-users-table thead th {
+.wps-users-table thead th,
+.wps-tunning-table thead th {
     background: #2b2b2b;
     color: #6cff5c;
     border-bottom: 2px solid #444;
 }
 
-.wps-users-table tbody tr:nth-child(even) {
+.wps-users-table tbody tr:nth-child(even),
+.wps-tunning-table tbody tr:nth-child(even) {
     background: #262626;
 }
 
-.wps-users-table tbody tr:hover {
+.wps-users-table tbody tr:hover,
+.wps-tunning-table tbody tr:hover {
     background: #2f2f2f;
 }
+
+/* Secciones y badges de Tunning */
+.wps-tunning-section {
+    margin: 20px 0;
+    padding: 15px 18px;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+.wps-tunning-section h2 {
+    margin-top: 0;
+    color: #6cff5c;
+}
+
+.wps-kv {
+    margin: 6px 0;
+}
+
+.wps-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 6px;
+}
+
+.wps-badge.ok   { background: #2e4e2e; color: #6cff5c; }
+.wps-badge.warn { background: #4e442e; color: #ffcf5c; }
+.wps-badge.bad  { background: #5a2d2d; color: #ff8a8a; }
 
 .wps-user-login {
     color: #9aa7b3;

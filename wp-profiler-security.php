@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 2.2
+ * Version: 2.3
  * Author: Tu Nombre
  */
 
@@ -14,6 +14,7 @@ define('WPS_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once WPS_PLUGIN_DIR . 'includes/diff.php';
 require_once WPS_PLUGIN_DIR . 'includes/profiler.php';
 require_once WPS_PLUGIN_DIR . 'includes/users.php';
+require_once WPS_PLUGIN_DIR . 'includes/tunning.php';
 
 /**
  * Indica si una ruta relativa pertenece realmente al core de WordPress.
@@ -69,6 +70,15 @@ add_action('admin_menu', function () {
         'wp-profiler-users',
         'wps_profiler_users_page'
     );
+
+    add_submenu_page(
+        'wp-profiler-security',
+        'Tunning',
+        'Tunning',
+        'manage_options',
+        'wp-profiler-tunning',
+        'wps_profiler_tunning_page'
+    );
 });
 
 // =============================
@@ -77,8 +87,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.2');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.2', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '2.3');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '2.3', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -104,6 +114,10 @@ function wps_profiler_profiling_page() {
 
 function wps_profiler_users_page() {
     include WPS_PLUGIN_DIR . 'admin/users.php';
+}
+
+function wps_profiler_tunning_page() {
+    include WPS_PLUGIN_DIR . 'admin/tunning.php';
 }
 
 // =============================

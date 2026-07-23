@@ -312,6 +312,38 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Tunning: limpiar transitorios caducados
+    $(document).on('click', '.wps-clean-transients', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        if (!confirm("¿Limpiar los transitorios caducados?\n\nEs una operación segura: son datos temporales caducados y WordPress los regenera cuando los necesite.")) return;
+
+        button.prop('disabled', true).text('Limpiando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_clean_transients',
+                nonce: button.data('nonce')
+            },
+            timeout: 120000,
+            success: function (res) {
+                if (res && res.success) {
+                    alert("Transitorios caducados eliminados: " + (res.data.removed || 0));
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo limpiar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Limpiar transitorios caducados');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Limpiar transitorios caducados');
+            }
+        });
+    });
+
     // Cerrar modales (botón X y botón "Cerrar")
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');
