@@ -170,9 +170,9 @@ body {
     text-shadow: none;
     transition: transform .08s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
-.wrap .button:hover,
+.wrap .button:not(.button-primary):hover,
 .wrap .button-secondary:hover,
-.wps-modal .button:hover {
+.wps-modal .button:not(.button-primary):hover {
     background: rgba(255, 255, 255, 0.12);
     border-color: var(--wps-primary-2);
     color: #fff;
@@ -192,9 +192,10 @@ body {
 }
 .wrap .button-primary:hover,
 .wrap .button-primary:focus {
-    color: #0b0f1e;
+    background: linear-gradient(135deg, #8f74ff 0%, #4fe3f6 100%);
+    color: #06121f;
     transform: translateY(-1px);
-    box-shadow: 0 9px 24px rgba(34, 211, 238, 0.42);
+    box-shadow: 0 9px 24px rgba(34, 211, 238, 0.5);
 }
 
 /* Botón de acción destructiva (rojo) */
