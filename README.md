@@ -1,6 +1,6 @@
 # WP Profiler & Security
 
-Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, cuatro utilidades de mantenimiento del sitio:
+Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, cinco utilidades de mantenimiento del sitio:
 
 1. **Integridad del core** — verifica los archivos de WordPress contra los checksums oficiales y permite comparar y restaurar los modificados.
 2. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
