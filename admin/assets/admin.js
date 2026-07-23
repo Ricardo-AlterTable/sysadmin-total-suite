@@ -266,6 +266,52 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Eliminar usuario de WordPress (doble confirmación, IRREMEDIABLE)
+    $(document).on('click', '.wps-delete-user', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const uid = button.data('user-id');
+        const label = button.data('user-label') || ('#' + uid);
+
+        // 1ª confirmación
+        if (!confirm(
+            "¿Seguro que quieres BORRAR el usuario?\n\n" + label + "\n\n" +
+            "⚠ Esta acción es IRREMEDIABLE: el usuario se elimina permanentemente y no se puede deshacer."
+        )) return;
+
+        // 2ª confirmación
+        if (!confirm(
+            "Confirmación final.\n\n" +
+            "Se eliminará el usuario \"" + label + "\" y el contenido del que sea autor.\n\n" +
+            "¿Continuar con el borrado definitivo?"
+        )) return;
+
+        button.prop('disabled', true).text('Eliminando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_delete_user',
+                nonce: button.data('nonce'),
+                user_id: uid
+            },
+            timeout: 60000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('tr').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar el usuario';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Eliminar');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Eliminar');
+            }
+        });
+    });
+
     // Cerrar modales (botón X y botón "Cerrar")
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');

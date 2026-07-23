@@ -240,6 +240,68 @@ body {
     vertical-align: middle;
 }
 
+/* Tabla de usuarios (sección Comprobar usuarios WP) */
+.wps-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #222;
+    border: 1px solid #444;
+}
+
+.wps-users-table th,
+.wps-users-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid #3a3a3a;
+    color: #f2f2f2;
+    vertical-align: middle;
+}
+
+.wps-users-table thead th {
+    background: #2b2b2b;
+    color: #6cff5c;
+    border-bottom: 2px solid #444;
+}
+
+.wps-users-table tbody tr:nth-child(even) {
+    background: #262626;
+}
+
+.wps-users-table tbody tr:hover {
+    background: #2f2f2f;
+}
+
+.wps-user-login {
+    color: #9aa7b3;
+    font-size: 12px;
+}
+
+.wps-user-you {
+    color: #6cff5c;
+    font-size: 12px;
+    margin-left: 4px;
+}
+
+.wps-user-nodelete {
+    color: #777;
+}
+
+/* Botón eliminar usuario: rojo (acción destructiva) */
+.wps-users-table .wps-delete-user {
+    background: #2b2b2b;
+    border-color: #ff5c5c;
+    color: #ff5c5c;
+    text-shadow: none;
+}
+
+.wps-users-table .wps-delete-user:hover,
+.wps-users-table .wps-delete-user:focus {
+    background: #5a2d2d;
+    border-color: #ff8a8a;
+    color: #ff8a8a;
+}
+
 /* Chart container adjustments */
 .wps-chart-container {
     max-width: 600px;
