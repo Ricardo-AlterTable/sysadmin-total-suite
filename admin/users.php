@@ -12,10 +12,10 @@ $can_delete  = current_user_can('delete_users');
 $date_format = get_option('date_format') . ' ' . get_option('time_format');
 ?>
 <div class="wrap">
-    <h1 style="color: #6cff5c;">Comprobar usuarios WP</h1>
+    <h1>Comprobar usuarios WP</h1>
     <p>Usuarios registrados en este WordPress: <strong><?php echo count($users); ?></strong></p>
     <?php if ($can_delete): ?>
-        <p style="color:#ff9c9c;">⚠ Eliminar un usuario es <strong>irremediable</strong>: se borra de forma permanente (junto con el contenido del que sea autor) y no se puede deshacer.</p>
+        <p class="wps-status wps-status--bad">⚠ Eliminar un usuario es <strong>irremediable</strong>: se borra de forma permanente (junto con el contenido del que sea autor) y no se puede deshacer.</p>
     <?php endif; ?>
 
     <table class="wps-users-table">

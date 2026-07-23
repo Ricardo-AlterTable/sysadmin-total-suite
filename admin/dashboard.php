@@ -5,7 +5,7 @@ $analysis = get_transient('wps_last_analysis');
 
 ?>
 <div class="wrap">
-    <h1 style="color: #6cff5c;">Integridad del Core</h1>
+    <h1>Integridad del Core</h1>
 
     <?php if (isset($_GET['cache_purged']) && $_GET['cache_purged'] === '1'): ?>
         <div id="message" class="updated notice is-dismissible">
@@ -13,7 +13,7 @@ $analysis = get_transient('wps_last_analysis');
         </div>
     <?php endif; ?>
 
-    <div style="display: flex; gap: 10px; margin-bottom: 1em;">
+    <div class="wps-actions">
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field('wps_run_analysis_nonce'); ?>
             <input type="hidden" name="action" value="wps_run_analysis">
@@ -49,14 +49,14 @@ $analysis = get_transient('wps_last_analysis');
         $core_issues = count($modificados) + count($faltantes);
         ?>
 
-        <h2 style="color: #6cff5c;">Resultado</h2>
+        <h2>Resultado</h2>
         <?php if ($core_issues > 0): ?>
-            <p style="color:#ff5c5c;">⚠ Se detectaron problemas en el core de WordPress</p>
+            <p class="wps-status wps-status--bad">⚠ Se detectaron problemas en el core de WordPress</p>
         <?php else: ?>
-            <p style="color:#6cff5c;">✔ No se detectaron problemas en el core de WordPress</p>
+            <p class="wps-status wps-status--ok">✔ No se detectaron problemas en el core de WordPress</p>
         <?php endif; ?>
         <?php if (!empty($extras)): ?>
-            <p style="color:#ffb84d;">⚠ Se detectaron archivos no reconocidos por WordPress</p>
+            <p class="wps-status wps-status--warn">⚠ Se detectaron archivos no reconocidos por WordPress</p>
         <?php endif; ?>
 
         <?php
@@ -102,7 +102,7 @@ $analysis = get_transient('wps_last_analysis');
         ?>
 
         <?php if (!empty($paged_files)): ?>
-            <h2 style="color: #6cff5c;">Archivos modificados / faltantes</h2>
+            <h2>Archivos modificados / faltantes</h2>
             <div class="tablenav top">
                 <div class="alignleft actions">
                     <form method="get">
@@ -129,12 +129,12 @@ $analysis = get_transient('wps_last_analysis');
                 <?php foreach ($paged_files as $file): ?>
                     <li>
                         <?php if ($file['type'] === 'Modificado'): ?>
-                            <strong style="color:#ff5c5c;">[Modificado]</strong>
+                            <span class="wps-tag wps-tag--danger">Modificado</span>
                             <code class="wps-file-path"><?php echo esc_html($file['path']); ?></code>
                             <button class="button show-diff" data-path="<?php echo esc_attr($file['path']); ?>">Mostrar cambios</button>
                             <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
                         <?php else: ?>
-                            <strong style="color:#ff5c5c;">[Faltante]</strong>
+                            <span class="wps-tag wps-tag--warn">Faltante</span>
                             <code class="wps-file-path"><?php echo esc_html($file['path']); ?></code>
                             <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
                         <?php endif; ?>
@@ -143,12 +143,12 @@ $analysis = get_transient('wps_last_analysis');
             </ul>
             <button class="button button-secondary restore-all" data-nonce="<?php echo wp_create_nonce('wps_restore_all'); ?>">Restaurar todos los modificados/faltantes</button>
         <?php elseif (!empty($modificados) || !empty($faltantes)): ?>
-             <h2 style="color: #6cff5c;">Archivos modificados / faltantes</h2>
+             <h2>Archivos modificados / faltantes</h2>
              <p>No se han detectado archivos modificados ni faltantes.</p>
         <?php endif; ?>
 
         <?php if (!empty($extras)): ?>
-            <h2 style="color: #6cff5c;">Archivos extra</h2>
+            <h2>Archivos extra</h2>
             <button class="button button-secondary view-extras">Ver archivos extra detectados</button>
         <?php endif; ?>
 
@@ -172,7 +172,7 @@ $analysis = get_transient('wps_last_analysis');
         <span class="wps-close">&times;</span>
         <h2>Archivos extra detectados</h2>
         <p>Estos archivos no pertenecen al core oficial de WordPress.</p>
-        <p style="color:#ff9c9c;">⚠ Eliminar un archivo es <strong>irreversible</strong>: se borra de forma permanente y no se puede deshacer.</p>
+        <p class="wps-status wps-status--bad">⚠ Eliminar un archivo es <strong>irreversible</strong>: se borra de forma permanente y no se puede deshacer.</p>
 
         <?php if (!empty($paged_extras)): ?>
             <div class="tablenav top">

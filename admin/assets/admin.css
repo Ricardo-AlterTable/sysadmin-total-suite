@@ -1,420 +1,466 @@
-/* General styles */
-body {
-    background-color: #1a1a1a;
-    color: #f2f2f2;
-    font-family: 'Courier New', Courier, monospace;
+/* ============================================================================
+   WP Profiler & Security — UI "control panel" moderno/futurista
+   (El estilo terminal se conserva SOLO en el contenido del diff.)
+   Solo se carga en las páginas del plugin.
+   ========================================================================== */
+
+:root {
+    --wps-bg-1: #0b0f1e;
+    --wps-bg-2: #121732;
+    --wps-surface: rgba(255, 255, 255, 0.045);
+    --wps-surface-2: rgba(255, 255, 255, 0.07);
+    --wps-border: rgba(255, 255, 255, 0.10);
+    --wps-border-strong: rgba(255, 255, 255, 0.18);
+    --wps-text: #e7ebf6;
+    --wps-muted: #98a2c0;
+    --wps-primary: #7c5cff;
+    --wps-primary-2: #22d3ee;
+    --wps-grad: linear-gradient(135deg, #7c5cff 0%, #22d3ee 100%);
+    --wps-ok: #34d399;
+    --wps-warn: #fbbf24;
+    --wps-danger: #fb5c74;
+    --wps-radius: 14px;
+    --wps-radius-sm: 9px;
+    --wps-shadow: 0 10px 34px rgba(0, 0, 0, 0.38);
+    --wps-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* ============================================================= */
-/* Legibilidad: forzar contraste del texto de WordPress sobre    */
-/* el fondo oscuro (solo se carga en las páginas del plugin).    */
-/* ============================================================= */
-.wrap,
+/* Fondo general (solo en páginas del plugin).
+   Se aplica sobre #wpwrap (selector con id) para ganar al esquema de color. */
+#wpwrap {
+    background:
+        radial-gradient(1100px 620px at 12% -8%, rgba(124, 92, 255, 0.16), transparent 60%),
+        radial-gradient(1000px 560px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+        linear-gradient(180deg, var(--wps-bg-1), var(--wps-bg-2));
+    background-attachment: fixed;
+}
+body {
+    color: var(--wps-text);
+    font-family: var(--wps-font);
+}
+
+#wpcontent,
+#wpbody-content {
+    background: transparent;
+}
+
+.wrap {
+    max-width: 1180px;
+    color: var(--wps-text);
+    font-family: var(--wps-font);
+    padding-top: 8px;
+}
+
+/* Tipografía / cabeceras */
+.wrap h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin: 6px 0 14px;
+    color: var(--wps-text);
+    display: inline-block;
+    position: relative;
+    padding-bottom: 8px;
+}
+.wrap h1::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 78px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--wps-grad);
+}
+
+.wrap h2 {
+    font-size: 17px;
+    font-weight: 650;
+    color: var(--wps-text);
+    margin: 0 0 12px;
+}
+.wrap h3 { color: var(--wps-text); }
+
 .wrap p,
 .wrap li,
-.wrap ul,
 .wrap td,
 .wrap th,
 .wrap label,
 .wrap span,
 .wrap strong,
-.wrap dt,
-.wrap dd {
-    color: #f2f2f2;
-}
-
-.wrap h1,
-.wrap h2,
-.wrap h3,
-.wrap h4 {
-    color: #6cff5c;
-}
-
-.wrap em {
-    color: #cfcfcf;
+.wrap dd,
+.wrap dt {
+    color: var(--wps-text);
 }
 
 .wrap a:not(.button):not(.button-primary):not(.button-secondary) {
-    color: #7db9ff;
+    color: var(--wps-primary-2);
+    text-decoration: none;
+}
+.wrap a:not(.button):not(.button-primary):not(.button-secondary):hover {
+    text-decoration: underline;
 }
 
 .wrap code,
 .wrap .wps-file-path {
-    background: #2b2b2b;
-    color: #ffd479;
-    padding: 2px 6px;
-    border-radius: 4px;
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    background: rgba(124, 92, 255, 0.14);
+    color: #cdd6ff;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 12.5px;
 }
 
-/* Botones con estética coherente y texto legible */
+.wrap .description,
+.wrap .wps-muted {
+    color: var(--wps-muted);
+}
+
+/* ---- Tarjetas (secciones) ---- */
+.wps-card,
+.wps-tunning-section {
+    margin: 18px 0;
+    padding: 20px 22px;
+    background: var(--wps-surface);
+    border: 1px solid var(--wps-border);
+    border-radius: var(--wps-radius);
+    box-shadow: var(--wps-shadow);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+}
+.wps-tunning-section::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 3px;
+    background: var(--wps-grad);
+    opacity: 0.85;
+}
+.wps-tunning-section h2 {
+    color: var(--wps-text);
+    margin-top: 4px;
+}
+
+/* ---- Barra de acciones ---- */
+.wps-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+/* ---- Botones ---- */
 .wrap .button,
-.wrap .button-secondary {
-    background: #2b2b2b;
-    border-color: #6cff5c;
-    color: #6cff5c;
+.wrap .button-secondary,
+.wrap input[type="submit"].button,
+.wps-modal .button {
+    border-radius: 999px;
+    border: 1px solid var(--wps-border-strong);
+    background: var(--wps-surface-2);
+    color: var(--wps-text);
+    font-family: var(--wps-font);
+    font-weight: 600;
+    padding: 4px 16px;
+    height: auto;
+    line-height: 2;
+    box-shadow: none;
     text-shadow: none;
+    transition: transform .08s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
 }
-
 .wrap .button:hover,
 .wrap .button-secondary:hover,
-.wrap .button:focus,
-.wrap .button-secondary:focus {
-    background: #333;
-    border-color: #8affff;
-    color: #8affff;
+.wps-modal .button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--wps-primary-2);
+    color: #fff;
+    transform: translateY(-1px);
 }
 
 .wrap .button-primary {
-    background: #2271b1;
-    border-color: #2271b1;
-    color: #fff;
+    border: 0;
+    border-radius: 999px;
+    background: var(--wps-grad);
+    color: #0b0f1e;
+    font-weight: 700;
+    padding: 5px 20px;
+    line-height: 2;
+    text-shadow: none;
+    box-shadow: 0 6px 18px rgba(124, 92, 255, 0.35);
 }
-
 .wrap .button-primary:hover,
 .wrap .button-primary:focus {
-    background: #135e96;
-    border-color: #135e96;
-    color: #fff;
+    color: #0b0f1e;
+    transform: translateY(-1px);
+    box-shadow: 0 9px 24px rgba(34, 211, 238, 0.42);
 }
 
-/* Controles de formulario (select de paginación, etc.) */
-.wrap select,
-.wrap input[type="text"],
-.wrap input[type="search"] {
-    background: #2b2b2b;
-    color: #f2f2f2;
-    border: 1px solid #555;
-}
-
-/* Paginación y cabeceras de tabla */
-.wrap .tablenav,
-.wrap .tablenav .displaying-num,
-.wrap .tablenav-pages,
-.wrap .tablenav-pages .tablenav-pages-navspan {
-    color: #cfcfcf;
-}
-
-.wrap .tablenav-pages a.page-numbers,
-.wrap .tablenav-pages span.page-numbers {
-    background: #2b2b2b;
-    border: 1px solid #444;
-    color: #f2f2f2 !important;
-    padding: 3px 8px;
-    border-radius: 4px;
-}
-
-.wrap .tablenav-pages a.page-numbers:hover {
-    background: #3a3a3a;
-    border-color: #6cff5c;
-}
-
-/* Pie del admin (queda oscuro sobre oscuro por defecto) */
-#wpfooter,
-#wpfooter p,
-#footer-left,
-#footer-upgrade,
-#footer-left a,
-#footer-upgrade a {
-    color: #cfcfcf !important;
-}
-
-/* Modal overlay & dialog */
-.wps-modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    z-index: 200000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.wps-modal {
-    background: #2b2b2b;
-    border: 1px solid #444;
-    border-radius: 8px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-    width: calc(100% - 80px);
-    max-width: 1000px;
-    max-height: 80vh;
-    overflow: auto;
-    padding: 18px;
-    color: #f2f2f2;
-}
-
-.wps-modal h2 {
-    margin-top: 0;
-    color: #6cff5c; /* Green accent color */
-}
-
-/* Botones dentro de los modales.
-   Por defecto blancos (Aplicar, Cerrar); los de eliminar en rojo. */
-.wps-modal .button,
-.wps-modal input[type="submit"].button {
-    background: #2b2b2b;
-    border-color: #cccccc;
-    color: #ffffff;
+/* Botón de acción destructiva (rojo) */
+.wps-btn-danger,
+.wps-modal .wps-delete-extra,
+.wps-modal .wps-delete-all-extras,
+.wps-users-table .wps-delete-user {
+    background: rgba(251, 92, 116, 0.12) !important;
+    border: 1px solid rgba(251, 92, 116, 0.55) !important;
+    color: #ff9caa !important;
+    border-radius: 999px !important;
+    font-weight: 600;
     text-shadow: none;
 }
-
-.wps-modal .button:hover,
-.wps-modal .button:focus,
-.wps-modal input[type="submit"].button:hover,
-.wps-modal input[type="submit"].button:focus {
-    background: #3a3a3a;
-    border-color: #ffffff;
-    color: #ffffff;
-}
-
-/* Botones de eliminar: rojo (acción destructiva) */
-.wps-modal .wps-delete-extra,
-.wps-modal .wps-delete-all-extras {
-    background: #2b2b2b;
-    border-color: #ff5c5c;
-    color: #ff5c5c;
-}
-
+.wps-btn-danger:hover,
 .wps-modal .wps-delete-extra:hover,
 .wps-modal .wps-delete-all-extras:hover,
-.wps-modal .wps-delete-extra:focus,
-.wps-modal .wps-delete-all-extras:focus {
-    background: #5a2d2d;
-    border-color: #ff8a8a;
-    color: #ff8a8a;
+.wps-users-table .wps-delete-user:hover {
+    background: rgba(251, 92, 116, 0.22) !important;
+    border-color: var(--wps-danger) !important;
+    color: #fff !important;
 }
 
-.wps-diff-output {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 13px;
-    background: #1a1a1a;
-    border: 1px solid #444;
-    padding: 10px;
-    white-space: pre-wrap;
+/* ---- Estado (mensajes ok / warn / bad) ---- */
+.wps-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--wps-radius-sm);
+    font-weight: 600;
+    margin: 6px 0;
+    border: 1px solid transparent;
 }
+.wps-status--ok   { background: rgba(52, 211, 153, 0.12); color: var(--wps-ok);    border-color: rgba(52, 211, 153, 0.35); }
+.wps-status--warn { background: rgba(251, 191, 36, 0.12); color: var(--wps-warn);  border-color: rgba(251, 191, 36, 0.35); }
+.wps-status--bad  { background: rgba(251, 92, 116, 0.12); color: var(--wps-danger);border-color: rgba(251, 92, 116, 0.38); }
 
-.line.add {
-    background: #2e4e2e;
-    color: #6cff5c;
-    padding: 1px 6px;
-    display: block;
+/* Etiquetas en línea (p.ej. [Modificado] / [Faltante]) */
+.wps-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-right: 8px;
 }
+.wps-tag--danger { background: rgba(251, 92, 116, 0.16); color: #ff9caa; }
+.wps-tag--warn   { background: rgba(251, 191, 36, 0.16); color: var(--wps-warn); }
 
-.line.del {
-    background: #5a2d2d;
-    color: #ff5c5c;
-    padding: 1px 6px;
-    display: block;
+.wps-num-warn { color: var(--wps-warn); }
+.wps-ok-text  { color: var(--wps-ok); }
+.wps-bad-text { color: var(--wps-danger); }
+
+/* ---- Badges (pills) ---- */
+.wps-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 6px;
+    border: 1px solid transparent;
 }
+.wps-badge.ok   { background: rgba(52, 211, 153, 0.14); color: var(--wps-ok);     border-color: rgba(52, 211, 153, 0.35); }
+.wps-badge.warn { background: rgba(251, 191, 36, 0.14); color: var(--wps-warn);   border-color: rgba(251, 191, 36, 0.35); }
+.wps-badge.bad  { background: rgba(251, 92, 116, 0.14); color: var(--wps-danger); border-color: rgba(251, 92, 116, 0.38); }
 
-.line.ctx {
-    color: #aaa;
-    padding: 1px 6px;
-    display: block;
-}
+.wps-kv { margin: 8px 0; color: var(--wps-text); }
+.wps-kv strong { color: #fff; }
 
-.line.hunk {
-    background: #2a3a4a;
-    color: #5c9cff;
-    font-weight: bold;
-    padding: 1px 6px;
-    display: block;
-}
-
-/* Buttons list */
+/* ---- Listas de integridad ---- */
 #wps-list {
     list-style: none;
     padding-left: 0;
+    margin: 6px 0 16px;
 }
-
 #wps-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
     margin-bottom: 8px;
+    background: var(--wps-surface);
+    border: 1px solid var(--wps-border);
+    border-radius: var(--wps-radius-sm);
 }
-
 .wps-file-path {
     display: inline-block;
-    width: 60%;
+    max-width: 55%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
     vertical-align: middle;
 }
 
-/* Tablas oscuras (usuarios y tunning) */
+/* ---- Tablas ---- */
 .wps-users-table,
 .wps-tunning-table {
     width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-    background: #222;
-    border: 1px solid #444;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--wps-border);
+    border-radius: var(--wps-radius);
+    overflow: hidden;
 }
-
 .wps-users-table th,
 .wps-users-table td,
 .wps-tunning-table th,
 .wps-tunning-table td {
     text-align: left;
-    padding: 10px 12px;
-    border-bottom: 1px solid #3a3a3a;
-    color: #f2f2f2;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--wps-border);
+    color: var(--wps-text);
     vertical-align: middle;
 }
-
 .wps-users-table thead th,
 .wps-tunning-table thead th {
-    background: #2b2b2b;
-    color: #6cff5c;
-    border-bottom: 2px solid #444;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--wps-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--wps-border-strong);
 }
-
-.wps-users-table tbody tr:nth-child(even),
-.wps-tunning-table tbody tr:nth-child(even) {
-    background: #262626;
-}
-
+.wps-users-table tbody tr:last-child td,
+.wps-tunning-table tbody tr:last-child td { border-bottom: 0; }
 .wps-users-table tbody tr:hover,
-.wps-tunning-table tbody tr:hover {
-    background: #2f2f2f;
+.wps-tunning-table tbody tr:hover { background: rgba(124, 92, 255, 0.08); }
+
+.wps-user-login { color: var(--wps-muted); font-size: 12px; }
+.wps-user-you   { color: var(--wps-primary-2); font-size: 12px; margin-left: 4px; }
+.wps-user-nodelete { color: var(--wps-muted); }
+
+/* ---- Paginación / tablenav ---- */
+.wrap .tablenav,
+.wrap .tablenav .displaying-num,
+.wrap .tablenav-pages,
+.wrap .tablenav-pages .tablenav-pages-navspan {
+    color: var(--wps-muted);
+}
+.wrap .tablenav-pages a.page-numbers,
+.wrap .tablenav-pages span.page-numbers {
+    background: var(--wps-surface-2);
+    border: 1px solid var(--wps-border);
+    color: var(--wps-text) !important;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+.wrap .tablenav-pages a.page-numbers:hover {
+    border-color: var(--wps-primary-2);
 }
 
-/* Secciones y badges de Tunning */
-.wps-tunning-section {
-    margin: 20px 0;
-    padding: 15px 18px;
-    background: #222;
-    border: 1px solid #444;
-    border-radius: 6px;
+/* ---- Controles de formulario ---- */
+.wrap select,
+.wrap input[type="text"],
+.wrap input[type="search"] {
+    background: var(--wps-surface-2);
+    color: var(--wps-text);
+    border: 1px solid var(--wps-border-strong);
+    border-radius: 8px;
+    padding: 3px 8px;
 }
 
-.wps-tunning-section h2 {
-    margin-top: 0;
-    color: #6cff5c;
+/* ---- Avisos nativos de WP ---- */
+.wrap .notice {
+    background: var(--wps-surface);
+    border: 1px solid var(--wps-border);
+    border-left: 4px solid var(--wps-primary);
+    color: var(--wps-text);
+    border-radius: var(--wps-radius-sm);
+    box-shadow: none;
 }
+.wrap .notice p { color: var(--wps-text); }
 
-.wps-kv {
-    margin: 6px 0;
-}
-
-.wps-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: bold;
-    margin-left: 6px;
-}
-
-.wps-badge.ok   { background: #2e4e2e; color: #6cff5c; }
-.wps-badge.warn { background: #4e442e; color: #ffcf5c; }
-.wps-badge.bad  { background: #5a2d2d; color: #ff8a8a; }
-
-/* Botón de acción destructiva (rojo) */
-.wps-btn-danger {
-    background: #2b2b2b;
-    border-color: #ff5c5c;
-    color: #ff5c5c;
-    text-shadow: none;
-}
-
-.wps-btn-danger:hover,
-.wps-btn-danger:focus {
-    background: #5a2d2d;
-    border-color: #ff8a8a;
-    color: #ff8a8a;
-}
-
-.wps-user-login {
-    color: #9aa7b3;
-    font-size: 12px;
-}
-
-.wps-user-you {
-    color: #6cff5c;
-    font-size: 12px;
-    margin-left: 4px;
-}
-
-.wps-user-nodelete {
-    color: #777;
-}
-
-/* Botón eliminar usuario: rojo (acción destructiva) */
-.wps-users-table .wps-delete-user {
-    background: #2b2b2b;
-    border-color: #ff5c5c;
-    color: #ff5c5c;
-    text-shadow: none;
-}
-
-.wps-users-table .wps-delete-user:hover,
-.wps-users-table .wps-delete-user:focus {
-    background: #5a2d2d;
-    border-color: #ff8a8a;
-    color: #ff8a8a;
-}
-
-/* Chart container adjustments */
+/* ---- Gráficas (profiling) ---- */
 .wps-chart-container {
-    max-width: 600px;
-    margin: 20px auto;
-    padding: 10px;
-    background: #2b2b2b;
-    border: 1px solid #444;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 640px;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--wps-surface);
+    border: 1px solid var(--wps-border);
+    border-radius: var(--wps-radius);
+    box-shadow: var(--wps-shadow);
 }
-
 .wps-chart-container canvas {
     width: 100% !important;
     height: 300px !important;
 }
 
-/* ============================= */
-/* Terminal style modal diff     */
-/* ============================= */
-/* El overlay hereda posición/centrado de .wps-modal-overlay; aquí solo
-   ajustamos el fondo. La visibilidad la controla el JS (display:flex/none). */
-#wpsDiffModal {
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 200001;
+/* ============================================================================
+   MODALES
+   ========================================================================== */
+.wps-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 18, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 200000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
 }
+.wps-modal {
+    background: linear-gradient(180deg, #141a30, #10152a);
+    border: 1px solid var(--wps-border-strong);
+    border-radius: var(--wps-radius);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+    width: calc(100% - 80px);
+    max-width: 1000px;
+    max-height: 82vh;
+    overflow: auto;
+    padding: 22px;
+    color: var(--wps-text);
+    font-family: var(--wps-font);
+}
+.wps-modal h2 { margin-top: 0; color: var(--wps-text); }
+.wps-modal .wps-close {
+    float: right;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--wps-muted);
+}
+.wps-modal .wps-close:hover { color: #fff; }
+
+/* ============================================================================
+   DIFF — se conserva la estética TERMINAL (por petición)
+   ========================================================================== */
+#wpsDiffModal { background: rgba(5, 8, 18, 0.82); z-index: 200001; }
 
 #wpsDiffModal .wps-modal {
-    background: #1e1e1e;
+    background: #0b0f16;
+    border: 1px solid #1f2a3a;
     display: flex;
     flex-direction: column;
 }
-
+#wpsDiffModal .wps-modal h2 {
+    font-family: "Courier New", Courier, monospace;
+    color: #6cff5c;
+}
 #wpsDiffContent {
-    font-size: 14px;
-    line-height: 1.4em;
-    color: #f2f2f2 !important;
-    background: #111;
-    border: 1px solid #333;
-    padding: 10px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #d7f7d2;
+    background: #05070c;
+    border: 1px solid #1f2a3a;
+    border-radius: 8px;
+    padding: 12px;
     overflow-y: auto;
-    flex: 1; /* scroll only here */
+    flex: 1;
     white-space: pre-wrap;
 }
+.diff-add { color: #6cff5c; }
+.diff-del { color: #ff5c5c; }
+.diff-ctx { color: #8aa0b4; }
 
-/* Diff colors */
-.diff-add {
-    color: #6cff5c; /* Green */
-}
-
-.diff-del {
-    color: #ff5c5c; /* Red */
-}
-
-.diff-ctx {
-    color: #bbb; /* Gray */
-}
-
-/* Close button */
-#wpsDiffModal .wps-close {
-    float: right;
-    font-size: 18px;
-    cursor: pointer;
-    color: #f2f2f2;
+/* ---- Responsive ---- */
+@media (max-width: 782px) {
+    .wps-file-path { max-width: 100%; }
+    .wps-chart-container { max-width: 100%; }
 }

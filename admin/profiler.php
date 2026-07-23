@@ -107,7 +107,25 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
             iframe.src = "<?php echo esc_url(home_url('/')); ?>?wps_profiling_test=1&t=" + Date.now();
         });
 
+        // Paleta acorde al panel (texto/rejilla legibles sobre fondo oscuro).
+        if (window.Chart) {
+            Chart.defaults.color = '#98a2c0';
+            Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
+            Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        }
+        const gridOpts = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.06)' } },
+                y: { grid: { color: 'rgba(255,255,255,0.06)' }, beginAtZero: true }
+            }
+        };
+
         const ctx1 = document.getElementById('wpsProfilingChart').getContext('2d');
+        const grad1 = ctx1.createLinearGradient(0, 0, 0, 300);
+        grad1.addColorStop(0, 'rgba(124, 92, 255, 0.85)');
+        grad1.addColorStop(1, 'rgba(34, 211, 238, 0.55)');
         new Chart(ctx1, {
             type: 'bar',
             data: {
@@ -115,12 +133,13 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
                 datasets: [{
                     label: 'Tiempo (ms)',
                     data: <?php echo json_encode(array_values($profile_data)); ?>,
-                    backgroundColor: 'rgba(54, 162, 235, 0.7)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+                    backgroundColor: grad1,
+                    borderColor: 'rgba(124, 92, 255, 1)',
+                    borderWidth: 1,
+                    borderRadius: 6
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: gridOpts
         });
 
         const ctx2 = document.getElementById('wpsHistoryChart').getContext('2d');
@@ -131,12 +150,14 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
                 datasets: [{
                     label: 'Tiempo total (ms)',
                     data: <?php echo json_encode($totals); ?>,
-                    fill: false,
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    tension: 0.1
+                    fill: true,
+                    backgroundColor: 'rgba(34, 211, 238, 0.12)',
+                    borderColor: '#22d3ee',
+                    pointBackgroundColor: '#7c5cff',
+                    tension: 0.35
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false }
+            options: gridOpts
         });
     });
     </script>

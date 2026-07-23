@@ -19,7 +19,7 @@ $plugins_warn  = $plugins['active'] > 20;                     // muchos plugins 
 $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
 ?>
 <div class="wrap">
-    <h1 style="color: #6cff5c;">Tunning</h1>
+    <h1>Tunning</h1>
     <p>Chequeo rápido de rendimiento del sitio.</p>
 
     <!-- 1) Plugins -->
@@ -58,7 +58,7 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
         </p>
         <p class="wps-kv">
             Transitorios con caducidad: <strong><?php echo (int) $transients['total']; ?></strong> ·
-            Caducados (basura): <strong style="color:#ffcf5c;"><?php echo (int) $transients['expired']; ?></strong>
+            Caducados (basura): <strong class="wps-num-warn"><?php echo (int) $transients['expired']; ?></strong>
         </p>
 
         <button class="button button-secondary wps-clean-transients"
@@ -79,7 +79,7 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <p style="color:#9aa7b3; font-size:12px;">El borrado automático de estas opciones no se ofrece por seguridad: podrían pertenecer a plugins activos. Elimínalas manualmente solo si reconoces que son de un plugin ya retirado.</p>
+            <p class="wps-muted" style="font-size:12px;">El borrado automático de estas opciones no se ofrece por seguridad: podrían pertenecer a plugins activos. Elimínalas manualmente solo si reconoces que son de un plugin ya retirado.</p>
         <?php endif; ?>
     </div>
 
@@ -100,7 +100,7 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
             Tareas programadas: <strong><?php echo (int) $cron['total']; ?></strong> ·
             Atrasadas: <strong><?php echo (int) $cron['overdue']; ?></strong>
             <?php if ($cron['overdue'] > 0): ?><span class="wps-badge warn">Hay tareas atrasadas</span><?php endif; ?>
-            · Huérfanas: <strong style="color:#ffcf5c;"><?php echo (int) $cron['orphaned']; ?></strong>
+            · Huérfanas: <strong class="wps-num-warn"><?php echo (int) $cron['orphaned']; ?></strong>
             <?php if ($cron['orphaned'] > 0): ?><span class="wps-badge warn">Basura de plugins retirados</span><?php endif; ?>
         </p>
 
@@ -172,15 +172,15 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
         <?php if ($cache['page_method'] === 'litespeed'): ?>
             <p class="wps-kv">Caché de página (LiteSpeed, a nivel de servidor):
                 <?php if ($cache['ls_cache_enabled'] === true): ?>
-                    <strong style="color:#6cff5c;">activada</strong>
+                    <strong class="wps-ok-text">activada</strong>
                 <?php elseif ($cache['ls_cache_enabled'] === false): ?>
-                    <strong style="color:#ff8a8a;">desactivada</strong>
+                    <strong class="wps-bad-text">desactivada</strong>
                     <span class="wps-badge warn">Actívala en LiteSpeed Cache → Cache</span>
                 <?php else: ?>
                     <strong><?php echo $cache['server_is_ls'] ? 'activa (servidor LiteSpeed detectado)' : 'estado no legible'; ?></strong>
                 <?php endif; ?>
             </p>
-            <p class="wps-kv" style="color:#9aa7b3; font-size:12px;">
+            <p class="wps-kv wps-muted" style="font-size:12px;">
                 LiteSpeed cachea en el servidor, por eso no usa <code>WP_CACHE</code> ni <code>advanced-cache.php</code>.
                 Puedes confirmarlo con la cabecera <code>x-litespeed-cache: hit</code> en el front.
             </p>
