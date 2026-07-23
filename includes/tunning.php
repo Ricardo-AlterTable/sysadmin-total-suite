@@ -108,12 +108,42 @@ function wps_tunning_cache_info(): array {
     $object_cache   = file_exists(WP_CONTENT_DIR . '/object-cache.php');
     $wp_cache_const = defined('WP_CACHE') && WP_CACHE;
 
+    // LiteSpeed cachea a NIVEL DE SERVIDOR: no usa WP_CACHE ni advanced-cache.php.
+    // Su estado real se lee del servidor web y de la opción del plugin.
+    $server    = isset($_SERVER['SERVER_SOFTWARE']) ? (string) $_SERVER['SERVER_SOFTWARE'] : '';
+    $server_ls = stripos($server, 'litespeed') !== false;
+    $ls_plugin = is_plugin_active('litespeed-cache/litespeed-cache.php');
+
+    // Estado de la caché de LiteSpeed (tri-estado: true / false / null=desconocido).
+    $ls_cache_enabled = null;
+    if ($ls_plugin) {
+        $opt = get_option('litespeed.conf.cache', null); // LSCWP v3+ guarda cada ajuste como opción
+        if ($opt !== null && $opt !== false) {
+            $ls_cache_enabled = (bool) $opt;
+        }
+    }
+
+    // Método efectivo de caché de página según lo que haya en el sitio.
+    if ($ls_plugin) {
+        $page_method = 'litespeed';
+        // Si no se puede leer la opción, se asume activa cuando el servidor es LiteSpeed.
+        $page_cache_active = ($ls_cache_enabled === null) ? $server_ls : $ls_cache_enabled;
+    } else {
+        $page_method = 'php';
+        $page_cache_active = $wp_cache_const && $advanced_cache;
+    }
+
     return [
-        'plugins'            => $active,
-        'page_cache_enabled' => $wp_cache_const && $advanced_cache,
-        'advanced_cache'     => $advanced_cache,
-        'object_cache'       => $object_cache,
-        'wp_cache_const'     => $wp_cache_const,
+        'plugins'           => $active,
+        'page_method'       => $page_method,       // 'litespeed' | 'php'
+        'page_cache_active' => $page_cache_active,
+        'server_software'   => $server,
+        'server_is_ls'      => $server_ls,
+        'ls_plugin'         => $ls_plugin,
+        'ls_cache_enabled'  => $ls_cache_enabled,  // true | false | null
+        'advanced_cache'    => $advanced_cache,
+        'object_cache'      => $object_cache,
+        'wp_cache_const'    => $wp_cache_const,
     ];
 }
 

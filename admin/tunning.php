@@ -16,7 +16,7 @@ $schedules  = wp_get_schedules();
 // Umbrales orientativos.
 $autoload_warn = $autoload['total_bytes'] > 1024 * 1024;      // > 1 MB autoload
 $plugins_warn  = $plugins['active'] > 20;                     // muchos plugins activos
-$has_cache     = !empty($cache['plugins']) || $cache['page_cache_enabled'];
+$has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
 ?>
 <div class="wrap">
     <h1 style="color: #6cff5c;">Tunning</h1>
@@ -161,12 +161,35 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_enabled'];
         <?php else: ?>
             <p class="wps-kv"><span class="wps-badge bad">Sin plugin de caché detectado</span></p>
         <?php endif; ?>
+        <p class="wps-kv">Servidor web:
+            <strong><?php echo $cache['server_software'] ? esc_html($cache['server_software']) : 'desconocido'; ?></strong>
+            <?php if ($cache['server_is_ls']): ?><span class="wps-badge ok">LiteSpeed</span><?php endif; ?>
+        </p>
         <p class="wps-kv">Plugin(s) de caché activos:
             <strong><?php echo $cache['plugins'] ? esc_html(implode(', ', $cache['plugins'])) : 'ninguno'; ?></strong>
         </p>
-        <p class="wps-kv">Caché de página (WP_CACHE + advanced-cache.php):
-            <strong><?php echo $cache['page_cache_enabled'] ? 'activada' : 'no activada'; ?></strong>
-        </p>
+
+        <?php if ($cache['page_method'] === 'litespeed'): ?>
+            <p class="wps-kv">Caché de página (LiteSpeed, a nivel de servidor):
+                <?php if ($cache['ls_cache_enabled'] === true): ?>
+                    <strong style="color:#6cff5c;">activada</strong>
+                <?php elseif ($cache['ls_cache_enabled'] === false): ?>
+                    <strong style="color:#ff8a8a;">desactivada</strong>
+                    <span class="wps-badge warn">Actívala en LiteSpeed Cache → Cache</span>
+                <?php else: ?>
+                    <strong><?php echo $cache['server_is_ls'] ? 'activa (servidor LiteSpeed detectado)' : 'estado no legible'; ?></strong>
+                <?php endif; ?>
+            </p>
+            <p class="wps-kv" style="color:#9aa7b3; font-size:12px;">
+                LiteSpeed cachea en el servidor, por eso no usa <code>WP_CACHE</code> ni <code>advanced-cache.php</code>.
+                Puedes confirmarlo con la cabecera <code>x-litespeed-cache: hit</code> en el front.
+            </p>
+        <?php else: ?>
+            <p class="wps-kv">Caché de página (WP_CACHE + advanced-cache.php):
+                <strong><?php echo $cache['page_cache_active'] ? 'activada' : 'no activada'; ?></strong>
+            </p>
+        <?php endif; ?>
+
         <p class="wps-kv">Caché de objetos (object-cache.php):
             <strong><?php echo $cache['object_cache'] ? 'presente' : 'no presente'; ?></strong>
         </p>
