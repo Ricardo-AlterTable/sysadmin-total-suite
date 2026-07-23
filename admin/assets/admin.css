@@ -309,6 +309,21 @@ body {
 .wps-badge.warn { background: #4e442e; color: #ffcf5c; }
 .wps-badge.bad  { background: #5a2d2d; color: #ff8a8a; }
 
+/* Botón de acción destructiva (rojo) */
+.wps-btn-danger {
+    background: #2b2b2b;
+    border-color: #ff5c5c;
+    color: #ff5c5c;
+    text-shadow: none;
+}
+
+.wps-btn-danger:hover,
+.wps-btn-danger:focus {
+    background: #5a2d2d;
+    border-color: #ff8a8a;
+    color: #ff8a8a;
+}
+
 .wps-user-login {
     color: #9aa7b3;
     font-size: 12px;

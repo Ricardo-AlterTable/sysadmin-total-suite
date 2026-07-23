@@ -135,6 +135,109 @@ function wps_tunning_env_versions(): array {
 }
 
 /**
+ * Estado de WP-Cron: modo, nº de tareas, atrasadas y huérfanas.
+ * "Huérfana" = tarea programada cuyo hook ya no tiene ninguna acción
+ * registrada (resto de un plugin desinstalado).
+ */
+function wps_tunning_cron_info(): array {
+    $cron = function_exists('_get_cron_array') ? _get_cron_array() : [];
+    $now  = time();
+
+    $events         = [];
+    $orphaned_hooks = [];
+
+    if (is_array($cron)) {
+        foreach ($cron as $ts => $hooks) {
+            if (!is_array($hooks)) continue;
+            foreach ($hooks as $hook => $instances) {
+                $orphan = !has_action($hook);
+                foreach ((array) $instances as $data) {
+                    $events[] = [
+                        'hook'     => $hook,
+                        'time'     => (int) $ts,
+                        'schedule' => (!empty($data['schedule'])) ? $data['schedule'] : '',
+                        'overdue'  => $ts < $now,
+                        'orphan'   => $orphan,
+                    ];
+                }
+                if ($orphan) $orphaned_hooks[$hook] = true;
+            }
+        }
+    }
+
+    usort($events, fn($a, $b) => $a['time'] <=> $b['time']);
+
+    return [
+        'disabled' => defined('DISABLE_WP_CRON') && DISABLE_WP_CRON,
+        'total'    => count($events),
+        'overdue'  => count(array_filter($events, fn($e) => $e['overdue'])),
+        'orphaned' => count($orphaned_hooks),
+        'events'   => $events,
+    ];
+}
+
+/**
+ * Ajax: eliminar las tareas de UN hook de cron huérfano.
+ * Salvaguarda: solo se permite si el hook no tiene ninguna acción registrada.
+ */
+add_action('wp_ajax_wps_clean_cron_hook', function () {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+    }
+    check_ajax_referer('wps_clean_cron', 'nonce');
+
+    $hook = isset($_POST['hook']) ? sanitize_text_field(wp_unslash($_POST['hook'])) : '';
+    if (!$hook) {
+        wp_send_json_error(['message' => 'Hook no válido'], 400);
+    }
+    if (has_action($hook)) {
+        wp_send_json_error(['message' => 'Ese hook tiene una acción registrada; no es huérfano y no se elimina.'], 400);
+    }
+
+    $removed = wp_unschedule_hook($hook);
+    wp_send_json_success([
+        'message' => 'Tareas eliminadas del hook: ' . $hook,
+        'hook'    => $hook,
+        'removed' => (int) $removed,
+    ]);
+});
+
+/**
+ * Ajax: eliminar TODAS las tareas cron huérfanas (hooks sin acción registrada).
+ */
+add_action('wp_ajax_wps_clean_cron_all', function () {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+    }
+    check_ajax_referer('wps_clean_cron_all', 'nonce');
+
+    $cron  = function_exists('_get_cron_array') ? _get_cron_array() : [];
+    $hooks = [];
+    if (is_array($cron)) {
+        foreach ($cron as $hooks_at) {
+            if (!is_array($hooks_at)) continue;
+            foreach ($hooks_at as $hook => $instances) {
+                $hooks[$hook] = true;
+            }
+        }
+    }
+
+    $count         = 0;
+    $removed_hooks = [];
+    foreach (array_keys($hooks) as $hook) {
+        if (!has_action($hook)) {
+            $n = wp_unschedule_hook($hook);
+            if ($n) {
+                $count += (int) $n;
+                $removed_hooks[] = $hook;
+            }
+        }
+    }
+
+    wp_send_json_success(['removed' => $count, 'hooks' => $removed_hooks]);
+});
+
+/**
  * Ajax: limpiar transitorios caducados (seguro; se regeneran solos).
  */
 add_action('wp_ajax_wps_clean_transients', function () {

@@ -344,6 +344,75 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Tunning: eliminar una tarea cron huérfana
+    $(document).on('click', '.wps-clean-cron-hook', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const hook = button.data('hook');
+        if (!confirm("¿Eliminar las tareas cron del hook huérfano?\n\n" + hook + "\n\nEs seguro: ese hook ya no tiene código asociado (resto de un plugin retirado).")) return;
+
+        button.prop('disabled', true).text('Eliminando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_clean_cron_hook',
+                nonce: button.data('nonce'),
+                hook: hook
+            },
+            timeout: 60000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('tr').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Eliminar');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Eliminar');
+            }
+        });
+    });
+
+    // Tunning: eliminar TODAS las tareas cron huérfanas
+    $(document).on('click', '.wps-clean-cron-all', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        if (!confirm("¿Eliminar TODAS las tareas cron huérfanas?\n\nSon tareas de plugins ya retirados (hooks sin código asociado). Es seguro.")) return;
+
+        button.prop('disabled', true).text('Limpiando...');
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: {
+                action: 'wps_clean_cron_all',
+                nonce: button.data('nonce')
+            },
+            timeout: 120000,
+            success: function (res) {
+                if (res && res.success) {
+                    let message = "Tareas cron huérfanas eliminadas: " + (res.data.removed || 0);
+                    if (res.data.hooks && res.data.hooks.length) {
+                        message += "\n\nHooks limpiados:\n" + res.data.hooks.join("\n");
+                    }
+                    alert(message);
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo limpiar';
+                    alert("Error: " + msg);
+                    button.prop('disabled', false).text('Limpiar todas las tareas cron huérfanas');
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
+                button.prop('disabled', false).text('Limpiar todas las tareas cron huérfanas');
+            }
+        });
+    });
+
     // Cerrar modales (botón X y botón "Cerrar")
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');

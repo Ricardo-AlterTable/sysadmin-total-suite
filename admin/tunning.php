@@ -8,8 +8,10 @@ if (!current_user_can('manage_options')) {
 $plugins   = wps_tunning_plugins_info();
 $autoload   = wps_tunning_autoload_stats();
 $transients = wps_tunning_transient_stats();
+$cron       = wps_tunning_cron_info();
 $cache      = wps_tunning_cache_info();
 $env        = wps_tunning_env_versions();
+$schedules  = wp_get_schedules();
 
 // Umbrales orientativos.
 $autoload_warn = $autoload['total_bytes'] > 1024 * 1024;      // > 1 MB autoload
@@ -81,7 +83,77 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_enabled'];
         <?php endif; ?>
     </div>
 
-    <!-- 3) Caché -->
+    <!-- 3) WP-Cron -->
+    <div class="wps-tunning-section">
+        <h2>WP-Cron</h2>
+        <p class="wps-kv">
+            Modo:
+            <?php if ($cron['disabled']): ?>
+                <strong>WP-Cron interno desactivado</strong> (<code>DISABLE_WP_CRON = true</code>)
+                <span class="wps-badge warn">Debe haber un cron real del sistema llamando a wp-cron.php</span>
+            <?php else: ?>
+                <strong>WP-Cron interno activo</strong>
+                <span class="wps-badge ok">Se dispara con las visitas</span>
+            <?php endif; ?>
+        </p>
+        <p class="wps-kv">
+            Tareas programadas: <strong><?php echo (int) $cron['total']; ?></strong> ·
+            Atrasadas: <strong><?php echo (int) $cron['overdue']; ?></strong>
+            <?php if ($cron['overdue'] > 0): ?><span class="wps-badge warn">Hay tareas atrasadas</span><?php endif; ?>
+            · Huérfanas: <strong style="color:#ffcf5c;"><?php echo (int) $cron['orphaned']; ?></strong>
+            <?php if ($cron['orphaned'] > 0): ?><span class="wps-badge warn">Basura de plugins retirados</span><?php endif; ?>
+        </p>
+
+        <?php if ($cron['orphaned'] > 0): ?>
+            <button class="button wps-btn-danger wps-clean-cron-all"
+                    data-nonce="<?php echo wp_create_nonce('wps_clean_cron_all'); ?>">
+                Limpiar todas las tareas cron huérfanas
+            </button>
+        <?php endif; ?>
+
+        <?php if (!empty($cron['events'])): ?>
+            <table class="wps-tunning-table">
+                <thead><tr><th>Hook</th><th>Próxima ejecución</th><th>Recurrencia</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                    <?php foreach ($cron['events'] as $ev): ?>
+                        <?php
+                        $when = wp_date(get_option('date_format') . ' ' . get_option('time_format'), $ev['time']);
+                        $recur = $ev['schedule']
+                            ? (isset($schedules[$ev['schedule']]['display']) ? $schedules[$ev['schedule']]['display'] : $ev['schedule'])
+                            : 'Una vez';
+                        ?>
+                        <tr>
+                            <td><code><?php echo esc_html($ev['hook']); ?></code></td>
+                            <td><?php echo esc_html($when); ?></td>
+                            <td><?php echo esc_html($recur); ?></td>
+                            <td>
+                                <?php if ($ev['orphan']): ?>
+                                    <span class="wps-badge warn">Huérfana</span>
+                                <?php elseif ($ev['overdue']): ?>
+                                    <span class="wps-badge warn">Atrasada</span>
+                                <?php else: ?>
+                                    <span class="wps-badge ok">OK</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($ev['orphan']): ?>
+                                    <button class="button wps-btn-danger wps-clean-cron-hook"
+                                            data-hook="<?php echo esc_attr($ev['hook']); ?>"
+                                            data-nonce="<?php echo wp_create_nonce('wps_clean_cron'); ?>">Eliminar</button>
+                                <?php else: ?>
+                                    <span class="wps-user-nodelete">—</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        <?php else: ?>
+            <p>No hay tareas cron programadas.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- 4) Caché -->
     <div class="wps-tunning-section">
         <h2>Caché</h2>
         <?php if ($has_cache): ?>
@@ -100,7 +172,7 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_enabled'];
         </p>
     </div>
 
-    <!-- 4) Versiones del entorno -->
+    <!-- 5) Versiones del entorno -->
     <div class="wps-tunning-section">
         <h2>Versiones del entorno</h2>
         <table class="wps-tunning-table">
