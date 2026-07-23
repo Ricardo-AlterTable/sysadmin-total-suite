@@ -413,9 +413,14 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Bloqueo bots IA: seleccionar / deseleccionar todos
-    $(document).on('change', '.wps-aibots-all', function () {
-        $('.wps-aibot-cb').prop('checked', this.checked);
+    // Bloqueo bots IA: aplicar a todos (bloquear / permitir)
+    $(document).on('click', '.wps-bots-block-all', function (e) {
+        e.preventDefault();
+        $('.wps-bot-cb').prop('checked', true);
+    });
+    $(document).on('click', '.wps-bots-allow-all', function (e) {
+        e.preventDefault();
+        $('.wps-bot-cb').prop('checked', false);
     });
 
     // Cerrar modales (botón X y botón "Cerrar")

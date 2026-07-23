@@ -43,10 +43,11 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **Versiones del entorno**: PHP, MySQL/MariaDB (cadena real del servidor) y WordPress.
 
 ### 🤖 Bloqueo de bots de IA
-- **Opt-out en `robots.txt`** (vía filtro `robots_txt`) para los rastreadores de IA que lo respetan: GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended, Applebot-Extended, Amazonbot, Bytespider, Meta, etc.
-- **Bloqueo real por User-Agent (403)** en el front para forzar el bloqueo de los que ignoran `robots.txt`.
+- **Toggle Permitir/Bloquear por bot** (por defecto *Permitido*), con botones para **aplicar a todos**.
+- Al bloquear un bot se le aplican **ambas capas** automáticamente: entrada en **`robots.txt`** (vía filtro `robots_txt`) y, si su User-Agent es real, **bloqueo 403** en el front.
+- Cobertura de ~20 rastreadores: GPTBot, ClaudeBot, PerplexityBot, CCBot, Google-Extended, Applebot-Extended, Amazonbot, Bytespider, Meta, etc.
 - Cabecera `X-Robots-Tag: noai, noimageai` como señal adicional de opt-out.
-- Interruptores independientes (robots.txt / 403), lista de bots cubiertos y avisos (UA falsificable, `robots.txt` físico, compatibilidad con caché de página).
+- Avisos integrados: UA falsificable, `robots.txt` físico y compatibilidad con caché de página (respuesta 403 no cacheable).
 
 ---
 
@@ -131,6 +132,7 @@ El tema visual está centralizado en variables CSS al inicio de `admin/assets/ad
 
 ## Changelog
 
+- **3.0 – 3.1** — Bloqueo de bots de IA con **toggle Permitir/Bloquear por bot** y acciones "aplicar a todos"; ajuste del hover de los botones primarios.
 - **2.8** — Nueva sección **Bloqueo de bots de IA** (robots.txt + 403 por User-Agent).
 - **2.6 – 2.7** — Rediseño completo de la interfaz a panel moderno (estética terminal conservada solo en el diff); ajustes de espaciado.
 - **2.5** — Detección de la caché de LiteSpeed a nivel de servidor.

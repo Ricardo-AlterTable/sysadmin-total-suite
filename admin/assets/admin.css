@@ -252,6 +252,48 @@ body {
 .wps-ok-text  { color: var(--wps-ok); }
 .wps-bad-text { color: var(--wps-danger); }
 
+/* Toggle Permitir / Bloquear (bots de IA) */
+.wps-toggle {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+}
+.wps-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.wps-toggle-btn {
+    display: inline-block;
+    min-width: 96px;
+    text-align: center;
+    padding: 5px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+/* Permitido (por defecto, sin marcar) */
+.wps-toggle input:not(:checked) + .wps-toggle-btn {
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--wps-ok);
+    border-color: rgba(52, 211, 153, 0.35);
+}
+.wps-toggle input:not(:checked) + .wps-toggle-btn::after { content: "Permitido"; }
+.wps-toggle:hover input:not(:checked) + .wps-toggle-btn::after { content: "Bloquear ▸"; }
+
+/* Bloqueado (marcado) */
+.wps-toggle input:checked + .wps-toggle-btn {
+    background: rgba(251, 92, 116, 0.16);
+    color: var(--wps-danger);
+    border-color: rgba(251, 92, 116, 0.45);
+}
+.wps-toggle input:checked + .wps-toggle-btn::after { content: "Bloqueado"; }
+.wps-toggle:hover input:checked + .wps-toggle-btn::after { content: "Permitir ▸"; }
+.wps-toggle input:focus-visible + .wps-toggle-btn { outline: 2px solid var(--wps-primary-2); outline-offset: 2px; }
+
 /* ---- Badges (pills) ---- */
 .wps-badge {
     display: inline-block;

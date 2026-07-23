@@ -5,16 +5,15 @@ if (!current_user_can('manage_options')) {
     wp_die('Permisos insuficientes', 403);
 }
 
-$settings          = wps_aibots_settings();
-$bots              = wps_aibots_list();
-$physical_robots   = file_exists(ABSPATH . 'robots.txt');
-$blockable         = array_filter($bots, fn($m) => !empty($m[1]));
+$settings        = wps_aibots_settings();
+$blocked         = $settings['blocked'];
+$bots            = wps_aibots_list();
+$physical_robots = file_exists(ABSPATH . 'robots.txt');
 ?>
 <div class="wrap">
     <h1>Bloqueo de bots de IA</h1>
-    <p>Evita que los rastreadores de IA usen el contenido del sitio. Combina un
-       <strong>opt-out en robots.txt</strong> (para los que lo respetan) y un
-       <strong>bloqueo real por User-Agent (403)</strong> en el front.</p>
+    <p>Marca como <strong>Bloqueado</strong> cada rastreador de IA que no quieras permitir.
+       Un bot bloqueado se añade al <code>robots.txt</code> y, si su User-Agent es real, además se bloquea con <strong>403</strong> en el front.</p>
 
     <?php if (isset($_GET['saved'])): ?>
         <div class="notice notice-success is-dismissible"><p>✅ Ajustes guardados.</p></div>
@@ -25,66 +24,51 @@ $blockable         = array_filter($bots, fn($m) => !empty($m[1]));
         <input type="hidden" name="action" value="wps_save_aibots">
 
         <div class="wps-tunning-section">
-            <h2>Método de bloqueo</h2>
-            <p class="wps-kv">
-                <label>
-                    <input type="checkbox" name="wps_aibots_robots" value="1" <?php checked($settings['robots']); ?>>
-                    Añadir el opt-out a <code>robots.txt</code>
-                </label>
-            </p>
-            <p class="wps-kv">
-                <label>
-                    <input type="checkbox" name="wps_aibots_block" value="1" <?php checked($settings['block']); ?>>
-                    Bloquear con <strong>403</strong> por User-Agent en el front
-                </label>
-            </p>
-
+            <h2>Aplicar a todos</h2>
+            <div class="wps-actions">
+                <button type="button" class="button wps-btn-danger wps-bots-block-all">Bloquear todos</button>
+                <button type="button" class="button wps-bots-allow-all">Permitir todos</button>
+            </div>
             <p class="wps-kv">Estado guardado:
-                <span class="wps-badge <?php echo $settings['robots'] ? 'ok' : 'bad'; ?>">robots.txt <?php echo $settings['robots'] ? 'activo' : 'inactivo'; ?></span>
-                <span class="wps-badge <?php echo $settings['block'] ? 'ok' : 'bad'; ?>">403 por UA <?php echo $settings['block'] ? 'activo' : 'inactivo'; ?></span>
-                <span class="wps-badge <?php echo count($settings['bots']) ? 'ok' : 'warn'; ?>"><?php echo count($settings['bots']); ?> bots seleccionados</span>
+                <span class="wps-badge <?php echo count($blocked) ? 'bad' : 'ok'; ?>">
+                    <?php echo count($blocked); ?> bloqueados
+                </span>
+                <span class="wps-badge ok"><?php echo (count($bots) - count($blocked)); ?> permitidos</span>
             </p>
 
-            <?php if ($settings['robots'] && $physical_robots): ?>
-                <p class="wps-status wps-status--warn">⚠ Existe un <code>robots.txt</code> físico en la raíz: WordPress no aplica el robots.txt virtual, así que las reglas no se añadirán. Edita ese fichero a mano o elimínalo para usar el virtual.</p>
+            <?php if (!empty($blocked) && $physical_robots): ?>
+                <p class="wps-status wps-status--warn">⚠ Existe un <code>robots.txt</code> físico en la raíz: WordPress no aplica el robots.txt virtual, así que las reglas no se añadirán a ese fichero. Edítalo a mano o elimínalo para usar el virtual. (El bloqueo 403 sí funciona igualmente.)</p>
             <?php endif; ?>
 
             <p class="wps-muted" style="font-size:12px;">
                 El User-Agent es falsificable, por eso el 403 complementa —no sustituye— a robots.txt.
                 Con caché de página (LiteSpeed), la respuesta 403 se marca como no cacheable.
+                Recuerda pulsar <strong>Guardar cambios</strong> tras modificar la selección.
             </p>
         </div>
 
         <div class="wps-tunning-section">
-            <h2>Bots a bloquear (<?php echo count($bots); ?>)</h2>
-            <p class="wps-kv">Marca los bots que quieras bloquear. Los métodos de arriba definen cómo se aplican a los seleccionados.</p>
+            <h2>Bots (<?php echo count($bots); ?>)</h2>
             <table class="wps-tunning-table">
                 <thead>
                     <tr>
-                        <th style="width:36px;"><input type="checkbox" class="wps-aibots-all" title="Seleccionar todos"></th>
                         <th>Bot</th>
                         <th>Token User-Agent</th>
-                        <th>robots.txt</th>
-                        <th>403</th>
+                        <th>Estado</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($bots as $token => $meta): ?>
                         <tr>
-                            <td>
-                                <input type="checkbox" class="wps-aibot-cb" name="wps_aibots_bots[]"
-                                       value="<?php echo esc_attr($token); ?>"
-                                       <?php checked(in_array($token, $settings['bots'], true)); ?>>
-                            </td>
                             <td><?php echo esc_html($meta[0]); ?></td>
                             <td><code><?php echo esc_html($token); ?></code></td>
-                            <td><span class="wps-badge ok">sí</span></td>
                             <td>
-                                <?php if (!empty($meta[1])): ?>
-                                    <span class="wps-badge ok">sí</span>
-                                <?php else: ?>
-                                    <span class="wps-user-nodelete">—</span>
-                                <?php endif; ?>
+                                <label class="wps-toggle">
+                                    <input type="checkbox" class="wps-bot-cb" name="wps_aibots_blocked[]"
+                                           value="<?php echo esc_attr($token); ?>"
+                                           <?php checked(in_array($token, $blocked, true)); ?>>
+                                    <span class="wps-toggle-btn"></span>
+                                </label>
                             </td>
                         </tr>
                     <?php endforeach; ?>
