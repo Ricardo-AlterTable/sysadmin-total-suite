@@ -413,6 +413,11 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Bloqueo bots IA: seleccionar / deseleccionar todos
+    $(document).on('change', '.wps-aibots-all', function () {
+        $('.wps-aibot-cb').prop('checked', this.checked);
+    });
+
     // Cerrar modales (botón X y botón "Cerrar")
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');

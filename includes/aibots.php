@@ -41,9 +41,17 @@ function wps_aibots_list(): array {
 function wps_aibots_settings(): array {
     $s = get_option(WPS_AIBOTS_OPTION, []);
     if (!is_array($s)) $s = [];
+
+    $all = array_keys(wps_aibots_list());
+    // 'bots' = tokens seleccionados. Si nunca se ha guardado, por defecto: todos.
+    $bots = (isset($s['bots']) && is_array($s['bots']))
+        ? array_values(array_intersect($all, $s['bots']))
+        : $all;
+
     return [
         'robots' => !empty($s['robots']),
         'block'  => !empty($s['block']),
+        'bots'   => $bots,
     ];
 }
 
@@ -54,10 +62,10 @@ function wps_aibots_settings(): array {
  */
 add_filter('robots_txt', function ($output, $public) {
     $s = wps_aibots_settings();
-    if (!$s['robots']) return $output;
+    if (!$s['robots'] || empty($s['bots'])) return $output;
 
     $block = "\n# Bots de IA bloqueados por WP Profiler & Security\n";
-    foreach (array_keys(wps_aibots_list()) as $ua) {
+    foreach ($s['bots'] as $ua) {
         $block .= "User-agent: {$ua}\n";
     }
     $block .= "Disallow: /\n";
@@ -84,13 +92,14 @@ add_action('init', function () {
     if (is_admin() || (defined('DOING_CRON') && DOING_CRON)) return;
 
     $s = wps_aibots_settings();
-    if (!$s['block']) return;
+    if (!$s['block'] || empty($s['bots'])) return;
 
     $ua = isset($_SERVER['HTTP_USER_AGENT']) ? (string) $_SERVER['HTTP_USER_AGENT'] : '';
     if ($ua === '') return;
 
-    foreach (wps_aibots_list() as $token => $meta) {
-        if (empty($meta[1])) continue; // solo UAs reales
+    $list = wps_aibots_list();
+    foreach ($s['bots'] as $token) {
+        if (empty($list[$token][1])) continue; // solo UAs reales bloqueables
         if (stripos($ua, $token) !== false) {
             if (!defined('DONOTCACHEPAGE')) define('DONOTCACHEPAGE', true); // no cachear el 403
             nocache_headers();
@@ -110,9 +119,15 @@ add_action('admin_post_wps_save_aibots', function () {
     }
     check_admin_referer('wps_aibots_nonce');
 
+    $posted = (isset($_POST['wps_aibots_bots']) && is_array($_POST['wps_aibots_bots']))
+        ? array_map('sanitize_text_field', wp_unslash($_POST['wps_aibots_bots']))
+        : [];
+    $valid_bots = array_values(array_intersect(array_keys(wps_aibots_list()), $posted));
+
     update_option(WPS_AIBOTS_OPTION, [
         'robots' => isset($_POST['wps_aibots_robots']) ? 1 : 0,
         'block'  => isset($_POST['wps_aibots_block']) ? 1 : 0,
+        'bots'   => $valid_bots,
     ]);
 
     wp_redirect(admin_url('admin.php?page=wp-profiler-aibots&saved=1'));
