@@ -34,24 +34,29 @@ if (!function_exists('wps_unified_diff')) {
  */
 add_action('wp_ajax_wps_show_diff', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_diff_nonce', 'nonce');
 
     $rel = isset($_POST['path']) ? sanitize_text_field(wp_unslash($_POST['path'])) : '';
-    if (!$rel || strpos($rel, '..') !== false) {
-        wp_send_json_error(['message' => 'Ruta no válida'], 400);
+    if (!$rel) {
+        wp_send_json_error(['message' => __('Invalid path', 'wp-profiler-security')], 400);
     }
 
-    $absRoot = wp_normalize_path(realpath(ABSPATH));
-    $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
-    if (!$absFile || strpos($absFile, $absRoot) !== 0 || !is_file($absFile)) {
-        wp_send_json_error(['message' => 'Archivo no encontrado: ' . $rel], 404);
+    // Resolver ANTES de validar: así '..' ya está normalizado y wps_is_core_path()
+    // se evalúa sobre la ruta real, no sobre la que envió el cliente.
+    $absFile = wps_resolve_site_path($rel);
+    if (!$absFile || !is_file($absFile)) {
+        wp_send_json_error(['message' => sprintf(__('File not found: %s', 'wp-profiler-security'), $rel)], 404);
+    }
+    $rel = wps_relative_site_path($absFile);
+    if (!$rel || !wps_is_core_path($rel)) {
+        wp_send_json_error(['message' => __('Only WordPress core files can be compared.', 'wp-profiler-security')], 400);
     }
 
     $current = @file_get_contents($absFile);
     if ($current === false) {
-        wp_send_json_error(['message' => 'No se pudo leer el archivo actual: ' . $rel], 500);
+        wp_send_json_error(['message' => sprintf(__('Could not read the current file: %s', 'wp-profiler-security'), $rel)], 500);
     }
 
     $analysis = get_transient('wps_last_analysis');
@@ -60,13 +65,13 @@ add_action('wp_ajax_wps_show_diff', function () {
     $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
 
     if (!is_array($fetch) || empty($fetch['body'])) {
-        wp_send_json_error(['message' => 'No se pudo obtener el archivo original.', 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
+        wp_send_json_error(['message' => __('Could not fetch the original file.', 'wp-profiler-security'), 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
     }
 
     $original = $fetch['body'];
 
     if (hash('sha256', $current) === hash('sha256', $original)) {
-        wp_send_json_success(['path' => $rel, 'diff' => "No se detectaron diferencias."]);
+        wp_send_json_success(['path' => $rel, 'diff' => __('No differences found.', 'wp-profiler-security')]);
     }
 
     $diff = wps_unified_diff($original, $current, 3);
@@ -78,19 +83,24 @@ add_action('wp_ajax_wps_show_diff', function () {
  */
 add_action('wp_ajax_wps_restore_file', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_restore_file', 'nonce');
 
     $rel = isset($_POST['path']) ? sanitize_text_field(wp_unslash($_POST['path'])) : '';
-    if (!$rel || strpos($rel, '..') !== false) {
-        wp_send_json_error(['message' => 'Ruta no válida'], 400);
+    if (!$rel) {
+        wp_send_json_error(['message' => __('Invalid path', 'wp-profiler-security')], 400);
     }
 
-    $absRoot = wp_normalize_path(realpath(ABSPATH));
-    $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
-    if (!$absFile || strpos($absFile, $absRoot) !== 0) {
-        wp_send_json_error(['message' => 'Archivo fuera del sitio: ' . $rel], 403);
+    // Resolución segura que también admite archivos faltantes. Se resuelve ANTES
+    // de validar para que '..' esté normalizado al comprobar que es del core.
+    $absFile = wps_resolve_site_path($rel);
+    if (!$absFile) {
+        wp_send_json_error(['message' => sprintf(__('File outside the site: %s', 'wp-profiler-security'), $rel)], 403);
+    }
+    $rel = wps_relative_site_path($absFile);
+    if (!$rel || !wps_is_core_path($rel)) {
+        wp_send_json_error(['message' => __('Only WordPress core files can be restored.', 'wp-profiler-security')], 400);
     }
 
     $analysis = get_transient('wps_last_analysis');
@@ -98,7 +108,7 @@ add_action('wp_ajax_wps_restore_file', function () {
     $locale   = $analysis['locale'] ?? get_locale();
     $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
     if (!is_array($fetch) || empty($fetch['body'])) {
-        wp_send_json_error(['message' => 'No se pudo obtener el archivo original.', 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
+        wp_send_json_error(['message' => __('Could not fetch the original file.', 'wp-profiler-security'), 'details' => $GLOBALS['wps_fetch_last_error'] ?? 'n/a'], 500);
     }
 
     // === Copia de seguridad opcional (a petición del usuario) ===
@@ -106,23 +116,26 @@ add_action('wp_ajax_wps_restore_file', function () {
     $backup_rel = null;
 
     if ($do_backup && is_file($absFile)) {
-        $backup_rel  = 'backup_wp-profiler-security/' . time() . '/' . $rel;
-        $backup_path = ABSPATH . $backup_rel;
-        wp_mkdir_p(dirname($backup_path));
-        if (!@copy($absFile, $backup_path)) {
+        $backup = wps_backup_dir();
+        if (!$backup) {
+            wp_send_json_error(['message' => __('Could not create the backup. Check permissions; the file was NOT restored.', 'wp-profiler-security')], 500);
+        }
+        $backup_rel = wps_backup_file($absFile, $rel, $backup);
+        if (!$backup_rel) {
             // Si se pidió copia y no se puede crear, abortamos sin sobrescribir.
-            wp_send_json_error(['message' => 'No se pudo crear la copia de seguridad. Revisa permisos; el archivo NO se ha restaurado.'], 500);
+            wp_send_json_error(['message' => __('Could not create the backup. Check permissions; the file was NOT restored.', 'wp-profiler-security')], 500);
         }
     }
 
-    // Restaurar
+    // Restaurar (creando el directorio si el archivo estaba faltante).
+    wp_mkdir_p(dirname($absFile));
     $ok = @file_put_contents($absFile, $fetch['body']);
     if ($ok === false) {
-        wp_send_json_error(['message' => 'No se pudo escribir el archivo local. Revisa permisos.'], 500);
+        wp_send_json_error(['message' => __('Could not write the local file. Check permissions.', 'wp-profiler-security')], 500);
     }
 
     wp_send_json_success([
-        'message' => 'Archivo restaurado correctamente: ' . $rel,
+        'message' => sprintf(__('File restored successfully: %s', 'wp-profiler-security'), $rel),
         'backup'  => $backup_rel, // ruta relativa a la raíz de WordPress, o null si no se pidió copia
     ]);
 });
@@ -132,13 +145,14 @@ add_action('wp_ajax_wps_restore_file', function () {
  */
 add_action('wp_ajax_wps_restore_all_files', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_restore_all', 'nonce');
+    wps_raise_limits();
 
     $files = isset($_POST['files']) && is_array($_POST['files']) ? array_map('sanitize_text_field', wp_unslash($_POST['files'])) : [];
     if (empty($files)) {
-        wp_send_json_error(['message' => 'No se especificaron archivos a restaurar.'], 400);
+        wp_send_json_error(['message' => __('No files were specified to restore.', 'wp-profiler-security')], 400);
     }
 
     $analysis = get_transient('wps_last_analysis');
@@ -147,42 +161,47 @@ add_action('wp_ajax_wps_restore_all_files', function () {
     $restored = [];
     $errors = [];
 
-    // Copia de seguridad opcional: una carpeta por lote.
-    $do_backup  = isset($_POST['backup']) && $_POST['backup'] === '1';
-    $batch_rel  = 'backup_wp-profiler-security/' . time() . '/';
-    $batch_root = ABSPATH . $batch_rel;
+    // Copia de seguridad opcional: una carpeta por lote, fuera de la raíz web.
+    $do_backup = isset($_POST['backup']) && $_POST['backup'] === '1';
+    $batch     = $do_backup ? wps_backup_dir() : null;
+    if ($do_backup && !$batch) {
+        wp_send_json_error(['message' => __('Could not create the backup. Check permissions; nothing was restored.', 'wp-profiler-security')], 500);
+    }
 
     foreach ($files as $rel) {
-        if (!$rel || strpos($rel, '..') !== false) {
-            $errors[$rel] = 'Ruta no válida';
+        if (!$rel) {
+            $errors[$rel] = __('Invalid path', 'wp-profiler-security');
             continue;
         }
-        $absRoot = wp_normalize_path(realpath(ABSPATH));
-        $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
-        if (!$absFile || strpos($absFile, $absRoot) !== 0) {
-            $errors[$rel] = 'Archivo fuera del sitio';
+        $absFile = wps_resolve_site_path($rel);
+        if (!$absFile) {
+            $errors[$rel] = __('File outside the site', 'wp-profiler-security');
+            continue;
+        }
+        $rel = wps_relative_site_path($absFile);
+        if (!$rel || !wps_is_core_path($rel)) {
+            $errors[$rel] = __('Only WordPress core files can be restored.', 'wp-profiler-security');
             continue;
         }
         $fetch = wps_fetch_core_file_from_zip($version, $rel, $locale);
         if (!is_array($fetch) || empty($fetch['body'])) {
-            $errors[$rel] = 'No se pudo obtener original: ' . ($GLOBALS['wps_fetch_last_error'] ?? '');
+            $errors[$rel] = sprintf(__('Could not fetch the original: %s', 'wp-profiler-security'), $GLOBALS['wps_fetch_last_error'] ?? '');
             continue;
         }
 
         // Copia de seguridad (solo si se pidió).
         if ($do_backup && is_file($absFile)) {
-            $backup_path = $batch_root . $rel;
-            wp_mkdir_p(dirname($backup_path));
-            if (!@copy($absFile, $backup_path)) {
-                $errors[$rel] = 'No se pudo crear la copia de seguridad; no se restauró';
+            if (!wps_backup_file($absFile, $rel, $batch)) {
+                $errors[$rel] = __('Could not create the backup; not restored', 'wp-profiler-security');
                 continue;
             }
         }
 
-        // Restaurar
+        // Restaurar (creando el directorio si el archivo estaba faltante).
+        wp_mkdir_p(dirname($absFile));
         $ok = @file_put_contents($absFile, $fetch['body']);
         if ($ok === false) {
-            $errors[$rel] = 'No se pudo escribir';
+            $errors[$rel] = __('Could not write', 'wp-profiler-security');
             continue;
         }
         $restored[] = $rel;
@@ -191,7 +210,7 @@ add_action('wp_ajax_wps_restore_all_files', function () {
     wp_send_json_success([
         'restored'   => $restored,
         'errors'     => $errors,
-        'backup_dir' => ($do_backup && !empty($restored)) ? $batch_rel : null,
+        'backup_dir' => ($do_backup && $batch && !empty($restored)) ? $batch['rel'] : null,
     ]);
 });
 
@@ -227,7 +246,7 @@ function wps_remove_extras_from_analysis(array $rels): void {
         return true;
     }));
 
-    set_transient('wps_last_analysis', $analysis, 5 * MINUTE_IN_SECONDS);
+    set_transient('wps_last_analysis', $analysis, HOUR_IN_SECONDS);
 }
 
 /**
@@ -236,32 +255,31 @@ function wps_remove_extras_from_analysis(array $rels): void {
  */
 add_action('wp_ajax_wps_delete_extra', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_delete_extra', 'nonce');
 
     $rel = isset($_POST['path']) ? sanitize_text_field(wp_unslash($_POST['path'])) : '';
-    if (!$rel || strpos($rel, '..') !== false) {
-        wp_send_json_error(['message' => 'Ruta no válida'], 400);
+    if (!$rel) {
+        wp_send_json_error(['message' => __('Invalid path', 'wp-profiler-security')], 400);
     }
 
     // Salvaguarda: solo se borran ficheros marcados como "Extra" en el análisis.
     if (!in_array($rel, wps_get_extra_files(), true)) {
-        wp_send_json_error(['message' => 'El archivo no está en la lista de extras del último análisis. Vuelve a analizar.'], 400);
+        wp_send_json_error(['message' => __('The file is not in the extras list of the last analysis. Run the analysis again.', 'wp-profiler-security')], 400);
     }
 
-    $absRoot = wp_normalize_path(realpath(ABSPATH));
-    $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
-    if (!$absFile || strpos($absFile, $absRoot) !== 0 || !is_file($absFile)) {
-        wp_send_json_error(['message' => 'Archivo no encontrado: ' . $rel], 404);
+    $absFile = wps_resolve_site_path($rel);
+    if (!$absFile || !is_file($absFile)) {
+        wp_send_json_error(['message' => sprintf(__('File not found: %s', 'wp-profiler-security'), $rel)], 404);
     }
 
     if (!@unlink($absFile)) {
-        wp_send_json_error(['message' => 'No se pudo eliminar el archivo. Revisa permisos.'], 500);
+        wp_send_json_error(['message' => __('Could not delete the file. Check permissions.', 'wp-profiler-security')], 500);
     }
 
     wps_remove_extras_from_analysis([$rel]);
-    wp_send_json_success(['message' => 'Archivo eliminado: ' . $rel, 'deleted' => $rel]);
+    wp_send_json_success(['message' => sprintf(__('File deleted: %s', 'wp-profiler-security'), $rel), 'deleted' => $rel]);
 });
 
 /**
@@ -269,33 +287,33 @@ add_action('wp_ajax_wps_delete_extra', function () {
  */
 add_action('wp_ajax_wps_delete_all_extras', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_delete_all_extras', 'nonce');
+    wps_raise_limits();
 
     $extras = wps_get_extra_files();
     if (empty($extras)) {
-        wp_send_json_error(['message' => 'No hay archivos extra para eliminar.'], 400);
+        wp_send_json_error(['message' => __('There are no extra files to delete.', 'wp-profiler-security')], 400);
     }
 
-    $absRoot = wp_normalize_path(realpath(ABSPATH));
     $deleted = [];
     $errors  = [];
 
     foreach ($extras as $rel) {
-        if (!$rel || strpos($rel, '..') !== false) {
-            $errors[$rel] = 'Ruta no válida';
+        if (!$rel) {
+            $errors[$rel] = __('Invalid path', 'wp-profiler-security');
             continue;
         }
-        $absFile = wp_normalize_path(realpath(ABSPATH . $rel));
-        if (!$absFile || strpos($absFile, $absRoot) !== 0 || !is_file($absFile)) {
-            $errors[$rel] = 'No encontrado';
+        $absFile = wps_resolve_site_path($rel);
+        if (!$absFile || !is_file($absFile)) {
+            $errors[$rel] = __('Not found', 'wp-profiler-security');
             continue;
         }
         if (@unlink($absFile)) {
             $deleted[] = $rel;
         } else {
-            $errors[$rel] = 'No se pudo eliminar (permisos)';
+            $errors[$rel] = __('Could not delete (permissions)', 'wp-profiler-security');
         }
     }
 
@@ -322,13 +340,18 @@ function wps_fetch_core_file_from_zip(string $version, string $relative_path, st
     $relative_path = ltrim($relative_path, '/');
 
     if (!class_exists('ZipArchive')) {
-        $wps_fetch_last_error = 'La clase ZipArchive no está disponible en tu versión de PHP.';
+        $wps_fetch_last_error = __('The ZipArchive class is not available in your PHP version.', 'wp-profiler-security');
         return null;
     }
 
-    $upload_dir = wp_upload_dir();
-    $cache_dir  = trailingslashit($upload_dir['basedir']) . 'wp-profiler-security-cache/';
-    wp_mkdir_p($cache_dir);
+    // Directorio de caché protegido: la ruta del ZIP es calculable desde fuera
+    // (md5 de una URL pública), así que debe estar denegado por HTTP.
+    $cache = wps_plugin_dir_in_uploads('wp-profiler-security-cache');
+    if (!$cache) {
+        $wps_fetch_last_error = __('Could not create the cache directory. Check permissions.', 'wp-profiler-security');
+        return null;
+    }
+    $cache_dir = $cache['dir'];
 
     // Lista de ZIP a intentar en orden de preferencia.
     $urls = [];
@@ -352,25 +375,37 @@ function wps_fetch_core_file_from_zip(string $version, string $relative_path, st
             }
         }
 
-        $zip = new ZipArchive();
-        if ($zip->open($zip_path) !== true) {
-            $errors[] = basename($zip_url) . ': ZIP corrupto';
-            @unlink($zip_path);
+        // El handle del ZIP se reutiliza durante toda la petición: en una
+        // restauración masiva, reabrir un archivo de ~30 MB por cada fichero
+        // agotaba el tiempo de ejecución y dejaba el core a medio restaurar.
+        static $handles = [];
+        if (!isset($handles[$zip_path])) {
+            $zip = new ZipArchive();
+            if ($zip->open($zip_path) !== true) {
+                $errors[] = basename($zip_url) . ': ' . __('corrupt ZIP', 'wp-profiler-security');
+                @unlink($zip_path);
+                $handles[$zip_path] = false;
+                continue;
+            }
+            $handles[$zip_path] = $zip;
+        }
+        if ($handles[$zip_path] === false) {
+            $errors[] = basename($zip_url) . ': ' . __('corrupt ZIP', 'wp-profiler-security');
             continue;
         }
+        $zip = $handles[$zip_path];
 
         $content = $zip->getFromName('wordpress/' . $relative_path);
         if ($content === false) {
             $content = $zip->getFromName($relative_path); // Fallback para ficheros de la raíz.
         }
-        $zip->close();
 
         if ($content !== false) {
             return ['body' => $content, 'url' => $zip_url];
         }
-        $errors[] = basename($zip_url) . ": no contiene {$relative_path}";
+        $errors[] = basename($zip_url) . ': ' . sprintf(__('does not contain %s', 'wp-profiler-security'), $relative_path);
     }
 
-    $wps_fetch_last_error = 'No se pudo obtener el archivo original. ' . implode(' | ', $errors);
+    $wps_fetch_last_error = __('Could not fetch the original file.', 'wp-profiler-security') . ' ' . implode(' | ', $errors);
     return null;
 }

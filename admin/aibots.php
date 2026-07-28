@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!current_user_can('manage_options')) {
-    wp_die('Permisos insuficientes', 403);
+    wp_die(esc_html__('Insufficient permissions', 'wp-profiler-security'), 403);
 }
 
 $settings        = wps_aibots_settings();
@@ -11,12 +11,11 @@ $bots            = wps_aibots_list();
 $physical_robots = file_exists(ABSPATH . 'robots.txt');
 ?>
 <div class="wrap">
-    <h1>Bloqueo de bots de IA</h1>
-    <p>Marca como <strong>Bloqueado</strong> cada rastreador de IA que no quieras permitir.
-       Un bot bloqueado se añade al <code>robots.txt</code> y, si su User-Agent es real, además se bloquea con <strong>403</strong> en el front.</p>
+    <h1><?php esc_html_e('AI bot blocking', 'wp-profiler-security'); ?></h1>
+    <p><?php esc_html_e('Mark as Blocked every AI crawler you do not want to allow. A blocked bot is added to robots.txt and, if its User-Agent is real, it is also blocked with a 403 on the front end.', 'wp-profiler-security'); ?></p>
 
     <?php if (isset($_GET['saved'])): ?>
-        <div class="notice notice-success is-dismissible"><p>✅ Ajustes guardados.</p></div>
+        <div class="notice notice-success is-dismissible"><p><?php esc_html_e('Settings saved.', 'wp-profiler-security'); ?></p></div>
     <?php endif; ?>
 
     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
@@ -24,37 +23,58 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
         <input type="hidden" name="action" value="wps_save_aibots">
 
         <div class="wps-card">
-            <h2>Aplicar a todos</h2>
+            <h2><?php esc_html_e('Apply to all', 'wp-profiler-security'); ?></h2>
             <div class="wps-actions">
-                <button type="button" class="button wps-btn-danger wps-bots-block-all">Bloquear todos</button>
-                <button type="button" class="button wps-bots-allow-all">Permitir todos</button>
+                <button type="button" class="button wps-btn-danger wps-bots-block-all"><?php esc_html_e('Block all', 'wp-profiler-security'); ?></button>
+                <button type="button" class="button wps-bots-allow-all"><?php esc_html_e('Allow all', 'wp-profiler-security'); ?></button>
             </div>
-            <p class="wps-kv">Estado guardado:
+            <p class="wps-kv"><?php esc_html_e('Saved state:', 'wp-profiler-security'); ?>
                 <span class="wps-badge <?php echo count($blocked) ? 'bad' : 'ok'; ?>">
-                    <?php echo count($blocked); ?> bloqueados
+                    <?php
+                    printf(
+                        /* translators: %d: number of blocked bots. */
+                        esc_html(_n('%d blocked', '%d blocked', count($blocked), 'wp-profiler-security')),
+                        count($blocked)
+                    );
+                    ?>
                 </span>
-                <span class="wps-badge ok"><?php echo (count($bots) - count($blocked)); ?> permitidos</span>
+                <span class="wps-badge ok">
+                    <?php
+                    $allowed = count($bots) - count($blocked);
+                    printf(
+                        /* translators: %d: number of allowed bots. */
+                        esc_html(_n('%d allowed', '%d allowed', $allowed, 'wp-profiler-security')),
+                        $allowed
+                    );
+                    ?>
+                </span>
             </p>
 
             <?php if (!empty($blocked) && $physical_robots): ?>
-                <p class="wps-status wps-status--warn">⚠ Existe un <code>robots.txt</code> físico en la raíz: WordPress no aplica el robots.txt virtual, así que las reglas no se añadirán a ese fichero. Edítalo a mano o elimínalo para usar el virtual. (El bloqueo 403 sí funciona igualmente.)</p>
+                <p class="wps-status wps-status--warn"><?php esc_html_e('⚠ A physical robots.txt exists in the site root: WordPress does not apply its virtual robots.txt, so the rules will not be added to that file. Edit it manually or remove it to use the virtual one. (The 403 blocking still works.)', 'wp-profiler-security'); ?></p>
             <?php endif; ?>
 
             <p class="wps-muted" style="font-size:12px;">
-                El User-Agent es falsificable, por eso el 403 complementa —no sustituye— a robots.txt.
-                Con caché de página (LiteSpeed), la respuesta 403 se marca como no cacheable.
-                Recuerda pulsar <strong>Guardar cambios</strong> tras modificar la selección.
+                <?php esc_html_e('The User-Agent can be spoofed, so the 403 complements — it does not replace — robots.txt. With page caching (LiteSpeed), the 403 response is marked as non-cacheable. Remember to press Save changes after modifying the selection.', 'wp-profiler-security'); ?>
             </p>
         </div>
 
         <div class="wps-card">
-            <h2>Bots (<?php echo count($bots); ?>)</h2>
+            <h2>
+                <?php
+                printf(
+                    /* translators: %d: total number of bots in the list. */
+                    esc_html__('Bots (%d)', 'wp-profiler-security'),
+                    count($bots)
+                );
+                ?>
+            </h2>
             <table class="wps-table">
                 <thead>
                     <tr>
-                        <th>Bot</th>
-                        <th>Token User-Agent</th>
-                        <th>Estado</th>
+                        <th><?php esc_html_e('Bot', 'wp-profiler-security'); ?></th>
+                        <th><?php esc_html_e('User-Agent token', 'wp-profiler-security'); ?></th>
+                        <th><?php esc_html_e('Status', 'wp-profiler-security'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -67,7 +87,11 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
                                     <input type="checkbox" class="wps-bot-cb" name="wps_aibots_blocked[]"
                                            value="<?php echo esc_attr($token); ?>"
                                            <?php checked(in_array($token, $blocked, true)); ?>>
-                                    <span class="wps-toggle-btn"></span>
+                                    <span class="wps-toggle-btn"
+                                          data-allowed="<?php echo esc_attr__('Allowed', 'wp-profiler-security'); ?>"
+                                          data-blocked="<?php echo esc_attr__('Blocked', 'wp-profiler-security'); ?>"
+                                          data-do-block="<?php echo esc_attr__('Block ▸', 'wp-profiler-security'); ?>"
+                                          data-do-allow="<?php echo esc_attr__('Allow ▸', 'wp-profiler-security'); ?>"></span>
                                 </label>
                             </td>
                         </tr>
@@ -76,7 +100,7 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
             </table>
 
             <div class="wps-actions" style="margin-top:16px;">
-                <button type="submit" class="button button-primary">Guardar cambios</button>
+                <button type="submit" class="button button-primary"><?php esc_html_e('Save changes', 'wp-profiler-security'); ?></button>
             </div>
         </div>
     </form>

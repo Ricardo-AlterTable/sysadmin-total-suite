@@ -1,15 +1,19 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
+if (!current_user_can('manage_options')) {
+    wp_die(esc_html__('Insufficient permissions', 'wp-profiler-security'), 403);
+}
+
 $analysis = get_transient('wps_last_analysis');
 
 ?>
 <div class="wrap">
-    <h1>Integridad del Core</h1>
+    <h1><?php esc_html_e('Core integrity', 'wp-profiler-security'); ?></h1>
 
     <?php if (isset($_GET['cache_purged']) && $_GET['cache_purged'] === '1'): ?>
         <div id="message" class="updated notice is-dismissible">
-            <p>Caché del plugin purgada. El próximo análisis será desde cero.</p>
+            <p><?php esc_html_e('Plugin cache purged. The next analysis will start from scratch.', 'wp-profiler-security'); ?></p>
         </div>
     <?php endif; ?>
 
@@ -17,13 +21,13 @@ $analysis = get_transient('wps_last_analysis');
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field('wps_run_analysis_nonce'); ?>
             <input type="hidden" name="action" value="wps_run_analysis">
-            <button type="submit" class="button button-primary">Analizar ahora</button>
+            <button type="submit" class="button button-primary"><?php esc_html_e('Analyze now', 'wp-profiler-security'); ?></button>
         </form>
 
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field('wps_purge_cache_nonce', 'wps_purge_cache'); ?>
             <input type="hidden" name="action" value="wps_purge_cache">
-            <button type="submit" class="button button-secondary">Purgar Caché</button>
+            <button type="submit" class="button button-secondary"><?php esc_html_e('Purge cache', 'wp-profiler-security'); ?></button>
         </form>
     </div>
 
@@ -35,10 +39,10 @@ $analysis = get_transient('wps_last_analysis');
         $extras = [];
 
         foreach ($analysis['errors'] as $err) {
-            if (strpos($err, 'Modificado:') === 0) {
-                $modificados[] = preg_replace('/^Modificado:\s*/', '', $err);
-            } elseif (strpos($err, 'Faltante:') === 0) {
-                $faltantes[] = preg_replace('/^Faltante:\s*/', '', $err);
+            if (strpos($err, 'Modified:') === 0) {
+                $modificados[] = preg_replace('/^Modified:\s*/', '', $err);
+            } elseif (strpos($err, 'Missing:') === 0) {
+                $faltantes[] = preg_replace('/^Missing:\s*/', '', $err);
             } elseif (strpos($err, 'Extra:') === 0) {
                 $extras[] = preg_replace('/^Extra:\s*/', '', $err);
             }
@@ -49,14 +53,14 @@ $analysis = get_transient('wps_last_analysis');
         $core_issues = count($modificados) + count($faltantes);
         ?>
 
-        <h2>Resultado</h2>
+        <h2><?php esc_html_e('Result', 'wp-profiler-security'); ?></h2>
         <?php if ($core_issues > 0): ?>
-            <p class="wps-status wps-status--bad">⚠ Se detectaron problemas en el core de WordPress</p>
+            <p class="wps-status wps-status--bad"><?php esc_html_e('⚠ Issues were detected in the WordPress core', 'wp-profiler-security'); ?></p>
         <?php else: ?>
-            <p class="wps-status wps-status--ok">✔ No se detectaron problemas en el core de WordPress</p>
+            <p class="wps-status wps-status--ok"><?php esc_html_e('✔ No issues were detected in the WordPress core', 'wp-profiler-security'); ?></p>
         <?php endif; ?>
         <?php if (!empty($extras)): ?>
-            <p class="wps-status wps-status--warn">⚠ Se detectaron archivos no reconocidos por WordPress</p>
+            <p class="wps-status wps-status--warn"><?php esc_html_e('⚠ Files not recognized by WordPress were detected', 'wp-profiler-security'); ?></p>
         <?php endif; ?>
 
         <?php
@@ -64,11 +68,11 @@ $analysis = get_transient('wps_last_analysis');
         // Pagination for modified/missing files
         if (!empty($modificados) || !empty($faltantes)) {
             $all_files = array_merge(
-                array_map(function($f) { return ['type' => 'Modificado', 'path' => $f]; }, $modificados),
-                array_map(function($f) { return ['type' => 'Faltante', 'path' => $f]; }, $faltantes)
+                array_map(function($f) { return ['type' => 'Modified', 'path' => $f]; }, $modificados),
+                array_map(function($f) { return ['type' => 'Missing', 'path' => $f]; }, $faltantes)
             );
 
-            $per_page = isset($_GET['per_page']) && in_array($_GET['per_page'], [20, 50, 100, 'all']) ? $_GET['per_page'] : 20;
+            $per_page = isset($_GET['per_page']) && in_array((string) $_GET['per_page'], ['20', '50', '100', 'all'], true) ? sanitize_text_field(wp_unslash($_GET['per_page'])) : 20;
             $current_page = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
             $total_items = count($all_files);
 
@@ -85,7 +89,7 @@ $analysis = get_transient('wps_last_analysis');
 
         // Pagination for extra files
         if (!empty($extras)) {
-            $extras_per_page = isset($_GET['extras_per_page']) && in_array($_GET['extras_per_page'], [20, 50, 100, 'all']) ? $_GET['extras_per_page'] : 20;
+            $extras_per_page = isset($_GET['extras_per_page']) && in_array((string) $_GET['extras_per_page'], ['20', '50', '100', 'all'], true) ? sanitize_text_field(wp_unslash($_GET['extras_per_page'])) : 20;
             $extras_current_page = isset($_GET['extras_paged']) ? max(1, intval($_GET['extras_paged'])) : 1;
             $extras_total_items = count($extras);
 
@@ -102,23 +106,23 @@ $analysis = get_transient('wps_last_analysis');
         ?>
 
         <?php if (!empty($paged_files)): ?>
-            <h2>Archivos modificados / faltantes</h2>
+            <h2><?php esc_html_e('Modified / missing files', 'wp-profiler-security'); ?></h2>
             <div class="tablenav top">
                 <div class="alignleft actions">
                     <form method="get">
-                        <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']); ?>" />
+                        <input type="hidden" name="page" value="<?php echo esc_attr(sanitize_key(wp_unslash($_REQUEST['page'] ?? ''))); ?>" />
                         <select name="per_page" onchange="this.form.submit()">
                             <option value="20" <?php selected($per_page, 20); ?>>20</option>
                             <option value="50" <?php selected($per_page, 50); ?>>50</option>
                             <option value="100" <?php selected($per_page, 100); ?>>100</option>
-                            <option value="all" <?php selected($per_page, 'all'); ?>>Todos</option>
+                            <option value="all" <?php selected($per_page, 'all'); ?>><?php esc_html_e('All', 'wp-profiler-security'); ?></option>
                         </select>
-                        <input type="submit" class="button" value="Aplicar">
+                        <input type="submit" class="button" value="<?php echo esc_attr__('Apply', 'wp-profiler-security'); ?>">
                     </form>
                 </div>
                 <?php if ($per_page !== 'all' && $total_pages > 1): ?>
                 <div class="tablenav-pages">
-                    <span class="displaying-num"><?php echo $total_items; ?> elementos</span>
+                    <span class="displaying-num"><?php printf(esc_html(_n('%s item', '%s items', $total_items, 'wp-profiler-security')), esc_html(number_format_i18n($total_items))); ?></span>
                     <span class="pagination-links">
                         <?php echo paginate_links(['total' => $total_pages, 'current' => $current_page]); ?>
                     </span>
@@ -128,32 +132,32 @@ $analysis = get_transient('wps_last_analysis');
             <ul id="wps-list">
                 <?php foreach ($paged_files as $file): ?>
                     <li>
-                        <?php if ($file['type'] === 'Modificado'): ?>
-                            <span class="wps-tag wps-tag--danger">Modificado</span>
+                        <?php if ($file['type'] === 'Modified'): ?>
+                            <span class="wps-tag wps-tag--danger"><?php esc_html_e('Modified', 'wp-profiler-security'); ?></span>
                             <code class="wps-file-path"><?php echo esc_html($file['path']); ?></code>
-                            <button class="button show-diff" data-path="<?php echo esc_attr($file['path']); ?>">Mostrar cambios</button>
-                            <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
+                            <button class="button show-diff" data-path="<?php echo esc_attr($file['path']); ?>"><?php esc_html_e('Show changes', 'wp-profiler-security'); ?></button>
+                            <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo esc_attr(wp_create_nonce('wps_restore_file')); ?>"><?php esc_html_e('Restore', 'wp-profiler-security'); ?></button>
                         <?php else: ?>
-                            <span class="wps-tag wps-tag--warn">Faltante</span>
+                            <span class="wps-tag wps-tag--warn"><?php esc_html_e('Missing', 'wp-profiler-security'); ?></span>
                             <code class="wps-file-path"><?php echo esc_html($file['path']); ?></code>
-                            <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo wp_create_nonce('wps_restore_file'); ?>">Restaurar</button>
+                            <button class="button restore-file" data-path="<?php echo esc_attr($file['path']); ?>" data-nonce="<?php echo esc_attr(wp_create_nonce('wps_restore_file')); ?>"><?php esc_html_e('Restore', 'wp-profiler-security'); ?></button>
                         <?php endif; ?>
                     </li>
                 <?php endforeach; ?>
             </ul>
-            <button class="button button-secondary restore-all" data-nonce="<?php echo wp_create_nonce('wps_restore_all'); ?>">Restaurar todos los modificados/faltantes</button>
+            <button class="button button-secondary restore-all" data-nonce="<?php echo esc_attr(wp_create_nonce('wps_restore_all')); ?>"><?php esc_html_e('Restore all modified/missing', 'wp-profiler-security'); ?></button>
         <?php elseif (!empty($modificados) || !empty($faltantes)): ?>
-             <h2>Archivos modificados / faltantes</h2>
-             <p>No se han detectado archivos modificados ni faltantes.</p>
+             <h2><?php esc_html_e('Modified / missing files', 'wp-profiler-security'); ?></h2>
+             <p><?php esc_html_e('No modified or missing files were detected.', 'wp-profiler-security'); ?></p>
         <?php endif; ?>
 
         <?php if (!empty($extras)): ?>
-            <h2>Archivos extra</h2>
-            <button class="button button-secondary view-extras">Ver archivos extra detectados</button>
+            <h2><?php esc_html_e('Extra files', 'wp-profiler-security'); ?></h2>
+            <button class="button button-secondary view-extras"><?php esc_html_e('View detected extra files', 'wp-profiler-security'); ?></button>
         <?php endif; ?>
 
     <?php else: ?>
-        <p>No hay análisis disponible. Ejecuta <strong>Analizar ahora</strong> para obtener resultados.</p>
+        <p><?php printf(esc_html__('No analysis available. Run %s to get results.', 'wp-profiler-security'), '<strong>' . esc_html__('Analyze now', 'wp-profiler-security') . '</strong>'); ?></p>
     <?php endif; ?>
 </div>
 
@@ -161,7 +165,7 @@ $analysis = get_transient('wps_last_analysis');
 <div id="wpsDiffModal" class="wps-modal-overlay" style="display:none;">
     <div class="wps-modal">
         <span class="wps-close">&times;</span>
-        <h2>Diferencias del archivo</h2>
+        <h2><?php esc_html_e('File differences', 'wp-profiler-security'); ?></h2>
         <pre id="wpsDiffContent"></pre>
     </div>
 </div>
@@ -170,33 +174,33 @@ $analysis = get_transient('wps_last_analysis');
 <div id="wpsExtrasModal" class="wps-modal-overlay" style="display:none;">
     <div class="wps-modal">
         <span class="wps-close">&times;</span>
-        <h2>Archivos extra detectados</h2>
-        <p>Estos archivos no pertenecen al core oficial de WordPress.</p>
-        <p class="wps-status wps-status--bad">⚠ Eliminar un archivo es <strong>irreversible</strong>: se borra de forma permanente y no se puede deshacer.</p>
+        <h2><?php esc_html_e('Detected extra files', 'wp-profiler-security'); ?></h2>
+        <p><?php esc_html_e('These files do not belong to the official WordPress core.', 'wp-profiler-security'); ?></p>
+        <p class="wps-status wps-status--bad"><?php printf(esc_html__('⚠ Deleting a file is %s: it is permanently removed and cannot be undone.', 'wp-profiler-security'), '<strong>' . esc_html__('irreversible', 'wp-profiler-security') . '</strong>'); ?></p>
 
         <?php if (!empty($paged_extras)): ?>
             <div class="tablenav top">
                 <div class="alignleft actions">
                     <form method="get">
-                        <input type="hidden" name="page" value="<?php echo esc_attr($_REQUEST['page']); ?>" />
+                        <input type="hidden" name="page" value="<?php echo esc_attr(sanitize_key(wp_unslash($_REQUEST['page'] ?? ''))); ?>" />
                         <input type="hidden" name="open_extras_modal" value="true" />
                         <?php foreach ($_GET as $key => $value) {
-                            if (!in_array($key, ['page', 'open_extras_modal', 'extras_per_page', 'extras_paged'])) {
-                                echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '" />';
+                            if (is_scalar($value) && !in_array($key, ['page', 'open_extras_modal', 'extras_per_page', 'extras_paged'], true)) {
+                                echo '<input type="hidden" name="' . esc_attr(sanitize_key($key)) . '" value="' . esc_attr(sanitize_text_field(wp_unslash($value))) . '" />';
                             }
                         } ?>
                         <select name="extras_per_page" onchange="this.form.submit()">
                             <option value="20" <?php selected($extras_per_page, 20); ?>>20</option>
                             <option value="50" <?php selected($extras_per_page, 50); ?>>50</option>
                             <option value="100" <?php selected($extras_per_page, 100); ?>>100</option>
-                            <option value="all" <?php selected($extras_per_page, 'all'); ?>>Todos</option>
+                            <option value="all" <?php selected($extras_per_page, 'all'); ?>><?php esc_html_e('All', 'wp-profiler-security'); ?></option>
                         </select>
-                        <input type="submit" class="button" value="Aplicar">
+                        <input type="submit" class="button" value="<?php echo esc_attr__('Apply', 'wp-profiler-security'); ?>">
                     </form>
                 </div>
                 <?php if ($extras_per_page !== 'all' && $extras_total_pages > 1): ?>
                 <div class="tablenav-pages">
-                    <span class="displaying-num"><?php echo $extras_total_items; ?> items</span>
+                    <span class="displaying-num"><?php printf(esc_html(_n('%s item', '%s items', $extras_total_items, 'wp-profiler-security')), esc_html(number_format_i18n($extras_total_items))); ?></span>
                     <span class="pagination-links">
                         <?php
                         $pagination_args = [
@@ -215,13 +219,13 @@ $analysis = get_transient('wps_last_analysis');
                 <?php foreach ($paged_extras as $file): ?>
                     <li>
                         <code class="wps-file-path"><?php echo esc_html($file); ?></code>
-                        <button class="button wps-delete-extra" data-path="<?php echo esc_attr($file); ?>" data-nonce="<?php echo wp_create_nonce('wps_delete_extra'); ?>">Eliminar</button>
+                        <button class="button wps-delete-extra" data-path="<?php echo esc_attr($file); ?>" data-nonce="<?php echo esc_attr(wp_create_nonce('wps_delete_extra')); ?>"><?php esc_html_e('Delete', 'wp-profiler-security'); ?></button>
                     </li>
                 <?php endforeach; ?>
             </ul>
-            <button class="button button-secondary wps-delete-all-extras" data-nonce="<?php echo wp_create_nonce('wps_delete_all_extras'); ?>">Eliminar todos los archivos extra</button>
+            <button class="button button-secondary wps-delete-all-extras" data-nonce="<?php echo esc_attr(wp_create_nonce('wps_delete_all_extras')); ?>"><?php esc_html_e('Delete all extra files', 'wp-profiler-security'); ?></button>
         <?php endif; ?>
-        <button class="button button-secondary" id="wps-extras-modal-close">Cerrar</button>
+        <button class="button button-secondary" id="wps-extras-modal-close"><?php esc_html_e('Close', 'wp-profiler-security'); ?></button>
     </div>
 </div>
 <script>

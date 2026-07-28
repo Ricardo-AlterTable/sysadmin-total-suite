@@ -8,22 +8,28 @@ if (!defined('ABSPATH')) exit;
  */
 add_action('wp_ajax_wps_delete_user', function () {
     if (!current_user_can('delete_users')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_delete_user', 'nonce');
 
     $user_id = isset($_POST['user_id']) ? absint($_POST['user_id']) : 0;
     if (!$user_id) {
-        wp_send_json_error(['message' => 'ID de usuario no válido'], 400);
+        wp_send_json_error(['message' => __('Invalid user ID', 'wp-profiler-security')], 400);
     }
 
     if ($user_id === get_current_user_id()) {
-        wp_send_json_error(['message' => 'No puedes eliminar tu propio usuario.'], 400);
+        wp_send_json_error(['message' => __('You cannot delete your own user.', 'wp-profiler-security')], 400);
     }
 
     $user = get_userdata($user_id);
     if (!$user) {
-        wp_send_json_error(['message' => 'El usuario no existe.'], 404);
+        wp_send_json_error(['message' => __('The user does not exist.', 'wp-profiler-security')], 404);
+    }
+
+    // Meta-capability por usuario: respeta los filtros map_meta_cap/user_has_cap
+    // con los que otros plugins protegen cuentas concretas.
+    if (!current_user_can('delete_user', $user_id)) {
+        wp_send_json_error(['message' => __('You are not allowed to delete this user.', 'wp-profiler-security')], 403);
     }
 
     // La API de borrado de usuarios no siempre está cargada en admin-ajax.
@@ -38,11 +44,11 @@ add_action('wp_ajax_wps_delete_user', function () {
     }
 
     if (!$ok) {
-        wp_send_json_error(['message' => 'No se pudo eliminar el usuario.'], 500);
+        wp_send_json_error(['message' => __('Could not delete the user.', 'wp-profiler-security')], 500);
     }
 
     wp_send_json_success([
-        'message' => 'Usuario eliminado: ' . $user->user_login,
+        'message' => sprintf(__('User deleted: %s', 'wp-profiler-security'), $user->user_login),
         'deleted' => $user_id,
     ]);
 });

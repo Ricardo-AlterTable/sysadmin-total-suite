@@ -2,7 +2,7 @@
 if (!defined('ABSPATH')) exit;
 
 if (!current_user_can('manage_options')) {
-    wp_die('Permisos insuficientes', 403);
+    wp_die(esc_html__('Insufficient permissions', 'wp-profiler-security'), 403);
 }
 
 $plugins   = wps_wpo_plugins_info();
@@ -19,22 +19,22 @@ $plugins_warn  = $plugins['active'] > 20;                     // muchos plugins 
 $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
 ?>
 <div class="wrap">
-    <h1>WPO</h1>
-    <p>Web Performance Optimization: chequeo rápido de rendimiento del sitio.</p>
+    <h1><?php esc_html_e('WPO', 'wp-profiler-security'); ?></h1>
+    <p><?php esc_html_e('Web Performance Optimization: a quick performance check of the site.', 'wp-profiler-security'); ?></p>
 
     <!-- 1) Plugins -->
     <div class="wps-card">
-        <h2>Plugins que afectan a la carga</h2>
-        <p class="wps-kv">Instalados: <strong><?php echo (int) $plugins['total']; ?></strong> ·
-           Activos: <strong><?php echo (int) $plugins['active']; ?></strong> ·
-           Inactivos: <strong><?php echo (int) $plugins['inactive']; ?></strong>
+        <h2><?php esc_html_e('Plugins affecting load time', 'wp-profiler-security'); ?></h2>
+        <p class="wps-kv"><?php esc_html_e('Installed:', 'wp-profiler-security'); ?> <strong><?php echo (int) $plugins['total']; ?></strong> ·
+           <?php esc_html_e('Active:', 'wp-profiler-security'); ?> <strong><?php echo (int) $plugins['active']; ?></strong> ·
+           <?php esc_html_e('Inactive:', 'wp-profiler-security'); ?> <strong><?php echo (int) $plugins['inactive']; ?></strong>
            <span class="wps-badge <?php echo $plugins_warn ? 'warn' : 'ok'; ?>">
-               <?php echo $plugins_warn ? 'Muchos plugins activos' : 'Cantidad razonable'; ?>
+               <?php echo $plugins_warn ? esc_html__('Many active plugins', 'wp-profiler-security') : esc_html__('Reasonable amount', 'wp-profiler-security'); ?>
            </span>
         </p>
-        <p>Los plugins <strong>activos</strong> se cargan en cada petición; son los que impactan en la velocidad:</p>
+        <p><?php printf(esc_html__('%s plugins load on every request; they are the ones impacting speed:', 'wp-profiler-security'), '<strong>' . esc_html__('Active', 'wp-profiler-security') . '</strong>'); ?></p>
         <table class="wps-table">
-            <thead><tr><th>Plugin activo</th><th>Versión</th></tr></thead>
+            <thead><tr><th><?php esc_html_e('Active plugin', 'wp-profiler-security'); ?></th><th><?php esc_html_e('Version', 'wp-profiler-security'); ?></th></tr></thead>
             <tbody>
                 <?php foreach ($plugins['active_list'] as $p): ?>
                     <tr>
@@ -48,28 +48,28 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
 
     <!-- 2) Basura en wp_options -->
     <div class="wps-card">
-        <h2>Opciones autoload y basura en wp_options</h2>
+        <h2><?php esc_html_e('Autoload options and wp_options junk', 'wp-profiler-security'); ?></h2>
         <p class="wps-kv">
-            Opciones autoload: <strong><?php echo (int) $autoload['count']; ?></strong> ·
-            Tamaño total autoload: <strong><?php echo esc_html(size_format($autoload['total_bytes'], 2)); ?></strong>
+            <?php esc_html_e('Autoload options:', 'wp-profiler-security'); ?> <strong><?php echo (int) $autoload['count']; ?></strong> ·
+            <?php esc_html_e('Total autoload size:', 'wp-profiler-security'); ?> <strong><?php echo esc_html(size_format($autoload['total_bytes'], 2)); ?></strong>
             <span class="wps-badge <?php echo $autoload_warn ? 'warn' : 'ok'; ?>">
-                <?php echo $autoload_warn ? 'Elevado (>1 MB)' : 'Correcto'; ?>
+                <?php echo $autoload_warn ? esc_html__('High (>1 MB)', 'wp-profiler-security') : esc_html__('OK', 'wp-profiler-security'); ?>
             </span>
         </p>
         <p class="wps-kv">
-            Transitorios con caducidad: <strong><?php echo (int) $transients['total']; ?></strong> ·
-            Caducados (basura): <strong class="wps-num-warn"><?php echo (int) $transients['expired']; ?></strong>
+            <?php esc_html_e('Transients with expiration:', 'wp-profiler-security'); ?> <strong><?php echo (int) $transients['total']; ?></strong> ·
+            <?php esc_html_e('Expired (junk):', 'wp-profiler-security'); ?> <strong class="wps-num-warn"><?php echo (int) $transients['expired']; ?></strong>
         </p>
 
         <button class="button button-secondary wps-clean-transients"
-                data-nonce="<?php echo wp_create_nonce('wps_clean_transients'); ?>">
-            Limpiar transitorios caducados
+                data-nonce="<?php echo esc_attr(wp_create_nonce('wps_clean_transients')); ?>">
+            <?php esc_html_e('Clean up expired transients', 'wp-profiler-security'); ?>
         </button>
 
         <?php if (!empty($autoload['largest'])): ?>
-            <p style="margin-top:15px;">Mayores opciones autoload (revisa si alguna es de un plugin ya desinstalado):</p>
+            <p style="margin-top:15px;"><?php esc_html_e('Largest autoload options (check whether any belongs to an uninstalled plugin):', 'wp-profiler-security'); ?></p>
             <table class="wps-table">
-                <thead><tr><th>option_name</th><th>Tamaño</th></tr></thead>
+                <thead><tr><th>option_name</th><th><?php esc_html_e('Size', 'wp-profiler-security'); ?></th></tr></thead>
                 <tbody>
                     <?php foreach ($autoload['largest'] as $o): ?>
                         <tr>
@@ -79,48 +79,48 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
                     <?php endforeach; ?>
                 </tbody>
             </table>
-            <p class="wps-muted" style="font-size:12px;">El borrado automático de estas opciones no se ofrece por seguridad: podrían pertenecer a plugins activos. Elimínalas manualmente solo si reconoces que son de un plugin ya retirado.</p>
+            <p class="wps-muted" style="font-size:12px;"><?php esc_html_e('Automatic deletion of these options is not offered for safety: they could belong to active plugins. Remove them manually only if you recognize them as belonging to a removed plugin.', 'wp-profiler-security'); ?></p>
         <?php endif; ?>
     </div>
 
     <!-- 3) WP-Cron -->
     <div class="wps-card">
-        <h2>WP-Cron</h2>
+        <h2><?php esc_html_e('WP-Cron', 'wp-profiler-security'); ?></h2>
         <p class="wps-kv">
-            Modo:
+            <?php esc_html_e('Mode:', 'wp-profiler-security'); ?>
             <?php if ($cron['disabled']): ?>
-                <strong>WP-Cron interno desactivado</strong> (<code>DISABLE_WP_CRON = true</code>)
-                <span class="wps-badge warn">Debe haber un cron real del sistema llamando a wp-cron.php</span>
+                <strong><?php esc_html_e('Internal WP-Cron disabled', 'wp-profiler-security'); ?></strong> (<code>DISABLE_WP_CRON = true</code>)
+                <span class="wps-badge warn"><?php esc_html_e('A real system cron must be calling wp-cron.php', 'wp-profiler-security'); ?></span>
             <?php else: ?>
-                <strong>WP-Cron interno activo</strong>
-                <span class="wps-badge ok">Se dispara con las visitas</span>
+                <strong><?php esc_html_e('Internal WP-Cron active', 'wp-profiler-security'); ?></strong>
+                <span class="wps-badge ok"><?php esc_html_e('Triggered by visits', 'wp-profiler-security'); ?></span>
             <?php endif; ?>
         </p>
         <p class="wps-kv">
-            Tareas programadas: <strong><?php echo (int) $cron['total']; ?></strong> ·
-            Atrasadas: <strong><?php echo (int) $cron['overdue']; ?></strong>
-            <?php if ($cron['overdue'] > 0): ?><span class="wps-badge warn">Hay tareas atrasadas</span><?php endif; ?>
-            · Huérfanas: <strong class="wps-num-warn"><?php echo (int) $cron['orphaned']; ?></strong>
-            <?php if ($cron['orphaned'] > 0): ?><span class="wps-badge warn">Basura de plugins retirados</span><?php endif; ?>
+            <?php esc_html_e('Scheduled tasks:', 'wp-profiler-security'); ?> <strong><?php echo (int) $cron['total']; ?></strong> ·
+            <?php esc_html_e('Overdue:', 'wp-profiler-security'); ?> <strong><?php echo (int) $cron['overdue']; ?></strong>
+            <?php if ($cron['overdue'] > 0): ?><span class="wps-badge warn"><?php esc_html_e('There are overdue tasks', 'wp-profiler-security'); ?></span><?php endif; ?>
+            · <?php esc_html_e('Orphaned:', 'wp-profiler-security'); ?> <strong class="wps-num-warn"><?php echo (int) $cron['orphaned']; ?></strong>
+            <?php if ($cron['orphaned'] > 0): ?><span class="wps-badge warn"><?php esc_html_e('Junk from removed plugins', 'wp-profiler-security'); ?></span><?php endif; ?>
         </p>
 
         <?php if ($cron['orphaned'] > 0): ?>
             <button class="button wps-btn-danger wps-clean-cron-all"
-                    data-nonce="<?php echo wp_create_nonce('wps_clean_cron_all'); ?>">
-                Limpiar todas las tareas cron huérfanas
+                    data-nonce="<?php echo esc_attr(wp_create_nonce('wps_clean_cron_all')); ?>">
+                <?php esc_html_e('Clean up all orphan cron tasks', 'wp-profiler-security'); ?>
             </button>
         <?php endif; ?>
 
         <?php if (!empty($cron['events'])): ?>
             <table class="wps-table">
-                <thead><tr><th>Hook</th><th>Próxima ejecución</th><th>Recurrencia</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th><?php esc_html_e('Hook', 'wp-profiler-security'); ?></th><th><?php esc_html_e('Next run', 'wp-profiler-security'); ?></th><th><?php esc_html_e('Recurrence', 'wp-profiler-security'); ?></th><th><?php esc_html_e('Status', 'wp-profiler-security'); ?></th><th><?php esc_html_e('Actions', 'wp-profiler-security'); ?></th></tr></thead>
                 <tbody>
                     <?php foreach ($cron['events'] as $ev): ?>
                         <?php
                         $when = wp_date(get_option('date_format') . ' ' . get_option('time_format'), $ev['time']);
                         $recur = $ev['schedule']
                             ? (isset($schedules[$ev['schedule']]['display']) ? $schedules[$ev['schedule']]['display'] : $ev['schedule'])
-                            : 'Una vez';
+                            : __('Once', 'wp-profiler-security');
                         ?>
                         <tr>
                             <td><code><?php echo esc_html($ev['hook']); ?></code></td>
@@ -128,18 +128,18 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
                             <td><?php echo esc_html($recur); ?></td>
                             <td>
                                 <?php if ($ev['orphan']): ?>
-                                    <span class="wps-badge warn">Huérfana</span>
+                                    <span class="wps-badge warn"><?php esc_html_e('Orphaned', 'wp-profiler-security'); ?></span>
                                 <?php elseif ($ev['overdue']): ?>
-                                    <span class="wps-badge warn">Atrasada</span>
+                                    <span class="wps-badge warn"><?php esc_html_e('Overdue', 'wp-profiler-security'); ?></span>
                                 <?php else: ?>
-                                    <span class="wps-badge ok">OK</span>
+                                    <span class="wps-badge ok"><?php esc_html_e('OK', 'wp-profiler-security'); ?></span>
                                 <?php endif; ?>
                             </td>
                             <td>
                                 <?php if ($ev['orphan']): ?>
                                     <button class="button wps-btn-danger wps-clean-cron-hook"
                                             data-hook="<?php echo esc_attr($ev['hook']); ?>"
-                                            data-nonce="<?php echo wp_create_nonce('wps_clean_cron'); ?>">Eliminar</button>
+                                            data-nonce="<?php echo esc_attr(wp_create_nonce('wps_clean_cron')); ?>"><?php esc_html_e('Delete', 'wp-profiler-security'); ?></button>
                                 <?php else: ?>
                                     <span class="wps-user-nodelete">—</span>
                                 <?php endif; ?>
@@ -149,59 +149,58 @@ $has_cache     = !empty($cache['plugins']) || $cache['page_cache_active'];
                 </tbody>
             </table>
         <?php else: ?>
-            <p>No hay tareas cron programadas.</p>
+            <p><?php esc_html_e('There are no scheduled cron tasks.', 'wp-profiler-security'); ?></p>
         <?php endif; ?>
     </div>
 
     <!-- 4) Caché -->
     <div class="wps-card">
-        <h2>Caché</h2>
+        <h2><?php esc_html_e('Cache', 'wp-profiler-security'); ?></h2>
         <?php if ($has_cache): ?>
-            <p class="wps-kv"><span class="wps-badge ok">Caché activa</span></p>
+            <p class="wps-kv"><span class="wps-badge ok"><?php esc_html_e('Cache active', 'wp-profiler-security'); ?></span></p>
         <?php else: ?>
-            <p class="wps-kv"><span class="wps-badge bad">Sin plugin de caché detectado</span></p>
+            <p class="wps-kv"><span class="wps-badge bad"><?php esc_html_e('No cache plugin detected', 'wp-profiler-security'); ?></span></p>
         <?php endif; ?>
-        <p class="wps-kv">Servidor web:
-            <strong><?php echo $cache['server_software'] ? esc_html($cache['server_software']) : 'desconocido'; ?></strong>
+        <p class="wps-kv"><?php esc_html_e('Web server:', 'wp-profiler-security'); ?>
+            <strong><?php echo $cache['server_software'] ? esc_html($cache['server_software']) : esc_html__('unknown', 'wp-profiler-security'); ?></strong>
             <?php if ($cache['server_is_ls']): ?><span class="wps-badge ok">LiteSpeed</span><?php endif; ?>
         </p>
-        <p class="wps-kv">Plugin(s) de caché activos:
-            <strong><?php echo $cache['plugins'] ? esc_html(implode(', ', $cache['plugins'])) : 'ninguno'; ?></strong>
+        <p class="wps-kv"><?php esc_html_e('Active cache plugin(s):', 'wp-profiler-security'); ?>
+            <strong><?php echo $cache['plugins'] ? esc_html(implode(', ', $cache['plugins'])) : esc_html__('none', 'wp-profiler-security'); ?></strong>
         </p>
 
         <?php if ($cache['page_method'] === 'litespeed'): ?>
-            <p class="wps-kv">Caché de página (LiteSpeed, a nivel de servidor):
+            <p class="wps-kv"><?php esc_html_e('Page cache (LiteSpeed, server level):', 'wp-profiler-security'); ?>
                 <?php if ($cache['ls_cache_enabled'] === true): ?>
-                    <strong class="wps-ok-text">activada</strong>
+                    <strong class="wps-ok-text"><?php esc_html_e('enabled', 'wp-profiler-security'); ?></strong>
                 <?php elseif ($cache['ls_cache_enabled'] === false): ?>
-                    <strong class="wps-bad-text">desactivada</strong>
-                    <span class="wps-badge warn">Actívala en LiteSpeed Cache → Cache</span>
+                    <strong class="wps-bad-text"><?php esc_html_e('disabled', 'wp-profiler-security'); ?></strong>
+                    <span class="wps-badge warn"><?php esc_html_e('Enable it in LiteSpeed Cache → Cache', 'wp-profiler-security'); ?></span>
                 <?php else: ?>
-                    <strong><?php echo $cache['server_is_ls'] ? 'activa (servidor LiteSpeed detectado)' : 'estado no legible'; ?></strong>
+                    <strong><?php echo $cache['server_is_ls'] ? esc_html__('active (LiteSpeed server detected)', 'wp-profiler-security') : esc_html__('state not readable', 'wp-profiler-security'); ?></strong>
                 <?php endif; ?>
             </p>
             <p class="wps-kv wps-muted" style="font-size:12px;">
-                LiteSpeed cachea en el servidor, por eso no usa <code>WP_CACHE</code> ni <code>advanced-cache.php</code>.
-                Puedes confirmarlo con la cabecera <code>x-litespeed-cache: hit</code> en el front.
+                <?php esc_html_e('LiteSpeed caches on the server, which is why it does not use WP_CACHE or advanced-cache.php. You can confirm it with the x-litespeed-cache: hit header on the front end.', 'wp-profiler-security'); ?>
             </p>
         <?php else: ?>
-            <p class="wps-kv">Caché de página (WP_CACHE + advanced-cache.php):
-                <strong><?php echo $cache['page_cache_active'] ? 'activada' : 'no activada'; ?></strong>
+            <p class="wps-kv"><?php esc_html_e('Page cache (WP_CACHE + advanced-cache.php):', 'wp-profiler-security'); ?>
+                <strong><?php echo $cache['page_cache_active'] ? esc_html__('enabled', 'wp-profiler-security') : esc_html__('not enabled', 'wp-profiler-security'); ?></strong>
             </p>
         <?php endif; ?>
 
-        <p class="wps-kv">Caché de objetos (object-cache.php):
-            <strong><?php echo $cache['object_cache'] ? 'presente' : 'no presente'; ?></strong>
+        <p class="wps-kv"><?php esc_html_e('Object cache (object-cache.php):', 'wp-profiler-security'); ?>
+            <strong><?php echo $cache['object_cache'] ? esc_html__('present', 'wp-profiler-security') : esc_html__('not present', 'wp-profiler-security'); ?></strong>
         </p>
     </div>
 
     <!-- 5) Versiones del entorno -->
     <div class="wps-card">
-        <h2>Versiones del entorno</h2>
+        <h2><?php esc_html_e('Environment versions', 'wp-profiler-security'); ?></h2>
         <table class="wps-table">
             <tbody>
                 <tr><td>PHP</td><td><strong><?php echo esc_html($env['php']); ?></strong></td></tr>
-                <tr><td>Base de datos</td><td><strong><?php echo esc_html($env['db_type'] . ' — ' . $env['db_server_info']); ?></strong></td></tr>
+                <tr><td><?php esc_html_e('Database', 'wp-profiler-security'); ?></td><td><strong><?php echo esc_html($env['db_type'] . ' — ' . $env['db_server_info']); ?></strong></td></tr>
                 <tr><td>WordPress</td><td><strong><?php echo esc_html($env['wp']); ?></strong></td></tr>
             </tbody>
         </table>

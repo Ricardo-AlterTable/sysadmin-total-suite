@@ -41,9 +41,30 @@ add_action('http_api_debug', function ($response, $context, $class, $args, $url)
 }, 10, 5);
 
 add_action('shutdown', function () {
-    // Guardar métrica solo en el home o si es una prueba lanzada desde el admin.
-    if (!(is_front_page() || isset($_GET['wps_profiling_test']))) {
+    // Una prueba manual solo cuenta si viene firmada desde el admin: sin esto,
+    // cualquier visitante podría forzar una escritura en la base de datos por
+    // petición (y saltarse la caché de página) con ?wps_profiling_test=1.
+    $is_test = false;
+    if (isset($_GET['wps_profiling_test'])) {
+        $nonce = isset($_GET['_wpnonce']) ? sanitize_text_field(wp_unslash($_GET['_wpnonce'])) : '';
+        if ($nonce && wp_verify_nonce($nonce, 'wps_profiling_test') && current_user_can('manage_options')) {
+            $is_test = true;
+        } else {
+            return; // petición no autorizada: no se registra nada
+        }
+    }
+
+    if (!($is_test || is_front_page())) {
         return;
+    }
+
+    // Limitación de frecuencia para las visitas normales al home: evita escribir
+    // en wp_options en cada visita no cacheada (coste y contención de fila).
+    if (!$is_test) {
+        if (get_transient('wps_profiling_throttle')) {
+            return;
+        }
+        set_transient('wps_profiling_throttle', 1, MINUTE_IN_SECONDS);
     }
 
     global $wps_profiler_data, $wpdb;

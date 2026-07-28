@@ -94,13 +94,25 @@ define('SAVEQUERIES', true);
 - El borrado de archivos extra solo admite rutas que el último análisis marcó como *Extra*.
 - La limpieza de cron solo actúa sobre hooks **sin acción registrada** (huérfanos); nunca sobre tareas activas.
 - Las consultas a base de datos usan `$wpdb->prepare()` cuando llevan parámetros.
+- Las rutas se resuelven con un helper propio (`wps_resolve_site_path()`) que normaliza `.`/`..` de forma léxica, valida el prefijo `ABSPATH` y comprueba `realpath` del directorio padre para impedir escapes por enlaces simbólicos; funciona también con archivos inexistentes.
+- La restauración y el diff se limitan a rutas del **core real** (`wps_is_core_path()`), de modo que no pueden escribir en `wp-content/`.
+- El visor de diferencias inserta el contenido del archivo con `textContent`/nodos DOM, **nunca como HTML**: un archivo del core manipulado con `<script>` no puede ejecutarse en el panel.
+- Las copias de seguridad usan un nombre de carpeta aleatorio y guardan el contenido con extensión `.bak` (no ejecutable), con `.htaccess`/`index.php` de protección. En **nginx** conviene denegar además la ruta en la configuración del servidor.
+- La prueba de profiling (`wps_profiling_test`) exige **nonce y `manage_options`**; las visitas normales al home escriben como máximo una medición por minuto.
+- Las tareas cron se **respaldan** en la opción `wps_cron_backup` antes de desprogramarlas (la detección de "huérfana" es heurística).
+- El borrado de usuarios comprueba la meta-capability `delete_user` por usuario, no solo `delete_users`.
+- Las URL de descarga se construyen con la versión y el idioma **saneados** (`[0-9.]` y `[a-zA-Z_]`), evitando la inyección de host (SSRF).
 
 ---
 
 ## Estructura del proyecto
 
 ```
-wp-profiler-security.php   # Bootstrap: menús, assets, acción de análisis
+wp-profiler-security.php   # Bootstrap: menús, assets, análisis, helpers de rutas seguras
+uninstall.php              # Limpieza de opciones/transitorios/caché al desinstalar
+readme.txt                 # Ficha para el directorio de WordPress.org
+.distignore                # Exclusiones del paquete distribuible
+languages/                 # .pot + traducción es_ES (.po/.mo)
 includes/
   diff.php                 # AJAX: diff, restaurar, eliminar extra; descarga del ZIP oficial
   profiler.php             # Medición de tiempos y guardado del histórico
@@ -125,6 +137,7 @@ El tema visual está centralizado en variables CSS al inicio de `admin/assets/ad
 ## Notas y limitaciones
 
 - El diff/restauración del core solo aplica a archivos que **pertenecen al ZIP oficial** de tu versión e idioma; los temas por defecto que WordPress ya no empaqueta no son restaurables desde el core.
+- Las copias de seguridad de la restauración se guardan en `wp-content/uploads/wp-profiler-security-backups/`, protegidas con `.htaccess` e `index.php`. **No** se eliminan al desinstalar (borrado irreversible).
 - La detección de la caché de **LiteSpeed** lee la opción `litespeed.conf.cache` y `SERVER_SOFTWARE`; LiteSpeed cachea a nivel de servidor, por lo que no usa `WP_CACHE`/`advanced-cache.php`.
 - El profiling basado en *milestones* (`plugins_loaded`, `after_setup_theme`, `template_redirect`) es orientativo; el tiempo total es *wall-clock* real.
 
@@ -132,6 +145,10 @@ El tema visual está centralizado en variables CSS al inicio de `admin/assets/ad
 
 ## Changelog
 
+- **3.6** — Corrección de un **XSS almacenado** en el visor de diferencias, endurecimiento de backups y caché, nonce en la prueba de profiling, validación de rutas tras normalizar, respaldo de cron antes de limpiar y menos falsos positivos en "archivos extra".
+- **3.5** — Endurecimiento de seguridad (resolución de rutas, restauración limitada al core, backups protegidos en uploads), arreglo de la restauración de archivos faltantes y `uninstall.php`.
+- **3.4** — Preparación para WordPress.org: `readme.txt`, cabeceras, Chart.js local e internacionalización (inglés base + traducción al español).
+- **3.2 – 3.3** — Sección Tunning renombrada a WPO (incluido el rename interno).
 - **3.0 – 3.1** — Bloqueo de bots de IA con **toggle Permitir/Bloquear por bot** y acciones "aplicar a todos"; ajuste del hover de los botones primarios.
 - **2.8** — Nueva sección **Bloqueo de bots de IA** (robots.txt + 403 por User-Agent).
 - **2.6 – 2.7** — Rediseño completo de la interfaz a panel moderno (estética terminal conservada solo en el diff); ajustes de espaciado.

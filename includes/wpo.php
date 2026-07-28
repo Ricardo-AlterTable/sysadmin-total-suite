@@ -207,26 +207,43 @@ function wps_wpo_cron_info(): array {
 }
 
 /**
+ * Guarda una copia del array de cron actual antes de modificarlo, para poder
+ * revertir manualmente si la detección de "huérfano" resultó equivocada.
+ * (has_action() se evalúa en admin-ajax, así que un hook registrado solo en el
+ * front puede parecer huérfano sin serlo.)
+ */
+function wps_backup_cron_array() {
+    if (!function_exists('_get_cron_array')) return;
+    $current = _get_cron_array();
+    if (!is_array($current)) return;
+    update_option('wps_cron_backup', [
+        'saved_at' => time(),
+        'cron'     => $current,
+    ], false);
+}
+
+/**
  * Ajax: eliminar las tareas de UN hook de cron huérfano.
  * Salvaguarda: solo se permite si el hook no tiene ninguna acción registrada.
  */
 add_action('wp_ajax_wps_clean_cron_hook', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_clean_cron', 'nonce');
 
     $hook = isset($_POST['hook']) ? sanitize_text_field(wp_unslash($_POST['hook'])) : '';
     if (!$hook) {
-        wp_send_json_error(['message' => 'Hook no válido'], 400);
+        wp_send_json_error(['message' => __('Invalid hook', 'wp-profiler-security')], 400);
     }
     if (has_action($hook)) {
-        wp_send_json_error(['message' => 'Ese hook tiene una acción registrada; no es huérfano y no se elimina.'], 400);
+        wp_send_json_error(['message' => __('That hook has a registered action; it is not orphaned and will not be removed.', 'wp-profiler-security')], 400);
     }
 
+    wps_backup_cron_array();
     $removed = wp_unschedule_hook($hook);
     wp_send_json_success([
-        'message' => 'Tareas eliminadas del hook: ' . $hook,
+        'message' => sprintf(__('Tasks removed from hook: %s', 'wp-profiler-security'), $hook),
         'hook'    => $hook,
         'removed' => (int) $removed,
     ]);
@@ -237,7 +254,7 @@ add_action('wp_ajax_wps_clean_cron_hook', function () {
  */
 add_action('wp_ajax_wps_clean_cron_all', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_clean_cron_all', 'nonce');
 
@@ -251,6 +268,8 @@ add_action('wp_ajax_wps_clean_cron_all', function () {
             }
         }
     }
+
+    wps_backup_cron_array();
 
     $count         = 0;
     $removed_hooks = [];
@@ -272,7 +291,7 @@ add_action('wp_ajax_wps_clean_cron_all', function () {
  */
 add_action('wp_ajax_wps_clean_transients', function () {
     if (!current_user_can('manage_options')) {
-        wp_send_json_error(['message' => 'Permisos insuficientes'], 403);
+        wp_send_json_error(['message' => __('Insufficient permissions', 'wp-profiler-security')], 403);
     }
     check_ajax_referer('wps_clean_transients', 'nonce');
 
@@ -287,6 +306,6 @@ add_action('wp_ajax_wps_clean_transients', function () {
 
     wp_send_json_success([
         'removed' => $removed,
-        'message' => 'Transitorios caducados eliminados: ' . $removed,
+        'message' => sprintf(__('Expired transients removed: %d', 'wp-profiler-security'), $removed),
     ]);
 });

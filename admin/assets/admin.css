@@ -280,8 +280,8 @@ body {
     color: var(--wps-ok);
     border-color: rgba(52, 211, 153, 0.35);
 }
-.wps-toggle input:not(:checked) + .wps-toggle-btn::after { content: "Permitido"; }
-.wps-toggle:hover input:not(:checked) + .wps-toggle-btn::after { content: "Bloquear ▸"; }
+.wps-toggle input:not(:checked) + .wps-toggle-btn::after { content: attr(data-allowed); }
+.wps-toggle:hover input:not(:checked) + .wps-toggle-btn::after { content: attr(data-do-block); }
 
 /* Bloqueado (marcado) */
 .wps-toggle input:checked + .wps-toggle-btn {
@@ -289,8 +289,8 @@ body {
     color: var(--wps-danger);
     border-color: rgba(251, 92, 116, 0.45);
 }
-.wps-toggle input:checked + .wps-toggle-btn::after { content: "Bloqueado"; }
-.wps-toggle:hover input:checked + .wps-toggle-btn::after { content: "Permitir ▸"; }
+.wps-toggle input:checked + .wps-toggle-btn::after { content: attr(data-blocked); }
+.wps-toggle:hover input:checked + .wps-toggle-btn::after { content: attr(data-do-allow); }
 .wps-toggle input:focus-visible + .wps-toggle-btn { outline: 2px solid var(--wps-primary-2); outline-offset: 2px; }
 
 /* ---- Badges (pills) ---- */

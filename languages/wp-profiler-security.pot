@@ -1,0 +1,1003 @@
+# Copyright (C) 2026 Ricardo Morales
+# This file is distributed under the GPLv2 or later license.
+msgid ""
+msgstr ""
+"Project-Id-Version: WP Profiler & Security 3.6\n"
+"Report-Msgid-Bugs-To: https://github.com/Ricardo-AlterTable\n"
+"POT-Creation-Date: 2026-07-28 15:50+0200\n"
+"PO-Revision-Date: 2026-07-28 15:45+0200\n"
+"Last-Translator: Ricardo Morales\n"
+"Language-Team: Ricardo Morales\n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: wp-profiler-security.php:217 wp-profiler-security.php:218
+msgid "Integrity"
+msgstr ""
+
+#: wp-profiler-security.php:226 wp-profiler-security.php:227
+#: admin/profiler.php:11
+msgid "Profiling"
+msgstr ""
+
+#: wp-profiler-security.php:235 wp-profiler-security.php:236 admin/users.php:15
+msgid "Check WP users"
+msgstr ""
+
+#: wp-profiler-security.php:244 wp-profiler-security.php:245 admin/wpo.php:22
+msgid "WPO"
+msgstr ""
+
+#: wp-profiler-security.php:253 wp-profiler-security.php:254
+#: admin/aibots.php:14
+msgid "AI bot blocking"
+msgstr ""
+
+#: wp-profiler-security.php:279
+msgid "The operation timed out."
+msgstr ""
+
+#: wp-profiler-security.php:280
+msgid "Communication error with the server."
+msgstr ""
+
+#: wp-profiler-security.php:281
+#, php-format
+msgid "Error: %s"
+msgstr ""
+
+#: wp-profiler-security.php:282
+msgid "Loading diff..."
+msgstr ""
+
+#: wp-profiler-security.php:283
+msgid "WPS_AJAX is not defined. Make sure wp_localize_script() ran."
+msgstr ""
+
+#: wp-profiler-security.php:285
+msgid "Are you sure you want to restore this file from the original core?"
+msgstr ""
+
+#: wp-profiler-security.php:286
+msgid ""
+"Do you want to keep a backup of the current file before overwriting it?\n"
+"\n"
+"OK = yes, make a backup\n"
+"Cancel = restore without a backup"
+msgstr ""
+
+#: wp-profiler-security.php:287
+msgid "Restoring..."
+msgstr ""
+
+#: wp-profiler-security.php:288 admin/dashboard.php:139 admin/dashboard.php:143
+msgid "Restore"
+msgstr ""
+
+#: wp-profiler-security.php:289
+#, php-format
+msgid "File restored: %s"
+msgstr ""
+
+#: wp-profiler-security.php:290
+msgid "Backup saved in:"
+msgstr ""
+
+#: wp-profiler-security.php:291
+msgid "(No backup was created)"
+msgstr ""
+
+#: wp-profiler-security.php:292
+msgid "Could not restore"
+msgstr ""
+
+#: wp-profiler-security.php:294
+msgid "Are you sure you want to restore ALL modified/missing files?"
+msgstr ""
+
+#: wp-profiler-security.php:295
+msgid ""
+"Do you want to keep a backup of the current files before overwriting them?\n"
+"\n"
+"OK = yes, make a backup\n"
+"Cancel = restore without a backup"
+msgstr ""
+
+#: wp-profiler-security.php:296
+msgid "There are no files to restore."
+msgstr ""
+
+#: wp-profiler-security.php:297
+msgid "Restore all"
+msgstr ""
+
+#: wp-profiler-security.php:298
+msgid "Operation completed."
+msgstr ""
+
+#: wp-profiler-security.php:299
+#, php-format
+msgid "Restored files (%d):"
+msgstr ""
+
+#: wp-profiler-security.php:300
+#, php-format
+msgid "Files with errors (%d):"
+msgstr ""
+
+#: wp-profiler-security.php:301
+msgid "Could not restore all"
+msgstr ""
+
+#: wp-profiler-security.php:303
+#, php-format
+msgid ""
+"Delete this file?\n"
+"\n"
+"%s\n"
+"\n"
+"⚠ This action is IRREVERSIBLE: the file is permanently removed and cannot be "
+"undone."
+msgstr ""
+
+#: wp-profiler-security.php:304
+msgid ""
+"Delete ALL files not recognized by WordPress?\n"
+"\n"
+"⚠ This action is IRREVERSIBLE: the files are permanently removed and cannot "
+"be undone."
+msgstr ""
+
+#: wp-profiler-security.php:305
+msgid "Deleting..."
+msgstr ""
+
+#: wp-profiler-security.php:306 admin/dashboard.php:222 admin/users.php:67
+#: admin/wpo.php:142
+msgid "Delete"
+msgstr ""
+
+#: wp-profiler-security.php:307 admin/dashboard.php:226
+msgid "Delete all extra files"
+msgstr ""
+
+#: wp-profiler-security.php:308
+#, php-format
+msgid "Deleted (%d):"
+msgstr ""
+
+#: wp-profiler-security.php:309
+msgid "Could not delete"
+msgstr ""
+
+#: wp-profiler-security.php:311
+msgid ""
+"Clean up expired transients?\n"
+"\n"
+"This is safe: they are expired temporary data and WordPress regenerates them "
+"when needed."
+msgstr ""
+
+#: wp-profiler-security.php:312
+msgid "Cleaning..."
+msgstr ""
+
+#: wp-profiler-security.php:313
+#, php-format
+msgid "Expired transients removed: %s"
+msgstr ""
+
+#: wp-profiler-security.php:314 admin/wpo.php:66
+msgid "Clean up expired transients"
+msgstr ""
+
+#: wp-profiler-security.php:315
+msgid "Could not clean up"
+msgstr ""
+
+#: wp-profiler-security.php:317
+#, php-format
+msgid ""
+"Remove the cron tasks for this hook?\n"
+"\n"
+"%s\n"
+"\n"
+"It appears orphaned (no code attached right now), but a plugin may register "
+"it only on the front end. A copy of the schedule is saved beforehand so it "
+"can be restored manually."
+msgstr ""
+
+#: wp-profiler-security.php:318
+msgid ""
+"Remove ALL cron tasks detected as orphaned?\n"
+"\n"
+"Some may belong to plugins that register their hook only on the front end, "
+"so review the list first. A copy of the schedule is saved beforehand so it "
+"can be restored manually."
+msgstr ""
+
+#: wp-profiler-security.php:319
+#, php-format
+msgid "Orphan cron tasks removed: %s"
+msgstr ""
+
+#: wp-profiler-security.php:320
+msgid "Cleaned hooks:"
+msgstr ""
+
+#: wp-profiler-security.php:321 admin/wpo.php:110
+msgid "Clean up all orphan cron tasks"
+msgstr ""
+
+#: wp-profiler-security.php:323
+#, php-format
+msgid ""
+"Are you sure you want to DELETE the user?\n"
+"\n"
+"%s\n"
+"\n"
+"⚠ This action is IRREVERSIBLE: the user is permanently removed and cannot be "
+"undone."
+msgstr ""
+
+#: wp-profiler-security.php:324
+#, php-format
+msgid ""
+"Final confirmation.\n"
+"\n"
+"The user \"%s\" and the content they authored will be removed.\n"
+"\n"
+"Continue with permanent deletion?"
+msgstr ""
+
+#: wp-profiler-security.php:325
+msgid "Could not delete the user"
+msgstr ""
+
+#: wp-profiler-security.php:358 wp-profiler-security.php:499
+#: wp-profiler-security.php:529 includes/aibots.php:116 includes/diff.php:37
+#: includes/diff.php:86 includes/diff.php:148 includes/diff.php:258
+#: includes/diff.php:290 includes/users.php:11 includes/wpo.php:231
+#: includes/wpo.php:257 includes/wpo.php:294 admin/aibots.php:5
+#: admin/dashboard.php:5 admin/profiler.php:5 admin/users.php:5 admin/wpo.php:5
+msgid "Insufficient permissions"
+msgstr ""
+
+#: includes/aibots.php:106
+msgid "403 Forbidden"
+msgstr ""
+
+#: includes/diff.php:43 includes/diff.php:92 includes/diff.php:173
+#: includes/diff.php:264 includes/diff.php:305
+msgid "Invalid path"
+msgstr ""
+
+#: includes/diff.php:50 includes/diff.php:274
+#, php-format
+msgid "File not found: %s"
+msgstr ""
+
+#: includes/diff.php:54
+msgid "Only WordPress core files can be compared."
+msgstr ""
+
+#: includes/diff.php:59
+#, php-format
+msgid "Could not read the current file: %s"
+msgstr ""
+
+#: includes/diff.php:68 includes/diff.php:111 includes/diff.php:409
+msgid "Could not fetch the original file."
+msgstr ""
+
+#: includes/diff.php:74
+msgid "No differences found."
+msgstr ""
+
+#: includes/diff.php:99
+#, php-format
+msgid "File outside the site: %s"
+msgstr ""
+
+#: includes/diff.php:103 includes/diff.php:183
+msgid "Only WordPress core files can be restored."
+msgstr ""
+
+#: includes/diff.php:121 includes/diff.php:126
+msgid ""
+"Could not create the backup. Check permissions; the file was NOT restored."
+msgstr ""
+
+#: includes/diff.php:134
+msgid "Could not write the local file. Check permissions."
+msgstr ""
+
+#: includes/diff.php:138
+#, php-format
+msgid "File restored successfully: %s"
+msgstr ""
+
+#: includes/diff.php:155
+msgid "No files were specified to restore."
+msgstr ""
+
+#: includes/diff.php:168
+msgid "Could not create the backup. Check permissions; nothing was restored."
+msgstr ""
+
+#: includes/diff.php:178
+msgid "File outside the site"
+msgstr ""
+
+#: includes/diff.php:188
+#, php-format
+msgid "Could not fetch the original: %s"
+msgstr ""
+
+#: includes/diff.php:195
+msgid "Could not create the backup; not restored"
+msgstr ""
+
+#: includes/diff.php:204
+msgid "Could not write"
+msgstr ""
+
+#: includes/diff.php:269
+msgid ""
+"The file is not in the extras list of the last analysis. Run the analysis "
+"again."
+msgstr ""
+
+#: includes/diff.php:278
+msgid "Could not delete the file. Check permissions."
+msgstr ""
+
+#: includes/diff.php:282
+#, php-format
+msgid "File deleted: %s"
+msgstr ""
+
+#: includes/diff.php:297
+msgid "There are no extra files to delete."
+msgstr ""
+
+#: includes/diff.php:310
+msgid "Not found"
+msgstr ""
+
+#: includes/diff.php:316
+msgid "Could not delete (permissions)"
+msgstr ""
+
+#: includes/diff.php:343
+msgid "The ZipArchive class is not available in your PHP version."
+msgstr ""
+
+#: includes/diff.php:351
+msgid "Could not create the cache directory. Check permissions."
+msgstr ""
+
+#: includes/diff.php:385 includes/diff.php:393
+msgid "corrupt ZIP"
+msgstr ""
+
+#: includes/diff.php:406
+#, php-format
+msgid "does not contain %s"
+msgstr ""
+
+#: includes/users.php:17
+msgid "Invalid user ID"
+msgstr ""
+
+#: includes/users.php:21
+msgid "You cannot delete your own user."
+msgstr ""
+
+#: includes/users.php:26
+msgid "The user does not exist."
+msgstr ""
+
+#: includes/users.php:32
+msgid "You are not allowed to delete this user."
+msgstr ""
+
+#: includes/users.php:47
+msgid "Could not delete the user."
+msgstr ""
+
+#: includes/users.php:51
+#, php-format
+msgid "User deleted: %s"
+msgstr ""
+
+#: includes/wpo.php:237
+msgid "Invalid hook"
+msgstr ""
+
+#: includes/wpo.php:240
+msgid ""
+"That hook has a registered action; it is not orphaned and will not be "
+"removed."
+msgstr ""
+
+#: includes/wpo.php:246
+#, php-format
+msgid "Tasks removed from hook: %s"
+msgstr ""
+
+#: includes/wpo.php:309
+#, php-format
+msgid "Expired transients removed: %d"
+msgstr ""
+
+#: admin/aibots.php:15
+msgid ""
+"Mark as Blocked every AI crawler you do not want to allow. A blocked bot is "
+"added to robots.txt and, if its User-Agent is real, it is also blocked with "
+"a 403 on the front end."
+msgstr ""
+
+#: admin/aibots.php:18
+msgid "Settings saved."
+msgstr ""
+
+#: admin/aibots.php:26
+msgid "Apply to all"
+msgstr ""
+
+#: admin/aibots.php:28
+msgid "Block all"
+msgstr ""
+
+#: admin/aibots.php:29
+msgid "Allow all"
+msgstr ""
+
+#: admin/aibots.php:31
+msgid "Saved state:"
+msgstr ""
+
+#. translators: %d: number of blocked bots.
+#: admin/aibots.php:36
+#, php-format
+msgid "%d blocked"
+msgid_plural "%d blocked"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of allowed bots.
+#: admin/aibots.php:46
+#, php-format
+msgid "%d allowed"
+msgid_plural "%d allowed"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/aibots.php:54
+msgid ""
+"⚠ A physical robots.txt exists in the site root: WordPress does not apply "
+"its virtual robots.txt, so the rules will not be added to that file. Edit it "
+"manually or remove it to use the virtual one. (The 403 blocking still works.)"
+msgstr ""
+
+#: admin/aibots.php:58
+msgid ""
+"The User-Agent can be spoofed, so the 403 complements — it does not replace "
+"— robots.txt. With page caching (LiteSpeed), the 403 response is marked as "
+"non-cacheable. Remember to press Save changes after modifying the selection."
+msgstr ""
+
+#. translators: %d: total number of bots in the list.
+#: admin/aibots.php:67
+#, php-format
+msgid "Bots (%d)"
+msgstr ""
+
+#: admin/aibots.php:75
+msgid "Bot"
+msgstr ""
+
+#: admin/aibots.php:76
+msgid "User-Agent token"
+msgstr ""
+
+#: admin/aibots.php:77 admin/wpo.php:116
+msgid "Status"
+msgstr ""
+
+#: admin/aibots.php:91
+msgid "Allowed"
+msgstr ""
+
+#: admin/aibots.php:92
+msgid "Blocked"
+msgstr ""
+
+#: admin/aibots.php:93
+msgid "Block ▸"
+msgstr ""
+
+#: admin/aibots.php:94
+msgid "Allow ▸"
+msgstr ""
+
+#: admin/aibots.php:103
+msgid "Save changes"
+msgstr ""
+
+#: admin/dashboard.php:12
+msgid "Core integrity"
+msgstr ""
+
+#: admin/dashboard.php:16
+msgid "Plugin cache purged. The next analysis will start from scratch."
+msgstr ""
+
+#: admin/dashboard.php:24 admin/dashboard.php:160
+msgid "Analyze now"
+msgstr ""
+
+#: admin/dashboard.php:30
+msgid "Purge cache"
+msgstr ""
+
+#: admin/dashboard.php:56
+msgid "Result"
+msgstr ""
+
+#: admin/dashboard.php:58
+msgid "⚠ Issues were detected in the WordPress core"
+msgstr ""
+
+#: admin/dashboard.php:60
+msgid "✔ No issues were detected in the WordPress core"
+msgstr ""
+
+#: admin/dashboard.php:63
+msgid "⚠ Files not recognized by WordPress were detected"
+msgstr ""
+
+#: admin/dashboard.php:109 admin/dashboard.php:150
+msgid "Modified / missing files"
+msgstr ""
+
+#: admin/dashboard.php:118 admin/dashboard.php:196
+msgid "All"
+msgstr ""
+
+#: admin/dashboard.php:120 admin/dashboard.php:198
+msgid "Apply"
+msgstr ""
+
+#: admin/dashboard.php:125 admin/dashboard.php:203
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/dashboard.php:136
+msgid "Modified"
+msgstr ""
+
+#: admin/dashboard.php:138
+msgid "Show changes"
+msgstr ""
+
+#: admin/dashboard.php:141
+msgid "Missing"
+msgstr ""
+
+#: admin/dashboard.php:148
+msgid "Restore all modified/missing"
+msgstr ""
+
+#: admin/dashboard.php:151
+msgid "No modified or missing files were detected."
+msgstr ""
+
+#: admin/dashboard.php:155
+msgid "Extra files"
+msgstr ""
+
+#: admin/dashboard.php:156
+msgid "View detected extra files"
+msgstr ""
+
+#: admin/dashboard.php:160
+#, php-format
+msgid "No analysis available. Run %s to get results."
+msgstr ""
+
+#: admin/dashboard.php:168
+msgid "File differences"
+msgstr ""
+
+#: admin/dashboard.php:177
+msgid "Detected extra files"
+msgstr ""
+
+#: admin/dashboard.php:178
+msgid "These files do not belong to the official WordPress core."
+msgstr ""
+
+#: admin/dashboard.php:179
+#, php-format
+msgid ""
+"⚠ Deleting a file is %s: it is permanently removed and cannot be undone."
+msgstr ""
+
+#: admin/dashboard.php:179 admin/users.php:26
+msgid "irreversible"
+msgstr ""
+
+#: admin/dashboard.php:228
+msgid "Close"
+msgstr ""
+
+#: admin/profiler.php:11
+msgid "No data yet. Use the button below to force a test:"
+msgstr ""
+
+#: admin/profiler.php:16 admin/profiler.php:70
+msgid "Reset history"
+msgstr ""
+
+#: admin/profiler.php:19 admin/profiler.php:74
+msgid "Run test"
+msgstr ""
+
+#: admin/profiler.php:20 admin/profiler.php:75
+msgid "Running test..."
+msgstr ""
+
+#: admin/profiler.php:49
+msgid "Core"
+msgstr ""
+
+#: admin/profiler.php:50
+msgid "Plugins"
+msgstr ""
+
+#: admin/profiler.php:51
+msgid "Theme"
+msgstr ""
+
+#: admin/profiler.php:52 admin/profiler.php:88
+msgid "MySQL"
+msgstr ""
+
+#: admin/profiler.php:53
+msgid "External"
+msgstr ""
+
+#: admin/profiler.php:54
+msgid "Total"
+msgstr ""
+
+#: admin/profiler.php:61
+msgid "Home page profiling"
+msgstr ""
+
+#: admin/profiler.php:64
+msgid "History cleared successfully."
+msgstr ""
+
+#: admin/profiler.php:79
+msgid "Last measurement"
+msgstr ""
+
+#. translators: %s: the SAVEQUERIES PHP constant snippet.
+#: admin/profiler.php:92
+#, php-format
+msgid "N/A (enable %s in wp-config.php to measure SQL time)"
+msgstr ""
+
+#: admin/profiler.php:101
+msgid "SQL queries:"
+msgstr ""
+
+#: admin/profiler.php:102
+msgid "HTTP calls:"
+msgstr ""
+
+#: admin/profiler.php:105
+msgid "Evolution (recent visits)"
+msgstr ""
+
+#: admin/profiler.php:148
+msgid "Time (ms)"
+msgstr ""
+
+#: admin/profiler.php:165
+msgid "Total time (ms)"
+msgstr ""
+
+#: admin/users.php:17
+msgid "Users registered in this WordPress:"
+msgstr ""
+
+#. translators: %s: the word "irreversible" in bold.
+#: admin/users.php:25
+#, php-format
+msgid ""
+"⚠ Deleting a user is %s: it is permanently removed (along with the content "
+"they authored) and cannot be undone."
+msgstr ""
+
+#: admin/users.php:35
+msgid "User"
+msgstr ""
+
+#: admin/users.php:36
+msgid "Email"
+msgstr ""
+
+#: admin/users.php:37
+msgid "Created on"
+msgstr ""
+
+#: admin/users.php:38
+msgid "Role / Capabilities"
+msgstr ""
+
+#: admin/users.php:39 admin/wpo.php:116
+msgid "Actions"
+msgstr ""
+
+#: admin/users.php:56
+msgid "(you)"
+msgstr ""
+
+#: admin/wpo.php:23
+msgid "Web Performance Optimization: a quick performance check of the site."
+msgstr ""
+
+#: admin/wpo.php:27
+msgid "Plugins affecting load time"
+msgstr ""
+
+#: admin/wpo.php:28
+msgid "Installed:"
+msgstr ""
+
+#: admin/wpo.php:29
+msgid "Active:"
+msgstr ""
+
+#: admin/wpo.php:30
+msgid "Inactive:"
+msgstr ""
+
+#: admin/wpo.php:32
+msgid "Many active plugins"
+msgstr ""
+
+#: admin/wpo.php:32
+msgid "Reasonable amount"
+msgstr ""
+
+#: admin/wpo.php:35
+#, php-format
+msgid "%s plugins load on every request; they are the ones impacting speed:"
+msgstr ""
+
+#: admin/wpo.php:35
+msgid "Active"
+msgstr ""
+
+#: admin/wpo.php:37
+msgid "Active plugin"
+msgstr ""
+
+#: admin/wpo.php:37
+msgid "Version"
+msgstr ""
+
+#: admin/wpo.php:51
+msgid "Autoload options and wp_options junk"
+msgstr ""
+
+#: admin/wpo.php:53
+msgid "Autoload options:"
+msgstr ""
+
+#: admin/wpo.php:54
+msgid "Total autoload size:"
+msgstr ""
+
+#: admin/wpo.php:56
+msgid "High (>1 MB)"
+msgstr ""
+
+#: admin/wpo.php:56 admin/wpo.php:135
+msgid "OK"
+msgstr ""
+
+#: admin/wpo.php:60
+msgid "Transients with expiration:"
+msgstr ""
+
+#: admin/wpo.php:61
+msgid "Expired (junk):"
+msgstr ""
+
+#: admin/wpo.php:70
+msgid ""
+"Largest autoload options (check whether any belongs to an uninstalled "
+"plugin):"
+msgstr ""
+
+#: admin/wpo.php:72
+msgid "Size"
+msgstr ""
+
+#: admin/wpo.php:82
+msgid ""
+"Automatic deletion of these options is not offered for safety: they could "
+"belong to active plugins. Remove them manually only if you recognize them as "
+"belonging to a removed plugin."
+msgstr ""
+
+#: admin/wpo.php:88
+msgid "WP-Cron"
+msgstr ""
+
+#: admin/wpo.php:90
+msgid "Mode:"
+msgstr ""
+
+#: admin/wpo.php:92
+msgid "Internal WP-Cron disabled"
+msgstr ""
+
+#: admin/wpo.php:93
+msgid "A real system cron must be calling wp-cron.php"
+msgstr ""
+
+#: admin/wpo.php:95
+msgid "Internal WP-Cron active"
+msgstr ""
+
+#: admin/wpo.php:96
+msgid "Triggered by visits"
+msgstr ""
+
+#: admin/wpo.php:100
+msgid "Scheduled tasks:"
+msgstr ""
+
+#: admin/wpo.php:101
+msgid "Overdue:"
+msgstr ""
+
+#: admin/wpo.php:102
+msgid "There are overdue tasks"
+msgstr ""
+
+#: admin/wpo.php:103
+msgid "Orphaned:"
+msgstr ""
+
+#: admin/wpo.php:104
+msgid "Junk from removed plugins"
+msgstr ""
+
+#: admin/wpo.php:116
+msgid "Hook"
+msgstr ""
+
+#: admin/wpo.php:116
+msgid "Next run"
+msgstr ""
+
+#: admin/wpo.php:116
+msgid "Recurrence"
+msgstr ""
+
+#: admin/wpo.php:123
+msgid "Once"
+msgstr ""
+
+#: admin/wpo.php:131
+msgid "Orphaned"
+msgstr ""
+
+#: admin/wpo.php:133
+msgid "Overdue"
+msgstr ""
+
+#: admin/wpo.php:152
+msgid "There are no scheduled cron tasks."
+msgstr ""
+
+#: admin/wpo.php:158
+msgid "Cache"
+msgstr ""
+
+#: admin/wpo.php:160
+msgid "Cache active"
+msgstr ""
+
+#: admin/wpo.php:162
+msgid "No cache plugin detected"
+msgstr ""
+
+#: admin/wpo.php:164
+msgid "Web server:"
+msgstr ""
+
+#: admin/wpo.php:165
+msgid "unknown"
+msgstr ""
+
+#: admin/wpo.php:168
+msgid "Active cache plugin(s):"
+msgstr ""
+
+#: admin/wpo.php:169
+msgid "none"
+msgstr ""
+
+#: admin/wpo.php:173
+msgid "Page cache (LiteSpeed, server level):"
+msgstr ""
+
+#: admin/wpo.php:175 admin/wpo.php:188
+msgid "enabled"
+msgstr ""
+
+#: admin/wpo.php:177
+msgid "disabled"
+msgstr ""
+
+#: admin/wpo.php:178
+msgid "Enable it in LiteSpeed Cache → Cache"
+msgstr ""
+
+#: admin/wpo.php:180
+msgid "active (LiteSpeed server detected)"
+msgstr ""
+
+#: admin/wpo.php:180
+msgid "state not readable"
+msgstr ""
+
+#: admin/wpo.php:184
+msgid ""
+"LiteSpeed caches on the server, which is why it does not use WP_CACHE or "
+"advanced-cache.php. You can confirm it with the x-litespeed-cache: hit "
+"header on the front end."
+msgstr ""
+
+#: admin/wpo.php:187
+msgid "Page cache (WP_CACHE + advanced-cache.php):"
+msgstr ""
+
+#: admin/wpo.php:188
+msgid "not enabled"
+msgstr ""
+
+#: admin/wpo.php:192
+msgid "Object cache (object-cache.php):"
+msgstr ""
+
+#: admin/wpo.php:193
+msgid "present"
+msgstr ""
+
+#: admin/wpo.php:193
+msgid "not present"
+msgstr ""
+
+#: admin/wpo.php:199
+msgid "Environment versions"
+msgstr ""
+
+#: admin/wpo.php:203
+msgid "Database"
+msgstr ""

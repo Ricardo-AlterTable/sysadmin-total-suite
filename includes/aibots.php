@@ -63,7 +63,7 @@ add_filter('robots_txt', function ($output, $public) {
     $blocked = wps_aibots_settings()['blocked'];
     if (empty($blocked)) return $output;
 
-    $block = "\n# Bots de IA bloqueados por WP Profiler & Security\n";
+    $block = "\n# AI bots blocked by WP Profiler & Security\n";
     foreach ($blocked as $ua) {
         $block .= "User-agent: {$ua}\n";
     }
@@ -103,7 +103,7 @@ add_action('init', function () {
             nocache_headers();
             status_header(403);
             header('X-Robots-Tag: noai, noimageai', true);
-            wp_die('403 Forbidden', '403 Forbidden', ['response' => 403]);
+            wp_die(esc_html__('403 Forbidden', 'wp-profiler-security'), esc_html__('403 Forbidden', 'wp-profiler-security'), ['response' => 403]);
         }
     }
 }, 1);
@@ -113,7 +113,7 @@ add_action('init', function () {
  */
 add_action('admin_post_wps_save_aibots', function () {
     if (!current_user_can('manage_options')) {
-        wp_die('Permisos insuficientes', 403);
+        wp_die(esc_html__('Insufficient permissions', 'wp-profiler-security'), 403);
     }
     check_admin_referer('wps_aibots_nonce');
 

@@ -1,62 +1,79 @@
 jQuery(document).ready(function ($) {
+    var T = (window.WPS_AJAX && WPS_AJAX.i18n) ? WPS_AJAX.i18n : {};
+
     if (typeof WPS_AJAX === 'undefined') {
-        console.warn('WPS_AJAX no definido. Asegúrate de que wp_localize_script() se ejecutó.');
+        console.warn(T.noWpsAjax || 'WPS_AJAX is not defined.');
+        return;
     }
 
-    // Extraer el mensaje de error real del servidor.
-    // wp_send_json_error() responde con códigos 4xx/5xx, así que jQuery entra en
-    // el callback "error" y el cuerpo JSON queda en jqXHR.responseJSON.
+    // Formatea una cadena con un único marcador (%s / %d).
+    function fmt(str, val) {
+        return String(str || '').replace(/%[sd]/, val);
+    }
+
+    // Mensaje de error real del servidor (jqXHR.responseJSON) o genérico.
     function serverErrorMessage(jqXHR, textStatus) {
-        if (textStatus === 'timeout') {
-            return "La operación ha superado el tiempo de espera.";
-        }
-        const data = jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.data;
+        if (textStatus === 'timeout') return T.timeout;
+        var data = jqXHR && jqXHR.responseJSON && jqXHR.responseJSON.data;
         if (data && data.message) {
-            return data.message + (data.details ? " (" + data.details + ")" : "");
+            return data.message + (data.details ? ' (' + data.details + ')' : '');
         }
-        return "Error de comunicación con el servidor.";
+        return T.commError;
     }
 
-    // Función para colorear diff
-    function formatDiff(text) {
-        if (!text) return '';
-        return text.split("\n").map(function (line) {
-            if (line.startsWith('+')) {
-                return '<span class="diff-add">' + line + '</span>';
-            } else if (line.startsWith('-')) {
-                return '<span class="diff-del">' + line + '</span>';
+    function errText(jqXHR, textStatus) {
+        return fmt(T.errorPrefix, serverErrorMessage(jqXHR, textStatus));
+    }
+
+    // Colorear diff.
+    // IMPORTANTE: el diff contiene el contenido LITERAL del archivo local, que es
+    // justamente el dato potencialmente malicioso que este plugin detecta. Nunca
+    // debe interpretarse como HTML: se construyen nodos y se usa textContent, de
+    // modo que un <script> incrustado en un archivo del core no pueda ejecutarse
+    // en el panel de administración.
+    function renderDiff(target, text) {
+        target.textContent = '';
+        if (!text) return;
+
+        const frag = document.createDocumentFragment();
+        text.split("\n").forEach(function (line, i) {
+            const span = document.createElement('span');
+            if (line.charAt(0) === '+') {
+                span.className = 'diff-add';
+            } else if (line.charAt(0) === '-') {
+                span.className = 'diff-del';
             } else {
-                return '<span class="diff-ctx">' + line + '</span>';
+                span.className = 'diff-ctx';
             }
-        }).join("\n");
+            span.textContent = line;                       // escapado por el DOM
+            if (i > 0) frag.appendChild(document.createTextNode("\n"));
+            frag.appendChild(span);
+        });
+        target.appendChild(frag);
     }
 
     // Mostrar cambios (diff)
     $(document).on('click', '.show-diff', function (e) {
         e.preventDefault();
         const path = $(this).data('path');
-        $("#wpsDiffContent").html("<em>Cargando diff...</em>");
+        $("#wpsDiffContent").text(T.loadingDiff);
         $("#wpsDiffModal").css('display', 'flex');
 
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_show_diff',
-                nonce: WPS_AJAX.nonce,
-                path: path
-            },
-            timeout: 300000, // 5 minutes
+            data: { action: 'wps_show_diff', nonce: WPS_AJAX.nonce, path: path },
+            timeout: 300000,
             success: function (res) {
                 if (res && res.success) {
-                    $("#wpsDiffContent").html(formatDiff(res.data.diff));
+                    renderDiff(document.getElementById('wpsDiffContent'), res.data.diff);
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'Respuesta inválida';
-                    $("#wpsDiffContent").text("Error: " + msg);
+                    const msg = res && res.data && res.data.message ? res.data.message : T.commError;
+                    $("#wpsDiffContent").text(fmt(T.errorPrefix, msg));
                 }
             },
             error: function (jqXHR, textStatus) {
-                $("#wpsDiffContent").text("Error: " + serverErrorMessage(jqXHR, textStatus));
+                $("#wpsDiffContent").text(errText(jqXHR, textStatus));
             }
         });
     });
@@ -64,47 +81,37 @@ jQuery(document).ready(function ($) {
     // Restaurar archivo
     $(document).on('click', '.restore-file', function (e) {
         e.preventDefault();
-        if (!confirm("¿Seguro que deseas restaurar este archivo desde el core original?")) return;
-
-        const doBackup = confirm(
-            "¿Quieres guardar una copia de seguridad del archivo actual antes de sobrescribirlo?\n\n" +
-            "Aceptar = sí, hacer copia\n" +
-            "Cancelar = restaurar sin copia"
-        );
+        if (!confirm(T.confirmRestore)) return;
+        const doBackup = confirm(T.askBackupFile);
 
         const button = $(this);
         const path = button.data('path');
-        button.prop('disabled', true).text('Restaurando...');
+        button.prop('disabled', true).text(T.restoring);
 
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_restore_file',
-                nonce: button.data('nonce'),
-                path: path,
-                backup: doBackup ? '1' : '0'
-            },
-            timeout: 300000, // 5 minutes
+            data: { action: 'wps_restore_file', nonce: button.data('nonce'), path: path, backup: doBackup ? '1' : '0' },
+            timeout: 300000,
             success: function (res) {
                 if (res && res.success) {
-                    let msg = "Archivo restaurado: " + path;
+                    let msg = fmt(T.fileRestored, path);
                     if (res.data && res.data.backup) {
-                        msg += "\n\nCopia de seguridad guardada en:\n" + res.data.backup;
+                        msg += "\n\n" + T.backupSavedIn + "\n" + res.data.backup;
                     } else {
-                        msg += "\n\n(No se creó copia de seguridad)";
+                        msg += "\n\n" + T.noBackupMade;
                     }
                     alert(msg);
                     location.reload();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Restaurar');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.restoreError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.restore);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Restaurar');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.restore);
             }
         });
     });
@@ -112,68 +119,51 @@ jQuery(document).ready(function ($) {
     // Restaurar todos
     $(document).on('click', '.restore-all', function (e) {
         e.preventDefault();
-        if (!confirm("¿Seguro que deseas restaurar TODOS los archivos modificados/faltantes?")) return;
+        if (!confirm(T.confirmRestoreAll)) return;
 
         const button = $(this);
-
-        const files = $('.restore-file').map(function() {
-            return $(this).data('path');
-        }).get();
+        const files = $('.restore-file').map(function () { return $(this).data('path'); }).get();
 
         if (files.length === 0) {
-            alert("No hay archivos para restaurar. Si hay archivos marcados como faltantes, es posible que deba corregir el plugin para incluirlos en la restauración masiva.");
+            alert(T.noFilesToRestore);
             return;
         }
 
-        const doBackup = confirm(
-            "¿Quieres guardar una copia de seguridad de los archivos actuales antes de sobrescribirlos?\n\n" +
-            "Aceptar = sí, hacer copia\n" +
-            "Cancelar = restaurar sin copia"
-        );
-
-        button.prop('disabled', true).text('Restaurando...');
+        const doBackup = confirm(T.askBackupAll);
+        button.prop('disabled', true).text(T.restoring);
 
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_restore_all_files',
-                nonce: button.data('nonce'),
-                files: files,
-                backup: doBackup ? '1' : '0'
-            },
-            timeout: 600000, // 10 minutes for all files
+            data: { action: 'wps_restore_all_files', nonce: button.data('nonce'), files: files, backup: doBackup ? '1' : '0' },
+            timeout: 600000,
             success: function (res) {
                 if (res && res.success) {
-                    let message = "Operación completada.\n\n";
+                    let message = T.opDone + "\n\n";
                     if (res.data.restored && res.data.restored.length > 0) {
-                        message += "Archivos restaurados (" + res.data.restored.length + "):\n" + res.data.restored.join("\n");
+                        message += fmt(T.filesRestoredN, res.data.restored.length) + "\n" + res.data.restored.join("\n");
                     }
-
                     if (res.data.backup_dir) {
-                        message += "\n\nCopia de seguridad guardada en:\n" + res.data.backup_dir;
+                        message += "\n\n" + T.backupSavedIn + "\n" + res.data.backup_dir;
                     } else {
-                        message += "\n\n(No se creó copia de seguridad)";
+                        message += "\n\n" + T.noBackupMade;
                     }
-
-                    const errorKeys = Object.keys(res.data.errors);
+                    const errorKeys = Object.keys(res.data.errors || {});
                     if (errorKeys.length > 0) {
-                        message += "\n\nArchivos con errores ("+ errorKeys.length +"):\n";
-                        errorKeys.forEach(function(file) {
-                            message += file + ": " + res.data.errors[file] + "\n";
-                        });
+                        message += "\n\n" + fmt(T.filesWithErrorsN, errorKeys.length) + "\n";
+                        errorKeys.forEach(function (file) { message += file + ": " + res.data.errors[file] + "\n"; });
                     }
                     alert(message);
                     location.reload();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'Error al restaurar todos';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Restaurar Todos');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.restoreAllError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.restoreAll);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Restaurar Todos');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.restoreAll);
             }
         });
     });
@@ -189,33 +179,26 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         const button = $(this);
         const path = button.data('path');
-        if (!confirm(
-            "¿Eliminar este archivo?\n\n" + path + "\n\n" +
-            "⚠ Esta acción es IRREVERSIBLE: el archivo se borra de forma permanente y no se puede deshacer."
-        )) return;
+        if (!confirm(fmt(T.confirmDeleteExtra, path))) return;
 
-        button.prop('disabled', true).text('Eliminando...');
+        button.prop('disabled', true).text(T.deleting);
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_delete_extra',
-                nonce: button.data('nonce'),
-                path: path
-            },
+            data: { action: 'wps_delete_extra', nonce: button.data('nonce'), path: path },
             timeout: 60000,
             success: function (res) {
                 if (res && res.success) {
                     button.closest('li').fadeOut();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Eliminar');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.delete);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Eliminar');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.delete);
             }
         });
     });
@@ -224,90 +207,36 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '.wps-delete-all-extras', function (e) {
         e.preventDefault();
         const button = $(this);
-        if (!confirm(
-            "¿Eliminar TODOS los archivos no reconocidos por WordPress?\n\n" +
-            "⚠ Esta acción es IRREVERSIBLE: los archivos se borran de forma permanente y no se pueden deshacer."
-        )) return;
+        if (!confirm(T.confirmDeleteAllExtra)) return;
 
-        button.prop('disabled', true).text('Eliminando...');
+        button.prop('disabled', true).text(T.deleting);
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_delete_all_extras',
-                nonce: button.data('nonce')
-            },
+            data: { action: 'wps_delete_all_extras', nonce: button.data('nonce') },
             timeout: 300000,
             success: function (res) {
                 if (res && res.success) {
-                    let message = "Operación completada.\n\n";
+                    let message = T.opDone + "\n\n";
                     if (res.data.deleted && res.data.deleted.length > 0) {
-                        message += "Eliminados (" + res.data.deleted.length + "):\n" + res.data.deleted.join("\n");
+                        message += fmt(T.deletedN, res.data.deleted.length) + "\n" + res.data.deleted.join("\n");
                     }
                     const errorKeys = Object.keys(res.data.errors || {});
                     if (errorKeys.length > 0) {
-                        message += "\n\nCon errores (" + errorKeys.length + "):\n";
-                        errorKeys.forEach(function (file) {
-                            message += file + ": " + res.data.errors[file] + "\n";
-                        });
+                        message += "\n\n" + fmt(T.filesWithErrorsN, errorKeys.length) + "\n";
+                        errorKeys.forEach(function (file) { message += file + ": " + res.data.errors[file] + "\n"; });
                     }
                     alert(message);
                     location.reload();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Eliminar todos los archivos extra');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.deleteAllExtra);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Eliminar todos los archivos extra');
-            }
-        });
-    });
-
-    // Eliminar usuario de WordPress (doble confirmación, IRREMEDIABLE)
-    $(document).on('click', '.wps-delete-user', function (e) {
-        e.preventDefault();
-        const button = $(this);
-        const uid = button.data('user-id');
-        const label = button.data('user-label') || ('#' + uid);
-
-        // 1ª confirmación
-        if (!confirm(
-            "¿Seguro que quieres BORRAR el usuario?\n\n" + label + "\n\n" +
-            "⚠ Esta acción es IRREMEDIABLE: el usuario se elimina permanentemente y no se puede deshacer."
-        )) return;
-
-        // 2ª confirmación
-        if (!confirm(
-            "Confirmación final.\n\n" +
-            "Se eliminará el usuario \"" + label + "\" y el contenido del que sea autor.\n\n" +
-            "¿Continuar con el borrado definitivo?"
-        )) return;
-
-        button.prop('disabled', true).text('Eliminando...');
-        $.ajax({
-            url: WPS_AJAX.ajax_url,
-            type: 'POST',
-            data: {
-                action: 'wps_delete_user',
-                nonce: button.data('nonce'),
-                user_id: uid
-            },
-            timeout: 60000,
-            success: function (res) {
-                if (res && res.success) {
-                    button.closest('tr').fadeOut();
-                } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar el usuario';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Eliminar');
-                }
-            },
-            error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Eliminar');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.deleteAllExtra);
             }
         });
     });
@@ -316,30 +245,27 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '.wps-clean-transients', function (e) {
         e.preventDefault();
         const button = $(this);
-        if (!confirm("¿Limpiar los transitorios caducados?\n\nEs una operación segura: son datos temporales caducados y WordPress los regenera cuando los necesite.")) return;
+        if (!confirm(T.confirmCleanTransients)) return;
 
-        button.prop('disabled', true).text('Limpiando...');
+        button.prop('disabled', true).text(T.cleaning);
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_clean_transients',
-                nonce: button.data('nonce')
-            },
+            data: { action: 'wps_clean_transients', nonce: button.data('nonce') },
             timeout: 120000,
             success: function (res) {
                 if (res && res.success) {
-                    alert("Transitorios caducados eliminados: " + (res.data.removed || 0));
+                    alert(fmt(T.transientsRemoved, res.data.removed || 0));
                     location.reload();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo limpiar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Limpiar transitorios caducados');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.cleanError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.cleanTransients);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Limpiar transitorios caducados');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.cleanTransients);
             }
         });
     });
@@ -349,30 +275,26 @@ jQuery(document).ready(function ($) {
         e.preventDefault();
         const button = $(this);
         const hook = button.data('hook');
-        if (!confirm("¿Eliminar las tareas cron del hook huérfano?\n\n" + hook + "\n\nEs seguro: ese hook ya no tiene código asociado (resto de un plugin retirado).")) return;
+        if (!confirm(fmt(T.confirmCleanCronHook, hook))) return;
 
-        button.prop('disabled', true).text('Eliminando...');
+        button.prop('disabled', true).text(T.deleting);
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_clean_cron_hook',
-                nonce: button.data('nonce'),
-                hook: hook
-            },
+            data: { action: 'wps_clean_cron_hook', nonce: button.data('nonce'), hook: hook },
             timeout: 60000,
             success: function (res) {
                 if (res && res.success) {
                     button.closest('tr').fadeOut();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo eliminar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Eliminar');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.cleanError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.delete);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Eliminar');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.delete);
             }
         });
     });
@@ -381,34 +303,63 @@ jQuery(document).ready(function ($) {
     $(document).on('click', '.wps-clean-cron-all', function (e) {
         e.preventDefault();
         const button = $(this);
-        if (!confirm("¿Eliminar TODAS las tareas cron huérfanas?\n\nSon tareas de plugins ya retirados (hooks sin código asociado). Es seguro.")) return;
+        if (!confirm(T.confirmCleanCronAll)) return;
 
-        button.prop('disabled', true).text('Limpiando...');
+        button.prop('disabled', true).text(T.cleaning);
         $.ajax({
             url: WPS_AJAX.ajax_url,
             type: 'POST',
-            data: {
-                action: 'wps_clean_cron_all',
-                nonce: button.data('nonce')
-            },
+            data: { action: 'wps_clean_cron_all', nonce: button.data('nonce') },
             timeout: 120000,
             success: function (res) {
                 if (res && res.success) {
-                    let message = "Tareas cron huérfanas eliminadas: " + (res.data.removed || 0);
+                    let message = fmt(T.cronRemoved, res.data.removed || 0);
                     if (res.data.hooks && res.data.hooks.length) {
-                        message += "\n\nHooks limpiados:\n" + res.data.hooks.join("\n");
+                        message += "\n\n" + T.hooksCleaned + "\n" + res.data.hooks.join("\n");
                     }
                     alert(message);
                     location.reload();
                 } else {
-                    const msg = res && res.data && res.data.message ? res.data.message : 'No se pudo limpiar';
-                    alert("Error: " + msg);
-                    button.prop('disabled', false).text('Limpiar todas las tareas cron huérfanas');
+                    const msg = res && res.data && res.data.message ? res.data.message : T.cleanError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.cleanAllCron);
                 }
             },
             error: function (jqXHR, textStatus) {
-                alert("Error: " + serverErrorMessage(jqXHR, textStatus));
-                button.prop('disabled', false).text('Limpiar todas las tareas cron huérfanas');
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.cleanAllCron);
+            }
+        });
+    });
+
+    // Eliminar usuario de WordPress (doble confirmación, IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-user', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const uid = button.data('user-id');
+        const label = button.data('user-label') || ('#' + uid);
+
+        if (!confirm(fmt(T.confirmDeleteUser1, label))) return;
+        if (!confirm(fmt(T.confirmDeleteUser2, label))) return;
+
+        button.prop('disabled', true).text(T.deleting);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'wps_delete_user', nonce: button.data('nonce'), user_id: uid },
+            timeout: 60000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('tr').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteUserError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.delete);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.delete);
             }
         });
     });
@@ -423,15 +374,11 @@ jQuery(document).ready(function ($) {
         $('.wps-bot-cb').prop('checked', false);
     });
 
-    // Cerrar modales (botón X y botón "Cerrar")
+    // Cerrar modales
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');
     });
-
-    // Cerrar al hacer clic en el fondo del overlay
     $(document).on('click', '.wps-modal-overlay', function (e) {
-        if (e.target === this) {
-            $(this).css('display', 'none');
-        }
+        if (e.target === this) $(this).css('display', 'none');
     });
 });
