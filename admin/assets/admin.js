@@ -374,6 +374,135 @@ jQuery(document).ready(function ($) {
         $('.wps-bot-cb').prop('checked', false);
     });
 
+    // ---------- Copias de seguridad ----------
+    function backupCtx(el) {
+        const $row  = $(el).closest('tr');
+        const $card = $(el).closest('.wps-backup');
+        return {
+            store:  $card.data('store'),
+            batch:  $card.data('batch'),
+            file:   $row.data('file'),
+            target: $row.data('target')
+        };
+    }
+
+    // Restaurar un archivo desde una copia
+    $(document).on('click', '.wps-restore-backup', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const ctx = backupCtx(this);
+        if (!confirm(fmt(T.confirmRestoreBackup, ctx.target))) return;
+
+        button.prop('disabled', true).text(T.restoring);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'wps_restore_backup', nonce: button.data('nonce'), store: ctx.store, batch: ctx.batch, file: ctx.file },
+            timeout: 120000,
+            success: function (res) {
+                if (res && res.success) {
+                    alert(res.data.message);
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : T.restoreError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.restore);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.restore);
+            }
+        });
+    });
+
+    // Eliminar un archivo de una copia (IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-backup-file', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const ctx = backupCtx(this);
+        if (!confirm(fmt(T.confirmDeleteBackupFile, ctx.target))) return;
+
+        button.prop('disabled', true).text(T.deleting);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'wps_delete_backup_file', nonce: button.data('nonce'), store: ctx.store, batch: ctx.batch, file: ctx.file },
+            timeout: 60000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('tr').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.delete);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.delete);
+            }
+        });
+    });
+
+    // Eliminar una copia completa (IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-backup-batch', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const ctx = backupCtx(this);
+        if (!confirm(T.confirmDeleteBackupBatch)) return;
+
+        button.prop('disabled', true).text(T.deleting);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'wps_delete_backup_batch', nonce: button.data('nonce'), store: ctx.store, batch: ctx.batch },
+            timeout: 120000,
+            success: function (res) {
+                if (res && res.success) {
+                    button.closest('.wps-backup').fadeOut();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.deleteBackupBatch);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.deleteBackupBatch);
+            }
+        });
+    });
+
+    // Eliminar TODAS las copias (IRREVERSIBLE)
+    $(document).on('click', '.wps-delete-all-backups', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        if (!confirm(T.confirmDeleteAllBackups)) return;
+
+        button.prop('disabled', true).text(T.deleting);
+        $.ajax({
+            url: WPS_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'wps_delete_all_backups', nonce: button.data('nonce') },
+            timeout: 300000,
+            success: function (res) {
+                if (res && res.success) {
+                    alert(fmt(T.backupsDeleted, res.data.deleted || 0));
+                    location.reload();
+                } else {
+                    const msg = res && res.data && res.data.message ? res.data.message : T.deleteError;
+                    alert(fmt(T.errorPrefix, msg));
+                    button.prop('disabled', false).text(T.deleteAllBackups);
+                }
+            },
+            error: function (jqXHR, textStatus) {
+                alert(errText(jqXHR, textStatus));
+                button.prop('disabled', false).text(T.deleteAllBackups);
+            }
+        });
+    });
+
     // Cerrar modales
     $(document).on('click', '.wps-close, #wps-extras-modal-close', function () {
         $(this).closest('.wps-modal-overlay').css('display', 'none');

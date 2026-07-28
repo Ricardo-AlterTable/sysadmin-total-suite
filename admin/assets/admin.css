@@ -376,6 +376,25 @@ body {
 .wps-user-you   { color: var(--wps-primary-2); font-size: 12px; margin-left: 4px; }
 .wps-user-nodelete { color: var(--wps-muted); }
 
+/* ---- Copias de seguridad ---- */
+.wps-backup {
+    margin: 14px 0;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--wps-border);
+    border-radius: var(--wps-radius-sm);
+}
+.wps-backup-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.wps-backup-head strong { font-size: 14px; }
+.wps-backup-head .button { margin-left: auto; }
+.wps-backup .wps-table { margin-top: 10px; background: transparent; }
+
 /* ---- Paginación / tablenav ---- */
 .wrap .tablenav,
 .wrap .tablenav .displaying-num,

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Integridad del core, profiling de tiempos, gestión de usuarios, WPO (rendimiento) y bloqueo de bots de IA, en un panel de administración unificado.
- * Version: 3.7
+ * Version: 3.8
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -28,6 +28,7 @@ require_once WPS_PLUGIN_DIR . 'includes/profiler.php';
 require_once WPS_PLUGIN_DIR . 'includes/users.php';
 require_once WPS_PLUGIN_DIR . 'includes/wpo.php';
 require_once WPS_PLUGIN_DIR . 'includes/aibots.php';
+require_once WPS_PLUGIN_DIR . 'includes/backups.php';
 
 /**
  * Indica si una ruta relativa pertenece realmente al core de WordPress.
@@ -264,8 +265,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.7');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.7', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.8');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.8', true);
 
     // Chart.js (empaquetada localmente; WordPress.org no permite CDN externos).
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -323,6 +324,14 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'confirmDeleteUser1'=> __("Are you sure you want to DELETE the user?\n\n%s\n\n⚠ This action is IRREVERSIBLE: the user is permanently removed and cannot be undone.", 'wp-profiler-security'),
             'confirmDeleteUser2'=> __("Final confirmation.\n\nThe user \"%s\" and the content they authored will be removed.\n\nContinue with permanent deletion?", 'wp-profiler-security'),
             'deleteUserError'  => __('Could not delete the user', 'wp-profiler-security'),
+            // Backups
+            'confirmRestoreBackup'   => __("Restore this file from the backup?\n\n%s\n\nThe file currently on the site will be overwritten.", 'wp-profiler-security'),
+            'confirmDeleteBackupFile'=> __("Delete this backup copy?\n\n%s\n\n⚠ This action is IRREVERSIBLE: the copy is permanently removed and cannot be undone.", 'wp-profiler-security'),
+            'confirmDeleteBackupBatch'=> __("Delete this whole backup?\n\n⚠ This action is IRREVERSIBLE: every copy it contains is permanently removed and cannot be undone.", 'wp-profiler-security'),
+            'confirmDeleteAllBackups'=> __("Delete ALL backups?\n\n⚠ This action is IRREVERSIBLE: every saved copy is permanently removed and cannot be undone.", 'wp-profiler-security'),
+            'deleteBackupBatch'      => __('Delete this backup', 'wp-profiler-security'),
+            'deleteAllBackups'       => __('Delete all backups', 'wp-profiler-security'),
+            'backupsDeleted'         => __('Backups deleted: %s', 'wp-profiler-security'),
         ],
     ]);
 });

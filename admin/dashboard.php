@@ -159,6 +159,97 @@ $analysis = get_transient('wps_last_analysis');
     <?php else: ?>
         <p><?php printf(esc_html__('No analysis available. Run %s to get results.', 'wp-profiler-security'), '<strong>' . esc_html__('Analyze now', 'wp-profiler-security') . '</strong>'); ?></p>
     <?php endif; ?>
+
+    <?php
+    // ==========================================================
+    // Copias de seguridad creadas por la restauración
+    // ==========================================================
+    $wps_backups     = wps_list_backups();
+    $wps_backups_n   = count($wps_backups);
+    $wps_backups_sz  = array_sum(array_column($wps_backups, 'size'));
+    $wps_bk_nonce    = wp_create_nonce('wps_backups');
+    $wps_datetime_fmt = get_option('date_format') . ' ' . get_option('time_format');
+    ?>
+    <div class="wps-card">
+        <h2><?php esc_html_e('Backups', 'wp-profiler-security'); ?></h2>
+
+        <?php if (!$wps_backups_n): ?>
+            <p class="wps-muted"><?php esc_html_e('There are no backups. They are created when you restore a core file and choose to keep a copy.', 'wp-profiler-security'); ?></p>
+        <?php else: ?>
+            <p class="wps-kv">
+                <?php
+                printf(
+                    /* translators: 1: number of backups, 2: total size. */
+                    esc_html__('Saved backups: %1$s (%2$s in total)', 'wp-profiler-security'),
+                    '<strong>' . esc_html(number_format_i18n($wps_backups_n)) . '</strong>',
+                    '<strong>' . esc_html(size_format($wps_backups_sz, 2)) . '</strong>'
+                );
+                ?>
+            </p>
+
+            <div class="wps-actions">
+                <button class="button wps-btn-danger wps-delete-all-backups" data-nonce="<?php echo esc_attr($wps_bk_nonce); ?>">
+                    <?php esc_html_e('Delete all backups', 'wp-profiler-security'); ?>
+                </button>
+            </div>
+
+            <?php foreach ($wps_backups as $bk): ?>
+                <div class="wps-backup" data-store="<?php echo esc_attr($bk['store']); ?>" data-batch="<?php echo esc_attr($bk['batch']); ?>">
+                    <div class="wps-backup-head">
+                        <strong>
+                            <?php
+                            echo $bk['time']
+                                ? esc_html(wp_date($wps_datetime_fmt, $bk['time']))
+                                : esc_html($bk['batch']);
+                            ?>
+                        </strong>
+                        <span class="wps-muted">
+                            <?php
+                            printf(
+                                /* translators: 1: number of files, 2: size. */
+                                esc_html(_n('%1$s file · %2$s', '%1$s files · %2$s', $bk['count'], 'wp-profiler-security')),
+                                esc_html(number_format_i18n($bk['count'])),
+                                esc_html(size_format($bk['size'], 2))
+                            );
+                            ?>
+                        </span>
+                        <?php if ($bk['legacy']): ?>
+                            <span class="wps-badge warn"><?php esc_html_e('Old location (web-accessible)', 'wp-profiler-security'); ?></span>
+                        <?php endif; ?>
+                        <button class="button wps-btn-danger wps-delete-backup-batch" data-nonce="<?php echo esc_attr($wps_bk_nonce); ?>">
+                            <?php esc_html_e('Delete this backup', 'wp-profiler-security'); ?>
+                        </button>
+                    </div>
+
+                    <table class="wps-table">
+                        <thead>
+                            <tr>
+                                <th><?php esc_html_e('File', 'wp-profiler-security'); ?></th>
+                                <th><?php esc_html_e('Size', 'wp-profiler-security'); ?></th>
+                                <th><?php esc_html_e('Actions', 'wp-profiler-security'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($bk['files'] as $f): ?>
+                                <tr data-file="<?php echo esc_attr($f['rel']); ?>" data-target="<?php echo esc_attr($f['target']); ?>">
+                                    <td><code class="wps-file-path"><?php echo esc_html($f['target']); ?></code></td>
+                                    <td><?php echo esc_html(size_format($f['size'], 2)); ?></td>
+                                    <td>
+                                        <button class="button wps-restore-backup" data-nonce="<?php echo esc_attr($wps_bk_nonce); ?>">
+                                            <?php esc_html_e('Restore', 'wp-profiler-security'); ?>
+                                        </button>
+                                        <button class="button wps-btn-danger wps-delete-backup-file" data-nonce="<?php echo esc_attr($wps_bk_nonce); ?>">
+                                            <?php esc_html_e('Delete', 'wp-profiler-security'); ?>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 </div>
 
 <!-- Modal for diff -->

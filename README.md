@@ -22,6 +22,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **Ver diferencias** (diff) de cualquier archivo modificado contra el original del ZIP oficial.
 - **Restaurar** archivos individualmente o en lote, con **copia de seguridad opcional** (te pregunta y, si aceptas, indica la ruta del backup).
 - **Eliminar** archivos extra (individual o en masa) con confirmación de irreversibilidad.
+- **Gestor de copias de seguridad**: lista las copias con **fecha y hora**, permite **restaurar** cada archivo desde su copia y **purgar** copias individualmente, por lote o todas. Detecta además las copias antiguas guardadas en la raíz del sitio y avisa de que esa ubicación es accesible por web.
 - Descarga el ZIP acorde al **idioma** del sitio (p. ej. `es_ES`) con *fallback* al internacional, de modo que el diff y la restauración sean coherentes con los checksums.
 
 ### 📊 Profiling
@@ -119,6 +120,7 @@ includes/
   users.php                # AJAX: eliminar usuario
   wpo.php                  # Helpers de rendimiento (WPO) + AJAX: limpiar transitorios / cron
   aibots.php               # robots.txt + bloqueo 403 por User-Agent de bots de IA
+  backups.php              # Gestión de copias: listado, restauración y purga
 admin/
   dashboard.php            # Página Integridad
   profiler.php             # Página Profiling (gráficas)
@@ -145,6 +147,8 @@ El tema visual está centralizado en variables CSS al inicio de `admin/assets/ad
 
 ## Changelog
 
+- **3.8** — Gestor de copias de seguridad en Integridad: listado con fecha/hora, restauración desde copia y purga individual, por lote o total.
+- **3.7** — Corregido el botón "Lanzar prueba" de Profiling (la URL firmada se rompía por el escapado de `&`).
 - **3.6** — Corrección de un **XSS almacenado** en el visor de diferencias, endurecimiento de backups y caché, nonce en la prueba de profiling, validación de rutas tras normalizar, respaldo de cron antes de limpiar y menos falsos positivos en "archivos extra".
 - **3.5** — Endurecimiento de seguridad (resolución de rutas, restauración limitada al core, backups protegidos en uploads), arreglo de la restauración de archivos faltantes y `uninstall.php`.
 - **3.4** — Preparación para WordPress.org: `readme.txt`, cabeceras, Chart.js local e internacionalización (inglés base + traducción al español).
