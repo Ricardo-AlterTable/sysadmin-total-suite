@@ -312,7 +312,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Tunning: limpiar transitorios caducados
+    // WPO: limpiar transitorios caducados
     $(document).on('click', '.wps-clean-transients', function (e) {
         e.preventDefault();
         const button = $(this);
@@ -344,7 +344,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Tunning: eliminar una tarea cron huérfana
+    // WPO: eliminar una tarea cron huérfana
     $(document).on('click', '.wps-clean-cron-hook', function (e) {
         e.preventDefault();
         const button = $(this);
@@ -377,7 +377,7 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Tunning: eliminar TODAS las tareas cron huérfanas
+    // WPO: eliminar TODAS las tareas cron huérfanas
     $(document).on('click', '.wps-clean-cron-all', function (e) {
         e.preventDefault();
         const button = $(this);

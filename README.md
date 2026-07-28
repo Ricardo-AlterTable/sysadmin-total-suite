@@ -1,11 +1,11 @@
 # WP Profiler & Security
 
-Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, cinco utilidades de mantenimiento del sitio:
+Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, cuatro utilidades de mantenimiento del sitio:
 
 1. **Integridad del core** — verifica los archivos de WordPress contra los checksums oficiales y permite comparar y restaurar los modificados.
 2. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
 3. **Comprobar usuarios WP** — lista los usuarios (nombre, alta, rol) y permite eliminarlos con doble confirmación.
-4. **Tunning** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
+4. **WPO** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
 5. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
 
 > ⚠️ Herramienta de administración. Todas las acciones requieren capacidades de administrador y están protegidas con nonces. Varias operaciones son **destructivas** (borrado de usuarios, archivos extra y tareas cron); úsalas con conocimiento de causa.
@@ -35,7 +35,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **Eliminar usuario** con **doble confirmación** y aviso de que es irremediable (elimina también el contenido del que sea autor).
 - No permite el auto-borrado; usa la API nativa (`wp_delete_user` / `wpmu_delete_user`).
 
-### ⚙️ Tunning
+### ⚙️ WPO (Web Performance Optimization)
 - **Plugins que afectan a la carga**: instalados / activos / inactivos y listado de los activos.
 - **Basura en `wp_options`**: tamaño de las opciones *autoload*, mayores opciones y conteo de **transitorios caducados**, con botón para limpiarlos (`delete_expired_transients`).
 - **WP-Cron**: modo (interno vs `DISABLE_WP_CRON`), tareas programadas, **atrasadas** y **huérfanas** (de plugins retirados), con limpieza segura (solo hooks sin acción registrada).
@@ -64,7 +64,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 
 1. Copia la carpeta del plugin en `wp-content/plugins/wp-profiler-security/`.
 2. Actívalo desde **Plugins** en el escritorio de WordPress.
-3. Encontrarás el menú **WP Profiler & Security** con sus secciones (Integridad, Profiling, Comprobar usuarios WP, Tunning).
+3. Encontrarás el menú **WP Profiler & Security** con sus secciones (Integridad, Profiling, Comprobar usuarios WP, WPO).
 
 > Si usas un plugin/servidor de caché (p. ej. **LiteSpeed**), purga la caché tras actualizar el plugin para que se sirvan los assets nuevos.
 
@@ -83,7 +83,7 @@ define('SAVEQUERIES', true);
 - **Integridad → Analizar ahora**: ejecuta la verificación. Revisa modificados/faltantes/extra y usa *Mostrar cambios*, *Restaurar* o *Eliminar* según corresponda. *Purgar Caché* borra la caché interna del plugin (transient y ZIP descargados).
 - **Profiling → Lanzar prueba**: genera una medición del home y actualiza las gráficas.
 - **Comprobar usuarios WP**: revisa la tabla y elimina usuarios si es necesario (doble confirmación).
-- **Tunning**: revisa los indicadores y usa los botones de limpieza (transitorios caducados, tareas cron huérfanas).
+- **WPO**: revisa los indicadores y usa los botones de limpieza (transitorios caducados, tareas cron huérfanas).
 
 ---
 
@@ -105,13 +105,13 @@ includes/
   diff.php                 # AJAX: diff, restaurar, eliminar extra; descarga del ZIP oficial
   profiler.php             # Medición de tiempos y guardado del histórico
   users.php                # AJAX: eliminar usuario
-  tunning.php              # Helpers de rendimiento + AJAX: limpiar transitorios / cron
+  wpo.php                  # Helpers de rendimiento (WPO) + AJAX: limpiar transitorios / cron
   aibots.php               # robots.txt + bloqueo 403 por User-Agent de bots de IA
 admin/
   dashboard.php            # Página Integridad
   profiler.php             # Página Profiling (gráficas)
   users.php                # Página Comprobar usuarios WP
-  tunning.php              # Página Tunning
+  wpo.php                  # Página WPO
   aibots.php               # Página Bloqueo de bots de IA
   assets/
     admin.css              # Tema del panel (paleta en variables CSS)

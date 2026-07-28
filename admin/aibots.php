@@ -23,7 +23,7 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
         <?php wp_nonce_field('wps_aibots_nonce'); ?>
         <input type="hidden" name="action" value="wps_save_aibots">
 
-        <div class="wps-tunning-section">
+        <div class="wps-card">
             <h2>Aplicar a todos</h2>
             <div class="wps-actions">
                 <button type="button" class="button wps-btn-danger wps-bots-block-all">Bloquear todos</button>
@@ -47,9 +47,9 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
             </p>
         </div>
 
-        <div class="wps-tunning-section">
+        <div class="wps-card">
             <h2>Bots (<?php echo count($bots); ?>)</h2>
-            <table class="wps-tunning-table">
+            <table class="wps-table">
                 <thead>
                     <tr>
                         <th>Bot</th>

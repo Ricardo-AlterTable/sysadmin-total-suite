@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Analiza la integridad del core de WordPress, permite restaurar archivos modificados y añade una sección de profiling de tiempos (core, plugins, tema, SQL y HTTP).
- * Version: 3.1
+ * Version: 3.3
  * Author: Ricardo Morales
  * Author URI: https://github.com/Ricardo-AlterTable
  * License: GPLv2 or later
@@ -17,7 +17,7 @@ define('WPS_PLUGIN_URL', plugin_dir_url(__FILE__));
 require_once WPS_PLUGIN_DIR . 'includes/diff.php';
 require_once WPS_PLUGIN_DIR . 'includes/profiler.php';
 require_once WPS_PLUGIN_DIR . 'includes/users.php';
-require_once WPS_PLUGIN_DIR . 'includes/tunning.php';
+require_once WPS_PLUGIN_DIR . 'includes/wpo.php';
 require_once WPS_PLUGIN_DIR . 'includes/aibots.php';
 
 /**
@@ -77,11 +77,11 @@ add_action('admin_menu', function () {
 
     add_submenu_page(
         'wp-profiler-security',
-        'Tunning',
-        'Tunning',
+        'WPO',
+        'WPO',
         'manage_options',
-        'wp-profiler-tunning',
-        'wps_profiler_tunning_page'
+        'wp-profiler-wpo',
+        'wps_profiler_wpo_page'
     );
 
     add_submenu_page(
@@ -100,8 +100,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.1');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.1', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.3');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.3', true);
 
     // Chart.js solo en profiling
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
@@ -129,8 +129,8 @@ function wps_profiler_users_page() {
     include WPS_PLUGIN_DIR . 'admin/users.php';
 }
 
-function wps_profiler_tunning_page() {
-    include WPS_PLUGIN_DIR . 'admin/tunning.php';
+function wps_profiler_wpo_page() {
+    include WPS_PLUGIN_DIR . 'admin/wpo.php';
 }
 
 function wps_profiler_aibots_page() {
