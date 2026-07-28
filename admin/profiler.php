@@ -32,7 +32,10 @@ if (empty($history)) {
             iframe.onload = function () {
                 window.location.reload();
             };
-            iframe.src = "<?php echo esc_js(add_query_arg(['wps_profiling_test' => 1, '_wpnonce' => wp_create_nonce('wps_profiling_test')], home_url('/'))); ?>&t=" + Date.now();
+            // La URL se emite con wp_json_encode (literal JS válido). No usar
+            // esc_js(): convierte los '&' en '&amp;' y rompería la cadena de
+            // consulta, de modo que el nonce no llegaría a PHP.
+            iframe.src = <?php echo wp_json_encode(add_query_arg(['wps_profiling_test' => 1, '_wpnonce' => wp_create_nonce('wps_profiling_test')], home_url('/')), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?> + "&t=" + Date.now();
         });
     });
     </script>
@@ -118,7 +121,10 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
             iframe.onload = function () {
                 window.location.reload();
             };
-            iframe.src = "<?php echo esc_js(add_query_arg(['wps_profiling_test' => 1, '_wpnonce' => wp_create_nonce('wps_profiling_test')], home_url('/'))); ?>&t=" + Date.now();
+            // La URL se emite con wp_json_encode (literal JS válido). No usar
+            // esc_js(): convierte los '&' en '&amp;' y rompería la cadena de
+            // consulta, de modo que el nonce no llegaría a PHP.
+            iframe.src = <?php echo wp_json_encode(add_query_arg(['wps_profiling_test' => 1, '_wpnonce' => wp_create_nonce('wps_profiling_test')], home_url('/')), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?> + "&t=" + Date.now();
         });
 
         // Paleta acorde al panel (texto/rejilla legibles sobre fondo oscuro).

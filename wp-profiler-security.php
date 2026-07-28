@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP Profiler & Security
  * Description: Integridad del core, profiling de tiempos, gestión de usuarios, WPO (rendimiento) y bloqueo de bots de IA, en un panel de administración unificado.
- * Version: 3.6
+ * Version: 3.7
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -264,8 +264,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'wp-profiler-security') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.6');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.6', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.7');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.7', true);
 
     // Chart.js (empaquetada localmente; WordPress.org no permite CDN externos).
     if (isset($_GET['page']) && $_GET['page'] === 'wp-profiler-profiling') {
