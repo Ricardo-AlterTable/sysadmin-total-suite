@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Site Integrity & Profiler
  * Description: Core integrity checks, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 4.0
+ * Version: 4.1
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -326,12 +326,12 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'site-integrity-profiler') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '4.0');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '4.0', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '4.1');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '4.1', true);
 
     // Chart.js (empaquetada localmente; WordPress.org no permite CDN externos).
     if (isset($_GET['page']) && $_GET['page'] === 'site-integrity-profiler-profiling') {  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Parámetro de solo lectura para paginación/avisos; no modifica estado.
-        wp_enqueue_script('chartjs', WPS_PLUGIN_URL . 'admin/assets/chart.min.js', [], '4.4.0', true);
+        wp_enqueue_script('chartjs', WPS_PLUGIN_URL . 'admin/assets/chart.min.js', [], '4.4.1', true);
     }
 
     wp_localize_script('wps-admin-js', 'WPS_AJAX', [
@@ -398,7 +398,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'deleteUserError'  => __('Could not delete the user', 'site-integrity-profiler'),
             // Backups
             /* translators: %s: file path. */
-            'confirmRestoreBackup'   => __("Restore this file from the backup?\n\n%s\n\nThe file currently on the site will be overwritten.", 'site-integrity-profiler'),
+            'confirmRestoreBackup'   => __("Restore this file from the backup?\n\n%s\n\nThe file currently on the site will be overwritten.\n\n⚠ A backup reflects the file as it was when the copy was made. If that version was already modified, those modifications will be restored. Only \"Restore\" on the Integrity list guarantees the official, unmodified content.", 'site-integrity-profiler'),
             /* translators: %s: value. */
             'confirmDeleteBackupFile'=> __("Delete this backup copy?\n\n%s\n\n⚠ This action is IRREVERSIBLE: the copy is permanently removed and cannot be undone.", 'site-integrity-profiler'),
             'confirmDeleteBackupBatch'=> __("Delete this whole backup?\n\n⚠ This action is IRREVERSIBLE: every copy it contains is permanently removed and cannot be undone.", 'site-integrity-profiler'),

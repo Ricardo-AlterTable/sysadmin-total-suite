@@ -4,7 +4,7 @@ Tags: security, performance, integrity, profiling, ai-bots
 Requires at least: 5.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 4.0
+Stable tag: 4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,6 +31,8 @@ This plugin connects to WordPress.org services in order to verify and restore th
 
 No personal data is sent and no other third-party service is contacted. These services are provided by the WordPress Foundation; see https://wordpress.org/about/privacy/ for details.
 
+The official package is used **only** as the reference copy of the core, exactly as WordPress itself does when it reinstalls or updates the core. No code is fetched from any third-party server, nothing is executed from the download, and the extracted content is only ever written back to the same core path it came from.
+
 == Installation ==
 
 1. Upload the plugin folder to `/wp-content/plugins/` or install it from your WordPress dashboard.
@@ -40,6 +42,22 @@ No personal data is sent and no other third-party service is contacted. These se
 Optional: to measure the SQL query time in the Profiling section, add `define('SAVEQUERIES', true);` to `wp-config.php`. Leaving it permanently enabled in production is not recommended because of its overhead.
 
 == Frequently Asked Questions ==
+
+= Does the plugin allow arbitrary code to be inserted or executed? =
+
+No. It contains no PHP or JavaScript editor, no file manager, no upload form and no field where code can be entered. It never calls `eval()`, `base64_decode()`, `exec()` or any dynamic include, and it does not generate code.
+
+The only content it can write is a file taken from the official WordPress package downloaded from WordPress.org, and only to the very same core path that file occupies in that package (`wp-admin/`, `wp-includes/` or a root file). Paths are normalized before validation, so `wp-content/` can never be written to. Every write requires the `manage_options` capability plus a nonce.
+
+= Why does the plugin download a ZIP from WordPress.org? =
+
+To be able to show a real diff and to restore a modified core file, the original file is needed. The plugin downloads the official package for your exact version and locale from WordPress.org — the same source and the same package WordPress itself uses to reinstall the core — extracts the single file being compared or restored, and caches the package in a protected directory. Nothing from the download is executed.
+
+If you prefer not to use this feature, the analysis works on its own as a read-only report, and you can repair the core from **Dashboard → Updates → Reinstall now**, which is WordPress's own mechanism.
+
+= Which files can the plugin delete? =
+
+Only files that the last analysis reported as **Extra**, meaning they are inside the core directories or the site root and are not part of the official package. Hidden files, `wp-config.php`, configuration files and search engine verification files are excluded and can never be deleted. There is no way to browse the filesystem or to delete an arbitrary path, and every deletion asks for confirmation stating that it is irreversible.
 
 = Does it require any PHP extension? =
 
@@ -69,6 +87,12 @@ In the uploads folder, inside a dedicated directory protected against direct acc
 4. AI bot blocking: per-bot selection.
 
 == Changelog ==
+
+= 4.1 =
+* Documented in detail how the official package is used and which files can be written or deleted, and added a clearer warning when restoring from a backup: a backup reproduces the file as it was, so it does not guarantee clean content the way the official package does.
+
+= 4.0 =
+* Remaining Plugin Check fixes and renamed the plugin so that its name and slug no longer contain restricted terms.
 
 = 3.9 =
 * Compliance with the Plugin Check tool: translator comments for every string with placeholders, output escaping, WordPress filesystem API instead of direct calls, prepared LIKE wildcards, `wp_safe_redirect()` and sanitized server variables.
@@ -111,6 +135,9 @@ In the uploads folder, inside a dedicated directory protected against direct acc
 * Integrity limited to the real core; locale alignment in diff and restore; nonce and interface fixes.
 
 == Upgrade Notice ==
+
+= 4.1 =
+Documentation and clearer warnings. No change in behaviour.
 
 = 3.9 =
 Compliance fixes for the plugin directory review. No change in behaviour.
