@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Site Integrity & Profiler
  * Description: Core integrity checks, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 3.9
+ * Version: 4.0
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -326,8 +326,8 @@ add_action('admin_menu', function () {
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'site-integrity-profiler') === false) return;
 
-    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '3.9');
-    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '3.9', true);
+    wp_enqueue_style('wps-admin-css', WPS_PLUGIN_URL . 'admin/assets/admin.css', [], '4.0');
+    wp_enqueue_script('wps-admin-js', WPS_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], '4.0', true);
 
     // Chart.js (empaquetada localmente; WordPress.org no permite CDN externos).
     if (isset($_GET['page']) && $_GET['page'] === 'site-integrity-profiler-profiling') {  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Parámetro de solo lectura para paginación/avisos; no modifica estado.
@@ -393,6 +393,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
             // Delete user
             /* translators: %s: user login name. */
             'confirmDeleteUser1'=> __("Are you sure you want to DELETE the user?\n\n%s\n\n⚠ This action is IRREVERSIBLE: the user is permanently removed and cannot be undone.", 'site-integrity-profiler'),
+            /* translators: %s: user login name. */
             'confirmDeleteUser2'=> __("Final confirmation.\n\nThe user \"%s\" and the content they authored will be removed.\n\nContinue with permanent deletion?", 'site-integrity-profiler'),
             'deleteUserError'  => __('Could not delete the user', 'site-integrity-profiler'),
             // Backups

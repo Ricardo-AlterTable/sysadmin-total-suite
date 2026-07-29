@@ -275,7 +275,8 @@ $analysis = get_transient('wps_last_analysis');
                     <form method="get">
                         <input type="hidden" name="page" value="<?php /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Parámetro de solo lectura para paginación/avisos; no modifica estado. */ echo esc_attr(sanitize_key(wp_unslash($_REQUEST['page'] ?? ''))); ?>" />
                         <input type="hidden" name="open_extras_modal" value="true" />
-                        <?php foreach ($_GET as $key => $value) {
+                        <?php /* phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Parámetros de solo lectura que se reinyectan en la paginación; no modifican estado. */
+                        foreach ($_GET as $key => $value) {
                             if (is_scalar($value) && !in_array($key, ['page', 'open_extras_modal', 'extras_per_page', 'extras_paged'], true)) {
                                 echo '<input type="hidden" name="' . esc_attr(sanitize_key($key)) . '" value="' . esc_attr(sanitize_text_field(wp_unslash($value))) . '" />';
                             }

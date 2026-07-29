@@ -2,9 +2,9 @@
 # This file is distributed under the GPLv2 or later license.
 msgid ""
 msgstr ""
-"Project-Id-Version: Site Integrity & Profiler 3.9\n"
+"Project-Id-Version: Site Integrity & Profiler 4.0\n"
 "Report-Msgid-Bugs-To: https://github.com/Ricardo-AlterTable\n"
-"POT-Creation-Date: 2026-07-28 17:15+0200\n"
+"POT-Creation-Date: 2026-07-29 08:23+0200\n"
 "PO-Revision-Date: 2026-07-28 17:00+0200\n"
 "Last-Translator: Ricardo Morales\n"
 "Language-Team: Ricardo Morales\n"
@@ -164,11 +164,11 @@ msgid "Deleting..."
 msgstr "Eliminando..."
 
 #: site-integrity-profiler.php:373 admin/dashboard.php:242
-#: admin/dashboard.php:313 admin/users.php:67 admin/wpo.php:142
+#: admin/dashboard.php:314 admin/users.php:67 admin/wpo.php:142
 msgid "Delete"
 msgstr "Eliminar"
 
-#: site-integrity-profiler.php:374 admin/dashboard.php:317
+#: site-integrity-profiler.php:374 admin/dashboard.php:318
 msgid "Delete all extra files"
 msgstr "Eliminar todos los archivos extra"
 
@@ -256,7 +256,8 @@ msgid ""
 "undone."
 msgstr "¿Seguro que quieres BORRAR el usuario?\n\n%s\n\n⚠ Esta acción es IRREMEDIABLE: el usuario se elimina permanentemente y no se puede deshacer."
 
-#: site-integrity-profiler.php:396
+#. translators: %s: user login name.
+#: site-integrity-profiler.php:397
 #, php-format
 msgid ""
 "Final confirmation.\n"
@@ -266,12 +267,12 @@ msgid ""
 "Continue with permanent deletion?"
 msgstr "Confirmación final.\n\nSe eliminará el usuario \\\"%s\\\" y el contenido del que sea autor.\n\n¿Continuar con el borrado definitivo?"
 
-#: site-integrity-profiler.php:397
+#: site-integrity-profiler.php:398
 msgid "Could not delete the user"
 msgstr "No se pudo eliminar el usuario"
 
 #. translators: %s: file path.
-#: site-integrity-profiler.php:400
+#: site-integrity-profiler.php:401
 #, php-format
 msgid ""
 "Restore this file from the backup?\n"
@@ -282,7 +283,7 @@ msgid ""
 msgstr "¿Restaurar este archivo desde la copia?\n\n%s\n\nSe sobrescribirá el archivo que hay ahora en el sitio."
 
 #. translators: %s: value.
-#: site-integrity-profiler.php:402
+#: site-integrity-profiler.php:403
 #, php-format
 msgid ""
 "Delete this backup copy?\n"
@@ -293,7 +294,7 @@ msgid ""
 "undone."
 msgstr "¿Eliminar esta copia de seguridad?\n\n%s\n\n⚠ Esta acción es IRREVERSIBLE: la copia se borra de forma permanente y no se puede deshacer."
 
-#: site-integrity-profiler.php:403
+#: site-integrity-profiler.php:404
 msgid ""
 "Delete this whole backup?\n"
 "\n"
@@ -301,7 +302,7 @@ msgid ""
 "and cannot be undone."
 msgstr "¿Eliminar esta copia completa?\n\n⚠ Esta acción es IRREVERSIBLE: todas las copias que contiene se borran de forma permanente y no se pueden deshacer."
 
-#: site-integrity-profiler.php:404
+#: site-integrity-profiler.php:405
 msgid ""
 "Delete ALL backups?\n"
 "\n"
@@ -309,22 +310,22 @@ msgid ""
 "cannot be undone."
 msgstr "¿Eliminar TODAS las copias de seguridad?\n\n⚠ Esta acción es IRREVERSIBLE: todas las copias guardadas se borran de forma permanente y no se pueden deshacer."
 
-#: site-integrity-profiler.php:405 admin/dashboard.php:220
+#: site-integrity-profiler.php:406 admin/dashboard.php:220
 msgid "Delete this backup"
 msgstr "Eliminar esta copia"
 
-#: site-integrity-profiler.php:406 admin/dashboard.php:192
+#: site-integrity-profiler.php:407 admin/dashboard.php:192
 msgid "Delete all backups"
 msgstr "Eliminar todas las copias"
 
 #. translators: %s: number of backups deleted.
-#: site-integrity-profiler.php:408
+#: site-integrity-profiler.php:409
 #, php-format
 msgid "Backups deleted: %s"
 msgstr "Copias eliminadas: %s"
 
-#: site-integrity-profiler.php:441 site-integrity-profiler.php:575
-#: site-integrity-profiler.php:599 includes/aibots.php:116
+#: site-integrity-profiler.php:442 site-integrity-profiler.php:576
+#: site-integrity-profiler.php:600 includes/aibots.php:116
 #: includes/backups.php:205 includes/backups.php:245 includes/backups.php:278
 #: includes/backups.php:301 includes/diff.php:37 includes/diff.php:88
 #: includes/diff.php:152 includes/diff.php:263 includes/diff.php:297
@@ -673,16 +674,16 @@ msgstr "⚠ Se detectaron archivos no reconocidos por WordPress"
 msgid "Modified / missing files"
 msgstr "Archivos modificados / faltantes"
 
-#: admin/dashboard.php:118 admin/dashboard.php:287
+#: admin/dashboard.php:118 admin/dashboard.php:288
 msgid "All"
 msgstr "Todos"
 
-#: admin/dashboard.php:120 admin/dashboard.php:289
+#: admin/dashboard.php:120 admin/dashboard.php:290
 msgid "Apply"
 msgstr "Aplicar"
 
 #. translators: %s: number of items.
-#: admin/dashboard.php:125 admin/dashboard.php:294
+#: admin/dashboard.php:125 admin/dashboard.php:295
 #, php-format
 msgid "%s item"
 msgid_plural "%s items"
@@ -786,7 +787,7 @@ msgstr "⚠ Eliminar un archivo es %s: se borra de forma permanente y no se pued
 msgid "irreversible"
 msgstr "irreversible"
 
-#: admin/dashboard.php:319
+#: admin/dashboard.php:320
 msgid "Close"
 msgstr "Cerrar"
 
