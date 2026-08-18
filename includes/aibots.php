@@ -99,7 +99,10 @@ add_action('init', function () {
     foreach ($blocked as $token) {
         if (empty($list[$token][1])) continue; // solo UAs reales bloqueables
         if (stripos($ua, $token) !== false) {
-            if (!defined('DONOTCACHEPAGE')) define('DONOTCACHEPAGE', true); // no cachear el 403
+            // Constante estándar del ecosistema de WordPress (la usan los plugins
+            // de caché); no lleva prefijo propio a propósito.
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- Constante de terceros, no definida por este plugin.
+            if (!defined('DONOTCACHEPAGE')) define('DONOTCACHEPAGE', true);
             nocache_headers();
             status_header(403);
             header('X-Robots-Tag: noai, noimageai', true);

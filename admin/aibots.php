@@ -5,10 +5,10 @@ if (!current_user_can('manage_options')) {
     wp_die(esc_html__('Insufficient permissions', 'sysadmin-total-suite'), 403);
 }
 
-$settings        = stsuite_aibots_settings();
-$blocked         = $settings['blocked'];
-$bots            = stsuite_aibots_list();
-$physical_robots = file_exists(ABSPATH . 'robots.txt');
+$stsuite_settings        = stsuite_aibots_settings();
+$stsuite_blocked         = $stsuite_settings['blocked'];
+$stsuite_bots            = stsuite_aibots_list();
+$stsuite_physical_robots = file_exists(ABSPATH . 'robots.txt');
 ?>
 <div class="wrap">
     <h1><?php esc_html_e('AI bot blocking', 'sysadmin-total-suite'); ?></h1>
@@ -29,28 +29,28 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
                 <button type="button" class="button stsuite-bots-allow-all"><?php esc_html_e('Allow all', 'sysadmin-total-suite'); ?></button>
             </div>
             <p class="stsuite-kv"><?php esc_html_e('Saved state:', 'sysadmin-total-suite'); ?>
-                <span class="stsuite-badge <?php echo count($blocked) ? 'bad' : 'ok'; ?>">
+                <span class="stsuite-badge <?php echo count($stsuite_blocked) ? 'bad' : 'ok'; ?>">
                     <?php
                     printf(
                         /* translators: %d: number of blocked bots. */
-                        esc_html(_n('%d blocked', '%d blocked', count($blocked), 'sysadmin-total-suite')),
-                        (int) count($blocked)
+                        esc_html(_n('%d blocked', '%d blocked', count($stsuite_blocked), 'sysadmin-total-suite')),
+                        (int) count($stsuite_blocked)
                     );
                     ?>
                 </span>
                 <span class="stsuite-badge ok">
                     <?php
-                    $allowed = count($bots) - count($blocked);
+                    $stsuite_allowed = count($stsuite_bots) - count($stsuite_blocked);
                     printf(
                         /* translators: %d: number of allowed bots. */
-                        esc_html(_n('%d allowed', '%d allowed', $allowed, 'sysadmin-total-suite')),
-                        (int) $allowed
+                        esc_html(_n('%d allowed', '%d allowed', $stsuite_allowed, 'sysadmin-total-suite')),
+                        (int) $stsuite_allowed
                     );
                     ?>
                 </span>
             </p>
 
-            <?php if (!empty($blocked) && $physical_robots): ?>
+            <?php if (!empty($stsuite_blocked) && $stsuite_physical_robots): ?>
                 <p class="stsuite-status stsuite-status--warn"><?php esc_html_e('⚠ A physical robots.txt exists in the site root: WordPress does not apply its virtual robots.txt, so the rules will not be added to that file. Edit it manually or remove it to use the virtual one. (The 403 blocking still works.)', 'sysadmin-total-suite'); ?></p>
             <?php endif; ?>
 
@@ -65,7 +65,7 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
                 printf(
                     /* translators: %d: total number of bots in the list. */
                     esc_html__('Bots (%d)', 'sysadmin-total-suite'),
-                    count($bots)
+                    count($stsuite_bots)
                 );
                 ?>
             </h2>
@@ -78,15 +78,15 @@ $physical_robots = file_exists(ABSPATH . 'robots.txt');
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($bots as $token => $meta): ?>
+                    <?php foreach ($stsuite_bots as $stsuite_token => $stsuite_meta): ?>
                         <tr>
-                            <td><?php echo esc_html($meta[0]); ?></td>
-                            <td><code><?php echo esc_html($token); ?></code></td>
+                            <td><?php echo esc_html($stsuite_meta[0]); ?></td>
+                            <td><code><?php echo esc_html($stsuite_token); ?></code></td>
                             <td>
                                 <label class="stsuite-toggle">
                                     <input type="checkbox" class="stsuite-bot-cb" name="stsuite_aibots_blocked[]"
-                                           value="<?php echo esc_attr($token); ?>"
-                                           <?php checked(in_array($token, $blocked, true)); ?>>
+                                           value="<?php echo esc_attr($stsuite_token); ?>"
+                                           <?php checked(in_array($stsuite_token, $stsuite_blocked, true)); ?>>
                                     <span class="stsuite-toggle-btn"
                                           data-allowed="<?php echo esc_attr__('Allowed', 'sysadmin-total-suite'); ?>"
                                           data-blocked="<?php echo esc_attr__('Blocked', 'sysadmin-total-suite'); ?>"

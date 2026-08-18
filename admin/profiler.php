@@ -5,9 +5,9 @@ if (!current_user_can('manage_options')) {
     wp_die(esc_html__('Insufficient permissions', 'sysadmin-total-suite'), 403);
 }
 
-$history = get_option('stsuite_profiling_history', []);
+$stsuite_history = get_option('stsuite_profiling_history', []);
 
-if (empty($history)) {
+if (empty($stsuite_history)) {
     echo '<div class="wrap"><h1>' . esc_html__('Profiling', 'sysadmin-total-suite') . '</h1><p>' . esc_html__('No data yet. Use the button below to force a test:', 'sysadmin-total-suite') . '</p>';
     ?>
     <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" style="margin: 20px 0;">
@@ -36,22 +36,22 @@ if (empty($history)) {
     return;
 }
 
-$last = end($history);
+$stsuite_last = end($stsuite_history);
 
-$sql_time_ms  = isset($last['sql_time']) && $last['sql_time'] !== null ? round($last['sql_time'] * 1000, 2) : null;
-$http_time_ms = round(($last['http_time'] ?? 0) * 1000, 2);
+$stsuite_sql_time_ms  = isset($stsuite_last['sql_time']) && $stsuite_last['sql_time'] !== null ? round($stsuite_last['sql_time'] * 1000, 2) : null;
+$stsuite_http_time_ms = round(($stsuite_last['http_time'] ?? 0) * 1000, 2);
 
-$profile_data = [
-    __('Core', 'sysadmin-total-suite')     => round($last['core']*1000, 2),
-    __('Plugins', 'sysadmin-total-suite')  => round($last['plugins']*1000, 2),
-    __('Theme', 'sysadmin-total-suite')    => round($last['theme']*1000, 2),
-    __('MySQL', 'sysadmin-total-suite')    => $sql_time_ms ?? 0,
-    __('External', 'sysadmin-total-suite') => $http_time_ms,
-    __('Total', 'sysadmin-total-suite')    => round($last['total']*1000, 2),
+$stsuite_profile_data = [
+    __('Core', 'sysadmin-total-suite')     => round($stsuite_last['core']*1000, 2),
+    __('Plugins', 'sysadmin-total-suite')  => round($stsuite_last['plugins']*1000, 2),
+    __('Theme', 'sysadmin-total-suite')    => round($stsuite_last['theme']*1000, 2),
+    __('MySQL', 'sysadmin-total-suite')    => $stsuite_sql_time_ms ?? 0,
+    __('External', 'sysadmin-total-suite') => $stsuite_http_time_ms,
+    __('Total', 'sysadmin-total-suite')    => round($stsuite_last['total']*1000, 2),
 ];
 
-$timestamps = array_map(fn($d) => wp_date('H:i:s', $d['timestamp']), $history);
-$totals = array_map(fn($d) => round($d['total']*1000,2), $history);
+$stsuite_timestamps = array_map(fn($stsuite_d) => wp_date('H:i:s', $stsuite_d['timestamp']), $stsuite_history);
+$stsuite_totals = array_map(fn($stsuite_d) => round($stsuite_d['total']*1000,2), $stsuite_history);
 ?>
 <div class="wrap">
     <h1><?php esc_html_e('Home page profiling', 'sysadmin-total-suite'); ?></h1>
@@ -78,10 +78,10 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
     </div>
 
     <ul>
-        <?php foreach ($profile_data as $k => $v): ?>
+        <?php foreach ($stsuite_profile_data as $stsuite_k => $stsuite_v): ?>
             <li>
-                <strong><?php echo esc_html($k); ?>:</strong>
-                <?php if ($k === __('MySQL', 'sysadmin-total-suite') && $sql_time_ms === null): ?>
+                <strong><?php echo esc_html($stsuite_k); ?>:</strong>
+                <?php if ($stsuite_k === __('MySQL', 'sysadmin-total-suite') && $stsuite_sql_time_ms === null): ?>
                     <?php
                     printf(
                         /* translators: %s: the SAVEQUERIES PHP constant snippet. */
@@ -90,12 +90,12 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
                     );
                     ?>
                 <?php else: ?>
-                    <?php echo esc_html($v); ?> ms
+                    <?php echo esc_html($stsuite_v); ?> ms
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>
-        <li><strong><?php esc_html_e('SQL queries:', 'sysadmin-total-suite'); ?></strong> <?php echo intval($last['sql_count']); ?></li>
-        <li><strong><?php esc_html_e('HTTP calls:', 'sysadmin-total-suite'); ?></strong> <?php echo intval($last['http_count']); ?></li>
+        <li><strong><?php esc_html_e('SQL queries:', 'sysadmin-total-suite'); ?></strong> <?php echo intval($stsuite_last['sql_count']); ?></li>
+        <li><strong><?php esc_html_e('HTTP calls:', 'sysadmin-total-suite'); ?></strong> <?php echo intval($stsuite_last['http_count']); ?></li>
     </ul>
 
     <h2><?php esc_html_e('Evolution (recent visits)', 'sysadmin-total-suite'); ?></h2>
@@ -112,10 +112,10 @@ $totals = array_map(fn($d) => round($d['total']*1000,2), $history);
             ],
             home_url('/')
         ),
-        'labels'     => array_keys($profile_data),
-        'values'     => array_values($profile_data),
-        'histLabels' => $timestamps,
-        'histValues' => $totals,
+        'labels'     => array_keys($stsuite_profile_data),
+        'values'     => array_values($stsuite_profile_data),
+        'histLabels' => $stsuite_timestamps,
+        'histValues' => $stsuite_totals,
         'labelTime'  => __('Time (ms)', 'sysadmin-total-suite'),
         'labelTotal' => __('Total time (ms)', 'sysadmin-total-suite'),
     ]);

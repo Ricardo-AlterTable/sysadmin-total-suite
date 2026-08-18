@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sysadmin Total Suite
  * Description: Core integrity checks, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 5.0
+ * Version: 5.2
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -15,7 +15,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('STSUITE_VERSION', '5.0');
+define('STSUITE_VERSION', '5.2');
 define('STSUITE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('STSUITE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -393,6 +393,50 @@ function stsuite_profiler_aibots_page() {
     include STSUITE_PLUGIN_DIR . 'admin/aibots.php';
 }
 
+
+/**
+ * Descarga los checksums oficiales del core para una versión e idioma.
+ *
+ * @return array<string,string>|false Mapa ruta => md5, o false si falla.
+ */
+function stsuite_fetch_checksums($version, $locale) {
+    $url = 'https://api.wordpress.org/core/checksums/1.0/?version=' . rawurlencode($version)
+         . '&locale=' . rawurlencode($locale);
+
+    $response = wp_remote_get($url, ['timeout' => 20]);
+    if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
+        return false;
+    }
+
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+    return (isset($data['checksums']) && is_array($data['checksums'])) ? $data['checksums'] : false;
+}
+
+/**
+ * Checksums del paquete internacional (en_US), descargados una sola vez y solo
+ * cuando hacen falta.
+ *
+ * Un sitio con idioma es_ES puede estar ejecutando el paquete internacional: en
+ * ese caso algunos ficheros (p. ej. wp-includes/version.php, que en los paquetes
+ * traducidos incluye $wp_local_package) no coinciden con los checksums del
+ * idioma sin que haya nada modificado. Comparar también con el paquete
+ * internacional evita ese falso positivo.
+ *
+ * @return array<string,string>|false
+ */
+function stsuite_fallback_checksums($version, $locale) {
+    static $cache = null;
+
+    if ($cache === null) {
+        $cache = (strpos($locale, 'en_US') === 0)
+            ? []                                          // ya era el internacional
+            : stsuite_fetch_checksums($version, 'en_US');
+        if ($cache === false) $cache = [];
+    }
+
+    return $cache;
+}
+
 // =============================
 // Acción de análisis (integridad)
 // =============================
@@ -439,20 +483,16 @@ add_action('admin_post_stsuite_run_analysis', function () {
      */
     $excluded_files = (array) apply_filters('stsuite_integrity_excluded_files', $excluded_files);
 
-    $version  = get_bloginfo('version');
-    $locale   = get_locale();
-    $url      = "https://api.wordpress.org/core/checksums/1.0/?version=" . rawurlencode($version) . "&locale=" . rawurlencode($locale);
-    $response = wp_remote_get($url, ['timeout'=>20]);
+    $version = get_bloginfo('version');
+    $locale  = get_locale();
 
     $checksum_result = 'core_check_failed';
     $errors = [];
     $modified_files = [];
 
-    if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) === 200) {
-        $data = json_decode(wp_remote_retrieve_body($response), true);
+    $checksums = stsuite_fetch_checksums($version, $locale);
 
-        if (isset($data['checksums']) && is_array($data['checksums'])) {
-            $checksums = $data['checksums'];
+    if (is_array($checksums)) {
 
             // Verificar solo los ficheros que pertenecen de verdad al core
             // (wp-admin/, wp-includes/ y ficheros sueltos de la raíz). Los archivos
@@ -463,13 +503,24 @@ add_action('admin_post_stsuite_run_analysis', function () {
                 }
                 $path = ABSPATH . $file;
                 if (file_exists($path)) {
-                    if (@md5_file($path) !== $md5) {
-                        $errors[] = "Modified: $file";
-                        $modified_files[] = $file;
+                    $actual = @md5_file($path);
+                    if ($actual !== $md5) {
+                        // Puede tratarse del paquete internacional en un sitio
+                        // traducido: solo se marca si tampoco coincide con él.
+                        $fallback = stsuite_fallback_checksums($version, $locale);
+                        if (!isset($fallback[$file]) || $fallback[$file] !== $actual) {
+                            $errors[] = "Modified: $file";
+                            $modified_files[] = $file;
+                        }
                     }
                 } else {
-                    $errors[] = "Missing: $file";
-                    $modified_files[] = $file;
+                    // Un fichero que solo existe en el paquete del idioma no
+                    // falta de verdad si el sitio usa el paquete internacional.
+                    $fallback = stsuite_fallback_checksums($version, $locale);
+                    if (empty($fallback) || isset($fallback[$file])) {
+                        $errors[] = "Missing: $file";
+                        $modified_files[] = $file;
+                    }
                 }
             }
 
@@ -486,7 +537,12 @@ add_action('admin_post_stsuite_run_analysis', function () {
                     $rel = str_replace('\\', '/', str_replace(ABSPATH, '', $fileinfo->getPathname()));
                     if (in_array($rel, $excluded_files, true)) continue;
                     if (!isset($checksums[$rel])) {
-                        $errors[] = "Extra: $rel";
+                        // Puede pertenecer al paquete internacional aunque no
+                        // esté en el del idioma: entonces no es un intruso.
+                        $fallback = stsuite_fallback_checksums($version, $locale);
+                        if (!isset($fallback[$rel])) {
+                            $errors[] = "Extra: $rel";
+                        }
                     }
                 }
             }
@@ -503,14 +559,16 @@ add_action('admin_post_stsuite_run_analysis', function () {
                 if (preg_match('/^(google[0-9a-f]{8,}\.html|BingSiteAuth\.xml|yandex_[0-9a-f]+\.html|pinterest-[0-9a-z]+\.html)$/i', $rel)) continue;
                 if (in_array($rel, $excluded_files, true)) continue;
                 if (!isset($checksums[$rel])) {
-                    $errors[] = "Extra: $rel";
+                    $fallback = stsuite_fallback_checksums($version, $locale);
+                    if (!isset($fallback[$rel])) {
+                        $errors[] = "Extra: $rel";
+                    }
                 }
             }
 
             $checksum_result = empty($errors)
                 ? 'core_ok'
                 : 'issues_found';
-        }
     }
 
     $analysis_data = [

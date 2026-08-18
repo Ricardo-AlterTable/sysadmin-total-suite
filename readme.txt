@@ -4,7 +4,7 @@ Tags: security, performance, integrity, profiling, ai-bots
 Requires at least: 5.3
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 5.0
+Stable tag: 5.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -65,6 +65,10 @@ Yes, the ZipArchive extension is needed to show differences and to restore core 
 
 The query time is only available when the `SAVEQUERIES` constant is enabled. The number of queries and the remaining timings are shown regardless.
 
+= A core file is reported as modified but I have not touched anything =
+
+Some sites run the international WordPress package while their locale is set to another language. In that case a few files (for example `wp-includes/version.php`, which carries `$wp_local_package` in translated packages) differ from the localized checksums without anything being wrong. The plugin compares against the international package as well before reporting a file, so this no longer produces a false positive.
+
 = The page cache shows as not enabled, but I use LiteSpeed =
 
 LiteSpeed caches at server level and does not use `WP_CACHE` or `advanced-cache.php`. The plugin detects that case and shows its real status; you can confirm it with the `x-litespeed-cache: hit` response header.
@@ -81,6 +85,12 @@ No. The User-Agent can be spoofed, which is why the 403 blocking complements, bu
 4. AI bot blocking: per-bot selection.
 
 == Changelog ==
+
+= 5.2 =
+* Fixed a false positive: a site running the international WordPress package while using a translated locale reported core files such as wp-includes/version.php as modified. Files are now also compared against the international package before being flagged.
+
+= 5.1 =
+* Prefixed the variables used by the admin views so that static analysis no longer reports them as unprefixed globals.
 
 = 5.0 =
 * The integrity section is now a read-only report. Following the plugin review team's feedback, the plugin no longer writes to or deletes anything inside the WordPress core directories: restoring files, restoring from a backup, the backup manager and the removal of extra files have all been removed.

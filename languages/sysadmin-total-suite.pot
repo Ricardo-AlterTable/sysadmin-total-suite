@@ -3,9 +3,9 @@
 # This file is distributed under the same license as the Sysadmin Total Suite package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sysadmin Total Suite 5.0\n"
+"Project-Id-Version: Sysadmin Total Suite 5.2\n"
 "Report-Msgid-Bugs-To: https://github.com/Ricardo-AlterTable\n"
-"POT-Creation-Date: 2026-08-18 12:27+0200\n"
+"POT-Creation-Date: 2026-08-18 12:59+0200\n"
 "PO-Revision-Date: 2026-08-18 12:20+0200\n"
 "Last-Translator: Ricardo Morales\n"
 "Language-Team: Ricardo Morales\n"
@@ -156,15 +156,15 @@ msgstr ""
 msgid "Could not delete the user"
 msgstr ""
 
-#: sysadmin-total-suite.php:401 sysadmin-total-suite.php:535
-#: sysadmin-total-suite.php:559 includes/aibots.php:116 includes/diff.php:37
+#: sysadmin-total-suite.php:445 sysadmin-total-suite.php:593
+#: sysadmin-total-suite.php:617 includes/aibots.php:119 includes/diff.php:37
 #: includes/users.php:11 includes/wpo.php:262 includes/wpo.php:289
 #: includes/wpo.php:326 admin/aibots.php:5 admin/dashboard.php:5
 #: admin/profiler.php:5 admin/users.php:5 admin/wpo.php:5
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/aibots.php:106
+#: includes/aibots.php:109
 msgid "403 Forbidden"
 msgstr ""
 
