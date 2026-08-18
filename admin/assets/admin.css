@@ -1,0 +1,528 @@
+/* ============================================================================
+   Sysadmin Total Suite — UI "control panel" moderno/futurista
+   (El estilo terminal se conserva SOLO en el contenido del diff.)
+   Solo se carga en las páginas del plugin.
+   ========================================================================== */
+
+:root {
+    --stsuite-bg-1: #0b0f1e;
+    --stsuite-bg-2: #121732;
+    --stsuite-surface: rgba(255, 255, 255, 0.045);
+    --stsuite-surface-2: rgba(255, 255, 255, 0.07);
+    --stsuite-border: rgba(255, 255, 255, 0.10);
+    --stsuite-border-strong: rgba(255, 255, 255, 0.18);
+    --stsuite-text: #e7ebf6;
+    --stsuite-muted: #98a2c0;
+    --stsuite-primary: #7c5cff;
+    --stsuite-primary-2: #22d3ee;
+    --stsuite-grad: linear-gradient(135deg, #7c5cff 0%, #22d3ee 100%);
+    --stsuite-ok: #34d399;
+    --stsuite-warn: #fbbf24;
+    --stsuite-danger: #fb5c74;
+    --stsuite-radius: 14px;
+    --stsuite-radius-sm: 9px;
+    --stsuite-shadow: 0 10px 34px rgba(0, 0, 0, 0.38);
+    --stsuite-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Fondo general (solo en páginas del plugin).
+   Se aplica sobre #wpwrap (selector con id) para ganar al esquema de color. */
+#wpwrap {
+    background:
+        radial-gradient(1100px 620px at 12% -8%, rgba(124, 92, 255, 0.16), transparent 60%),
+        radial-gradient(1000px 560px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+        linear-gradient(180deg, var(--stsuite-bg-1), var(--stsuite-bg-2));
+    background-attachment: fixed;
+}
+body {
+    color: var(--stsuite-text);
+    font-family: var(--stsuite-font);
+}
+
+#wpcontent,
+#wpbody-content {
+    background: transparent;
+}
+
+.wrap {
+    max-width: 1180px;
+    color: var(--stsuite-text);
+    font-family: var(--stsuite-font);
+    padding-top: 8px;
+}
+
+/* Tipografía / cabeceras */
+.wrap h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    margin: 6px 0 14px;
+    color: var(--stsuite-text);
+    display: inline-block;
+    position: relative;
+    padding-bottom: 8px;
+}
+.wrap h1::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 78px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--stsuite-grad);
+}
+
+.wrap h2 {
+    font-size: 17px;
+    font-weight: 650;
+    color: var(--stsuite-text);
+    margin: 0 0 12px;
+}
+.wrap h3 { color: var(--stsuite-text); }
+
+.wrap p,
+.wrap li,
+.wrap td,
+.wrap th,
+.wrap label,
+.wrap span,
+.wrap strong,
+.wrap dd,
+.wrap dt {
+    color: var(--stsuite-text);
+}
+
+.wrap a:not(.button):not(.button-primary):not(.button-secondary) {
+    color: var(--stsuite-primary-2);
+    text-decoration: none;
+}
+.wrap a:not(.button):not(.button-primary):not(.button-secondary):hover {
+    text-decoration: underline;
+}
+
+.wrap code,
+.wrap .stsuite-file-path {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
+    background: rgba(124, 92, 255, 0.14);
+    color: #cdd6ff;
+    padding: 2px 7px;
+    border-radius: 6px;
+    font-size: 12.5px;
+}
+
+.wrap .description,
+.wrap .stsuite-muted {
+    color: var(--stsuite-muted);
+}
+
+/* ---- Tarjetas (secciones) ---- */
+.stsuite-card {
+    margin: 18px 0;
+    padding: 20px 22px;
+    background: var(--stsuite-surface);
+    border: 1px solid var(--stsuite-border);
+    border-radius: var(--stsuite-radius);
+    box-shadow: var(--stsuite-shadow);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    position: relative;
+    overflow: hidden;
+}
+.stsuite-card::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0;
+    width: 100%; height: 3px;
+    background: var(--stsuite-grad);
+    opacity: 0.85;
+}
+.stsuite-card h2 {
+    color: var(--stsuite-text);
+    margin-top: 4px;
+}
+
+/* ---- Barra de acciones ---- */
+.stsuite-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+/* ---- Botones ---- */
+.wrap .button,
+.wrap .button-secondary,
+.wrap input[type="submit"].button,
+.stsuite-modal .button {
+    border-radius: 999px;
+    border: 1px solid var(--stsuite-border-strong);
+    background: var(--stsuite-surface-2);
+    color: var(--stsuite-text);
+    font-family: var(--stsuite-font);
+    font-weight: 600;
+    padding: 4px 16px;
+    height: auto;
+    line-height: 2;
+    box-shadow: none;
+    text-shadow: none;
+    transition: transform .08s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.wrap .button:not(.button-primary):hover,
+.wrap .button-secondary:hover,
+.stsuite-modal .button:not(.button-primary):hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--stsuite-primary-2);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.wrap .button-primary {
+    border: 0;
+    border-radius: 999px;
+    background: var(--stsuite-grad);
+    color: #0b0f1e;
+    font-weight: 700;
+    padding: 5px 20px;
+    line-height: 2;
+    text-shadow: none;
+    box-shadow: 0 6px 18px rgba(124, 92, 255, 0.35);
+}
+.wrap .button-primary:hover,
+.wrap .button-primary:focus {
+    background: linear-gradient(135deg, #8f74ff 0%, #4fe3f6 100%);
+    color: #06121f;
+    transform: translateY(-1px);
+    box-shadow: 0 9px 24px rgba(34, 211, 238, 0.5);
+}
+
+/* Botón de acción destructiva (rojo) */
+.stsuite-btn-danger,
+.stsuite-modal .stsuite-delete-extra,
+.stsuite-modal .stsuite-delete-all-extras,
+.stsuite-users-table .stsuite-delete-user {
+    background: rgba(251, 92, 116, 0.12) !important;
+    border: 1px solid rgba(251, 92, 116, 0.55) !important;
+    color: #ff9caa !important;
+    border-radius: 999px !important;
+    font-weight: 600;
+    text-shadow: none;
+}
+.stsuite-btn-danger:hover,
+.stsuite-modal .stsuite-delete-extra:hover,
+.stsuite-modal .stsuite-delete-all-extras:hover,
+.stsuite-users-table .stsuite-delete-user:hover {
+    background: rgba(251, 92, 116, 0.22) !important;
+    border-color: var(--stsuite-danger) !important;
+    color: #fff !important;
+}
+
+/* ---- Estado (mensajes ok / warn / bad) ---- */
+.stsuite-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: var(--stsuite-radius-sm);
+    font-weight: 600;
+    margin: 6px 0;
+    border: 1px solid transparent;
+}
+.stsuite-status--ok   { background: rgba(52, 211, 153, 0.12); color: var(--stsuite-ok);    border-color: rgba(52, 211, 153, 0.35); }
+.stsuite-status--warn { background: rgba(251, 191, 36, 0.12); color: var(--stsuite-warn);  border-color: rgba(251, 191, 36, 0.35); }
+.stsuite-status--bad  { background: rgba(251, 92, 116, 0.12); color: var(--stsuite-danger);border-color: rgba(251, 92, 116, 0.38); }
+
+/* Etiquetas en línea (p.ej. [Modificado] / [Faltante]) */
+.stsuite-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .3px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-right: 8px;
+}
+.stsuite-tag--danger { background: rgba(251, 92, 116, 0.16); color: #ff9caa; }
+.stsuite-tag--warn   { background: rgba(251, 191, 36, 0.16); color: var(--stsuite-warn); }
+
+.stsuite-num-warn { color: var(--stsuite-warn); }
+.stsuite-ok-text  { color: var(--stsuite-ok); }
+.stsuite-bad-text { color: var(--stsuite-danger); }
+
+/* Toggle Permitir / Bloquear (bots de IA) */
+.stsuite-toggle {
+    display: inline-block;
+    cursor: pointer;
+    user-select: none;
+}
+.stsuite-toggle input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.stsuite-toggle-btn {
+    display: inline-block;
+    min-width: 96px;
+    text-align: center;
+    padding: 5px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+/* Permitido (por defecto, sin marcar) */
+.stsuite-toggle input:not(:checked) + .stsuite-toggle-btn {
+    background: rgba(52, 211, 153, 0.12);
+    color: var(--stsuite-ok);
+    border-color: rgba(52, 211, 153, 0.35);
+}
+.stsuite-toggle input:not(:checked) + .stsuite-toggle-btn::after { content: attr(data-allowed); }
+.stsuite-toggle:hover input:not(:checked) + .stsuite-toggle-btn::after { content: attr(data-do-block); }
+
+/* Bloqueado (marcado) */
+.stsuite-toggle input:checked + .stsuite-toggle-btn {
+    background: rgba(251, 92, 116, 0.16);
+    color: var(--stsuite-danger);
+    border-color: rgba(251, 92, 116, 0.45);
+}
+.stsuite-toggle input:checked + .stsuite-toggle-btn::after { content: attr(data-blocked); }
+.stsuite-toggle:hover input:checked + .stsuite-toggle-btn::after { content: attr(data-do-allow); }
+.stsuite-toggle input:focus-visible + .stsuite-toggle-btn { outline: 2px solid var(--stsuite-primary-2); outline-offset: 2px; }
+
+/* ---- Badges (pills) ---- */
+.stsuite-badge {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 6px;
+    border: 1px solid transparent;
+}
+.stsuite-badge.ok   { background: rgba(52, 211, 153, 0.14); color: var(--stsuite-ok);     border-color: rgba(52, 211, 153, 0.35); }
+.stsuite-badge.warn { background: rgba(251, 191, 36, 0.14); color: var(--stsuite-warn);   border-color: rgba(251, 191, 36, 0.35); }
+.stsuite-badge.bad  { background: rgba(251, 92, 116, 0.14); color: var(--stsuite-danger); border-color: rgba(251, 92, 116, 0.38); }
+
+.stsuite-kv { margin: 8px 0; color: var(--stsuite-text); }
+.stsuite-kv strong { color: #fff; }
+
+/* ---- Listas de integridad ---- */
+#stsuite-list {
+    list-style: none;
+    padding-left: 0;
+    margin: 6px 0 16px;
+}
+#stsuite-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    background: var(--stsuite-surface);
+    border: 1px solid var(--stsuite-border);
+    border-radius: var(--stsuite-radius-sm);
+}
+.stsuite-file-path {
+    display: inline-block;
+    max-width: 55%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+}
+
+/* ---- Tablas ---- */
+.stsuite-users-table,
+.stsuite-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--stsuite-border);
+    border-radius: var(--stsuite-radius);
+    overflow: hidden;
+}
+.stsuite-users-table th,
+.stsuite-users-table td,
+.stsuite-table th,
+.stsuite-table td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--stsuite-border);
+    color: var(--stsuite-text);
+    vertical-align: middle;
+}
+.stsuite-users-table thead th,
+.stsuite-table thead th {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--stsuite-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    border-bottom: 1px solid var(--stsuite-border-strong);
+}
+.stsuite-users-table tbody tr:last-child td,
+.stsuite-table tbody tr:last-child td { border-bottom: 0; }
+.stsuite-users-table tbody tr:hover,
+.stsuite-table tbody tr:hover { background: rgba(124, 92, 255, 0.08); }
+
+.stsuite-user-login { color: var(--stsuite-muted); font-size: 12px; }
+.stsuite-user-you   { color: var(--stsuite-primary-2); font-size: 12px; margin-left: 4px; }
+.stsuite-user-nodelete { color: var(--stsuite-muted); }
+
+/* ---- Copias de seguridad ---- */
+.stsuite-backup {
+    margin: 14px 0;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid var(--stsuite-border);
+    border-radius: var(--stsuite-radius-sm);
+}
+.stsuite-backup-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+.stsuite-backup-head strong { font-size: 14px; }
+.stsuite-backup-head .button { margin-left: auto; }
+.stsuite-backup .stsuite-table { margin-top: 10px; background: transparent; }
+
+/* ---- Paginación / tablenav ---- */
+.wrap .tablenav,
+.wrap .tablenav .displaying-num,
+.wrap .tablenav-pages,
+.wrap .tablenav-pages .tablenav-pages-navspan {
+    color: var(--stsuite-muted);
+}
+.wrap .tablenav-pages a.page-numbers,
+.wrap .tablenav-pages span.page-numbers {
+    background: var(--stsuite-surface-2);
+    border: 1px solid var(--stsuite-border);
+    color: var(--stsuite-text) !important;
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+.wrap .tablenav-pages a.page-numbers:hover {
+    border-color: var(--stsuite-primary-2);
+}
+
+/* ---- Controles de formulario ---- */
+.wrap select,
+.wrap input[type="text"],
+.wrap input[type="search"] {
+    background: var(--stsuite-surface-2);
+    color: var(--stsuite-text);
+    border: 1px solid var(--stsuite-border-strong);
+    border-radius: 8px;
+    padding: 3px 8px;
+}
+
+/* ---- Avisos nativos de WP ---- */
+.wrap .notice {
+    background: var(--stsuite-surface);
+    border: 1px solid var(--stsuite-border);
+    border-left: 4px solid var(--stsuite-primary);
+    color: var(--stsuite-text);
+    border-radius: var(--stsuite-radius-sm);
+    box-shadow: none;
+}
+.wrap .notice p { color: var(--stsuite-text); }
+
+/* ---- Gráficas (profiling) ---- */
+.stsuite-chart-container {
+    max-width: 640px;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--stsuite-surface);
+    border: 1px solid var(--stsuite-border);
+    border-radius: var(--stsuite-radius);
+    box-shadow: var(--stsuite-shadow);
+}
+.stsuite-chart-container canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+/* ============================================================================
+   MODALES
+   ========================================================================== */
+.stsuite-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5, 8, 18, 0.72);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 200000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+.stsuite-modal {
+    background: linear-gradient(180deg, #141a30, #10152a);
+    border: 1px solid var(--stsuite-border-strong);
+    border-radius: var(--stsuite-radius);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6);
+    width: calc(100% - 80px);
+    max-width: 1000px;
+    max-height: 82vh;
+    overflow: auto;
+    padding: 22px;
+    color: var(--stsuite-text);
+    font-family: var(--stsuite-font);
+}
+.stsuite-modal h2 { margin-top: 0; color: var(--stsuite-text); }
+.stsuite-modal .stsuite-close {
+    float: right;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--stsuite-muted);
+}
+.stsuite-modal .stsuite-close:hover { color: #fff; }
+
+/* ============================================================================
+   DIFF — se conserva la estética TERMINAL (por petición)
+   ========================================================================== */
+#stsuiteDiffModal { background: rgba(5, 8, 18, 0.82); z-index: 200001; }
+
+#stsuiteDiffModal .stsuite-modal {
+    background: #0b0f16;
+    border: 1px solid #1f2a3a;
+    display: flex;
+    flex-direction: column;
+}
+#stsuiteDiffModal .stsuite-modal h2 {
+    font-family: "Courier New", Courier, monospace;
+    color: #6cff5c;
+}
+#stsuiteDiffContent {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #d7f7d2;
+    background: #05070c;
+    border: 1px solid #1f2a3a;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-y: auto;
+    flex: 1;
+    white-space: pre-wrap;
+}
+.diff-add { color: #6cff5c; }
+.diff-del { color: #ff5c5c; }
+.diff-ctx { color: #8aa0b4; }
+
+/* ---- Responsive ---- */
+@media (max-width: 782px) {
+    .stsuite-file-path { max-width: 100%; }
+    .stsuite-chart-container { max-width: 100%; }
+}
