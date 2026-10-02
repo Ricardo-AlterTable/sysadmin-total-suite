@@ -569,6 +569,7 @@ body {
 .stsuite-table--nested td { padding: 4px 10px; font-size: 12px; }
 
 /* ---- Medios no usados ---- */
+.stsuite-table .stsuite-check { width: 28px; }
 .stsuite-media-thumb { width: 64px; }
 .stsuite-media-thumb img { display: block; width: 60px; height: 60px; object-fit: cover; border-radius: 6px; background: rgba(255, 255, 255, 0.06); }
 

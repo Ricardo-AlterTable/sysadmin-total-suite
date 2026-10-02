@@ -31,6 +31,7 @@ require_once STSUITE_PLUGIN_DIR . 'includes/aibots.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/audit.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/disk.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/media.php';
+require_once STSUITE_PLUGIN_DIR . 'includes/media-quarantine.php';
 
 /**
  * Migración única de los datos guardados con el prefijo anterior ('wps_'),
@@ -412,6 +413,11 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'mediaProgress'    => __('Looking for references: step %1$s of %2$s...', 'sysadmin-total-suite'),
             'mediaDone'        => __('Scan complete. Reloading...', 'sysadmin-total-suite'),
             'mediaScan'        => __('Scan media', 'sysadmin-total-suite'),
+            'selectSomething'  => __('Select at least one item first.', 'sysadmin-total-suite'),
+            /* translators: %s: number of selected media items. */
+            'confirmQuarantine'=> __("Move %s media item(s) to quarantine?\n\nThey will be hidden from the media library and their files moved to a protected folder. Any page that still uses them will show a broken image until you restore them. Nothing is deleted.", 'sysadmin-total-suite'),
+            'purgeQuarantine1' => __("Empty the quarantine?\n\nEvery media item in it and all its files will be PERMANENTLY deleted.", 'sysadmin-total-suite'),
+            'purgeQuarantine2' => __("Final confirmation.\n\nThis cannot be undone. Continue with permanent deletion?", 'sysadmin-total-suite'),
         ],
     ]);
 });

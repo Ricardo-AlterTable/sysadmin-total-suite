@@ -219,8 +219,11 @@ function stsuite_media_run_phase(array &$s): bool {
             }
             foreach ($rows as $r) {
                 $cursor = (int) $r->ID;
-                $s['checked']++;
                 $id   = (int) $r->ID;
+                if (get_post_meta($id, STSUITE_QUARANTINE_META, true)) {
+                    continue; // ya está en cuarentena: se lista en su propia sección
+                }
+                $s['checked']++;
                 $file = (string) get_post_meta($id, '_wp_attached_file', true);
                 $meta = wp_get_attachment_metadata($id);
 

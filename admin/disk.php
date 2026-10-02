@@ -228,6 +228,17 @@ $stsuite_bar = function ($stsuite_part, $stsuite_whole) {
                                     <?php if ($stsuite_item['path'] !== ''): ?>
                                         <br><code class="stsuite-file-path"><?php echo esc_html($stsuite_item['path']); ?></code>
                                     <?php endif; ?>
+                                    <?php if ($stsuite_g === 'uploads' && $stsuite_name === 'sysadmin-total-suite-quarantine/'): ?>
+                                        <br><span class="stsuite-muted">
+                                            <?php
+                                            printf(
+                                                /* translators: %s: link to the Unused media screen. */
+                                                esc_html__('Media items in quarantine. Restore them or empty the quarantine from %s.', 'sysadmin-total-suite'),
+                                                '<a href="' . esc_url(admin_url('admin.php?page=sysadmin-total-suite-media#stsuite-quarantine')) . '">' . esc_html__('Unused media', 'sysadmin-total-suite') . '</a>'
+                                            );
+                                            ?>
+                                        </span>
+                                    <?php endif; ?>
                                     <?php if ($stsuite_g === 'uploads' && $stsuite_name === 'sysadmin-total-suite-cache/'): ?>
                                         <br><span class="stsuite-muted">
                                             <?php

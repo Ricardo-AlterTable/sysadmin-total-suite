@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T12:56:24+00:00\n"
+"POT-Creation-Date: 2026-10-02T13:17:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -49,21 +49,24 @@ msgstr ""
 #: includes/diff.php:37
 #: includes/disk.php:309
 #: includes/disk.php:336
-#: includes/media.php:418
-#: includes/media.php:450
+#: includes/media-quarantine.php:307
+#: includes/media-quarantine.php:344
+#: includes/media-quarantine.php:363
+#: includes/media.php:421
+#: includes/media.php:453
 #: includes/users.php:11
 #: includes/wpo.php:262
 #: includes/wpo.php:289
 #: includes/wpo.php:326
-#: sysadmin-total-suite.php:503
-#: sysadmin-total-suite.php:651
-#: sysadmin-total-suite.php:675
+#: sysadmin-total-suite.php:509
+#: sysadmin-total-suite.php:657
+#: sysadmin-total-suite.php:681
 msgid "Insufficient permissions"
 msgstr ""
 
 #: admin/aibots.php:14
-#: sysadmin-total-suite.php:329
 #: sysadmin-total-suite.php:330
+#: sysadmin-total-suite.php:331
 msgid "AI bot blocking"
 msgstr ""
 
@@ -131,6 +134,7 @@ msgid "User-Agent token"
 msgstr ""
 
 #: admin/aibots.php:77
+#: admin/media.php:80
 #: admin/wpo.php:116
 msgid "Status"
 msgstr ""
@@ -180,8 +184,8 @@ msgid "Unrated"
 msgstr ""
 
 #: admin/audit.php:49
-#: sysadmin-total-suite.php:275
 #: sysadmin-total-suite.php:276
+#: sysadmin-total-suite.php:277
 msgid "Plugin audit"
 msgstr ""
 
@@ -214,20 +218,20 @@ msgstr ""
 #. translators: %s: the button label in bold.
 #: admin/audit.php:83
 #: admin/audit.php:88
-#: sysadmin-total-suite.php:402
+#: sysadmin-total-suite.php:403
 msgid "Scan plugins"
 msgstr ""
 
 #. translators: %s: the button label in bold.
 #: admin/audit.php:88
-#: admin/media.php:35
+#: admin/media.php:125
 #, php-format
 msgid "No scan available. Run %s to get results."
 msgstr ""
 
 #. translators: %s: date and time of the last scan.
 #: admin/audit.php:95
-#: admin/media.php:42
+#: admin/media.php:132
 #, php-format
 msgid "Last scan: %s"
 msgstr ""
@@ -445,7 +449,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: admin/dashboard.php:148
-#: admin/media.php:140
+#: admin/media.php:239
 msgid "Modified"
 msgstr ""
 
@@ -523,8 +527,8 @@ msgid "Loose files"
 msgstr ""
 
 #: admin/disk.php:107
-#: sysadmin-total-suite.php:311
 #: sysadmin-total-suite.php:312
+#: sysadmin-total-suite.php:313
 msgid "Disk usage"
 msgstr ""
 
@@ -535,7 +539,7 @@ msgstr ""
 #. translators: %s: the "Measure now" button label in bold.
 #: admin/disk.php:111
 #: admin/disk.php:116
-#: sysadmin-total-suite.php:408
+#: sysadmin-total-suite.php:409
 msgid "Measure now"
 msgstr ""
 
@@ -552,7 +556,7 @@ msgid "Last measurement: %s"
 msgstr ""
 
 #: admin/disk.php:131
-#: admin/media.php:49
+#: admin/media.php:139
 msgid "Summary"
 msgstr ""
 
@@ -562,6 +566,7 @@ msgstr ""
 
 #. translators: %s: number of files.
 #: admin/disk.php:134
+#: admin/media.php:90
 #, php-format
 msgid "%s file"
 msgid_plural "%s files"
@@ -610,9 +615,10 @@ msgid "Folder"
 msgstr ""
 
 #: admin/disk.php:198
-#: admin/disk.php:315
-#: admin/media.php:76
-#: admin/media.php:141
+#: admin/disk.php:326
+#: admin/media.php:79
+#: admin/media.php:170
+#: admin/media.php:240
 #: admin/wpo.php:72
 msgid "Size"
 msgstr ""
@@ -625,22 +631,35 @@ msgstr ""
 msgid "Parent theme"
 msgstr ""
 
-#. translators: %s: link to the Integrity screen.
+#. translators: %s: link to the Unused media screen.
 #: admin/disk.php:236
+#, php-format
+msgid "Media items in quarantine. Restore them or empty the quarantine from %s."
+msgstr ""
+
+#: admin/disk.php:237
+#: admin/media.php:36
+#: sysadmin-total-suite.php:321
+#: sysadmin-total-suite.php:322
+msgid "Unused media"
+msgstr ""
+
+#. translators: %s: link to the Integrity screen.
+#: admin/disk.php:247
 #, php-format
 msgid "Copies of the official WordPress package used by this plugin to show diffs. You can delete them from %s."
 msgstr ""
 
-#: admin/disk.php:237
+#: admin/disk.php:248
 msgid "Integrity → Purge cache"
 msgstr ""
 
-#: admin/disk.php:243
+#: admin/disk.php:254
 msgid "Not readable"
 msgstr ""
 
 #. translators: %s: number of folders.
-#: admin/disk.php:265
+#: admin/disk.php:276
 #, php-format
 msgid "%s folder with files"
 msgid_plural "%s folders with files"
@@ -648,138 +667,178 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of empty folders.
-#: admin/disk.php:268
+#: admin/disk.php:279
 #, php-format
 msgid "%s empty"
 msgid_plural "%s empty"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/disk.php:296
+#: admin/disk.php:307
 #: admin/wpo.php:203
 msgid "Database"
 msgstr ""
 
-#: admin/disk.php:298
+#: admin/disk.php:309
 msgid "The table sizes could not be read (the database user may not have access to information_schema)."
 msgstr ""
 
 #. translators: %s: amount of space.
-#: admin/disk.php:305
+#: admin/disk.php:316
 #, php-format
 msgid "Reclaimable space (overhead): %s. It is recovered by optimizing the tables from your hosting panel or phpMyAdmin."
 msgstr ""
 
-#: admin/disk.php:314
+#: admin/disk.php:325
 msgid "Table"
 msgstr ""
 
-#: admin/disk.php:316
+#: admin/disk.php:327
 msgid "Rows (approx.)"
 msgstr ""
 
-#: admin/disk.php:317
+#: admin/disk.php:328
 msgid "Overhead"
 msgstr ""
 
 #. translators: 1: number of tables, 2: their total size.
-#: admin/disk.php:338
+#: admin/disk.php:349
 #, php-format
 msgid "The database also contains %1$s table from another application or prefix (%2$s), not included above."
 msgid_plural "The database also contains %1$s tables from other applications or prefixes (%2$s), not included above."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/disk.php:348
+#: admin/disk.php:359
 msgid "Sizes are the sum of the file sizes; the space actually used on disk and your hosting quota (which may also include email, logs or other sites) can differ."
 msgstr ""
 
-#: admin/media.php:26
-#: sysadmin-total-suite.php:320
-#: sysadmin-total-suite.php:321
-msgid "Unused media"
+#: admin/media.php:37
+msgid "Finds media library items that do not seem to be used anywhere on the site, and files in the uploads folders that do not belong to any media item. The scan itself changes nothing; unused items can then be moved to a quarantine from which they can be restored."
 msgstr ""
 
-#: admin/media.php:27
-msgid "Finds media library items that do not seem to be used anywhere on the site, and files in the uploads folders that do not belong to any media item. This is a read-only report: nothing is moved or deleted."
-msgstr ""
-
-#. translators: %s: the button label in bold.
-#: admin/media.php:30
-#: admin/media.php:35
-#: sysadmin-total-suite.php:414
-msgid "Scan media"
-msgstr ""
-
-#: admin/media.php:51
-msgid "Media items checked:"
-msgstr ""
-
-#: admin/media.php:52
-msgid "Apparently unused:"
-msgstr ""
-
-#: admin/media.php:53
-msgid "Orphan files:"
-msgstr ""
-
-#: admin/media.php:55
-msgid "Optimization backups:"
-msgstr ""
-
-#: admin/media.php:59
-msgid "⚠ This is an estimate. An item is reported only when no reference to it was found in posts, pages, custom fields, page builders, widgets, theme settings or term and user data. Images used only from theme files, external sites, emails or newsletters cannot be detected. Review every item before deleting it."
-msgstr ""
-
-#: admin/media.php:65
-msgid "Media items without references"
-msgstr ""
-
-#: admin/media.php:67
-msgid "No unused media items were found."
+#: admin/media.php:68
+msgid "Quarantine"
 msgstr ""
 
 #: admin/media.php:69
-msgid "To delete one, open it in the media library and use \"Delete permanently\". Its size includes every generated thumbnail."
+msgid "These media items are hidden from the media library and their files have been moved to a protected folder. If something on the site now shows a broken image, restore the item: it will be exactly as it was."
 msgstr ""
 
-#: admin/media.php:74
-msgid "Media item"
-msgstr ""
-
-#: admin/media.php:75
-msgid "Uploaded"
+#: admin/media.php:76
+#: admin/media.php:166
+msgid "Select all"
 msgstr ""
 
 #: admin/media.php:77
+#: admin/media.php:168
+msgid "Media item"
+msgstr ""
+
+#: admin/media.php:78
+msgid "In quarantine since"
+msgstr ""
+
+#: admin/media.php:96
+msgid "Referenced again: restore it"
+msgstr ""
+
+#: admin/media.php:98
+msgid "No references found"
+msgstr ""
+
+#: admin/media.php:106
+msgid "Restore selected"
+msgstr ""
+
+#: admin/media.php:107
+msgid "Restore all"
+msgstr ""
+
+#: admin/media.php:113
+msgid "Emptying the quarantine permanently deletes these media items and their files, using WordPress's own deletion. It cannot be undone: make sure the site has been working correctly for a while first."
+msgstr ""
+
+#: admin/media.php:114
+msgid "Empty quarantine (delete permanently)"
+msgstr ""
+
+#. translators: %s: the button label in bold.
+#: admin/media.php:120
+#: admin/media.php:125
+#: sysadmin-total-suite.php:415
+msgid "Scan media"
+msgstr ""
+
+#: admin/media.php:141
+msgid "Media items checked:"
+msgstr ""
+
+#: admin/media.php:142
+msgid "Apparently unused:"
+msgstr ""
+
+#: admin/media.php:143
+msgid "Orphan files:"
+msgstr ""
+
+#: admin/media.php:145
+msgid "Optimization backups:"
+msgstr ""
+
+#: admin/media.php:149
+msgid "⚠ This is an estimate. An item is reported only when no reference to it was found in posts, pages, custom fields, page builders, widgets, theme settings or term and user data. Images used only from theme files, external sites, emails or newsletters cannot be detected. Review every item before deleting it."
+msgstr ""
+
+#: admin/media.php:155
+msgid "Media items without references"
+msgstr ""
+
+#: admin/media.php:157
+msgid "No unused media items were found."
+msgstr ""
+
+#: admin/media.php:159
+msgid "Select the items you are sure about and move them to the quarantine: they disappear from the media library and their files are moved aside, but they can be restored at any time. Each item is checked again for references before being moved. Sizes include every generated thumbnail."
+msgstr ""
+
+#: admin/media.php:169
+msgid "Uploaded"
+msgstr ""
+
+#: admin/media.php:171
 #: admin/users.php:39
 #: admin/wpo.php:116
 msgid "Actions"
 msgstr ""
 
 #. translators: %s: title of the post the media item was uploaded to.
-#: admin/media.php:93
+#: admin/media.php:188
 #, php-format
 msgid "Uploaded to: %s"
 msgstr ""
 
-#: admin/media.php:105
+#: admin/media.php:200
 msgid "Open in library"
 msgstr ""
 
+#: admin/media.php:208
+msgid "Move selected to quarantine"
+msgstr ""
+
 #. translators: 1: rows shown, 2: total rows.
-#: admin/media.php:114
-#: admin/media.php:156
+#: admin/media.php:213
+#: admin/media.php:255
 #, php-format
 msgid "Showing the %1$s largest of %2$s."
 msgstr ""
 
-#: admin/media.php:123
+#: admin/media.php:222
 msgid "Image optimization backups"
 msgstr ""
 
 #. translators: %s: number of files.
-#: admin/media.php:124
+#: admin/media.php:223
 #, php-format
 msgid "%s copy of an original image (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache."
 msgid_plural "%s copies of original images (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache."
@@ -787,29 +846,29 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of files.
-#: admin/media.php:125
+#: admin/media.php:224
 msgid "They are not orphans: they allow the plugin to restore the original images. If you no longer need that, remove them from the optimization plugin itself (in LiteSpeed Cache, in its Image Optimization tools), not by FTP, so that it keeps its records consistent."
 msgstr ""
 
-#: admin/media.php:131
+#: admin/media.php:230
 msgid "Orphan files in uploads"
 msgstr ""
 
-#: admin/media.php:133
+#: admin/media.php:232
 msgid "No orphan files were found in the year/month upload folders."
 msgstr ""
 
-#: admin/media.php:135
+#: admin/media.php:234
 msgid "Files inside the year/month upload folders that do not belong to any media item: usually thumbnails of sizes no longer registered, leftovers of deleted items or files uploaded by FTP. WebP/AVIF copies made by optimization plugins are not listed. They can only be removed by FTP or from your hosting file manager."
 msgstr ""
 
-#: admin/media.php:139
+#: admin/media.php:238
 msgid "File"
 msgstr ""
 
 #: admin/profiler.php:11
-#: sysadmin-total-suite.php:284
 #: sysadmin-total-suite.php:285
+#: sysadmin-total-suite.php:286
 msgid "Profiling"
 msgstr ""
 
@@ -892,8 +951,8 @@ msgid "Total time (ms)"
 msgstr ""
 
 #: admin/users.php:15
-#: sysadmin-total-suite.php:293
 #: sysadmin-total-suite.php:294
+#: sysadmin-total-suite.php:295
 msgid "Check WP users"
 msgstr ""
 
@@ -933,13 +992,13 @@ msgstr ""
 
 #: admin/users.php:67
 #: admin/wpo.php:142
-#: sysadmin-total-suite.php:375
+#: sysadmin-total-suite.php:376
 msgid "Delete"
 msgstr ""
 
 #: admin/wpo.php:22
-#: sysadmin-total-suite.php:302
 #: sysadmin-total-suite.php:303
+#: sysadmin-total-suite.php:304
 msgid "WPO"
 msgstr ""
 
@@ -1015,7 +1074,7 @@ msgid "Expired (junk):"
 msgstr ""
 
 #: admin/wpo.php:66
-#: sysadmin-total-suite.php:381
+#: sysadmin-total-suite.php:382
 msgid "Clean up expired transients"
 msgstr ""
 
@@ -1072,7 +1131,7 @@ msgid "Junk from removed plugins"
 msgstr ""
 
 #: admin/wpo.php:110
-#: sysadmin-total-suite.php:390
+#: sysadmin-total-suite.php:391
 msgid "Clean up all orphan cron tasks"
 msgstr ""
 
@@ -1191,7 +1250,7 @@ msgstr ""
 
 #: includes/audit.php:333
 #: includes/disk.php:342
-#: includes/media.php:456
+#: includes/media.php:459
 msgid "No scan in progress."
 msgstr ""
 
@@ -1301,60 +1360,60 @@ msgstr ""
 msgid "Expired transients removed: %d"
 msgstr ""
 
-#: sysadmin-total-suite.php:266
 #: sysadmin-total-suite.php:267
+#: sysadmin-total-suite.php:268
 msgid "Integrity"
 msgstr ""
 
-#: sysadmin-total-suite.php:368
+#: sysadmin-total-suite.php:369
 msgid "The operation timed out."
 msgstr ""
 
-#: sysadmin-total-suite.php:369
+#: sysadmin-total-suite.php:370
 msgid "Communication error with the server."
 msgstr ""
 
 #. translators: %s: error message.
-#: sysadmin-total-suite.php:371
+#: sysadmin-total-suite.php:372
 #, php-format
 msgid "Error: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:372
+#: sysadmin-total-suite.php:373
 msgid "Loading diff..."
 msgstr ""
 
-#: sysadmin-total-suite.php:373
+#: sysadmin-total-suite.php:374
 msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
 msgstr ""
 
-#: sysadmin-total-suite.php:374
+#: sysadmin-total-suite.php:375
 msgid "Deleting..."
 msgstr ""
 
-#: sysadmin-total-suite.php:377
+#: sysadmin-total-suite.php:378
 msgid ""
 "Clean up expired transients?\n"
 "\n"
 "This is safe: they are expired temporary data and WordPress regenerates them when needed."
 msgstr ""
 
-#: sysadmin-total-suite.php:378
+#: sysadmin-total-suite.php:379
 msgid "Cleaning..."
 msgstr ""
 
 #. translators: %d: number of transients removed.
-#: sysadmin-total-suite.php:380
+#: sysadmin-total-suite.php:381
 #, php-format
 msgid "Expired transients removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:382
+#: sysadmin-total-suite.php:383
 msgid "Could not clean up"
 msgstr ""
 
 #. translators: %s: cron hook name.
-#: sysadmin-total-suite.php:385
+#: sysadmin-total-suite.php:386
 #, php-format
 msgid ""
 "Remove the cron tasks for this hook?\n"
@@ -1364,7 +1423,7 @@ msgid ""
 "It appears orphaned (no code attached right now), but a plugin may register it only on the front end. A copy of the schedule is saved beforehand so it can be restored manually."
 msgstr ""
 
-#: sysadmin-total-suite.php:386
+#: sysadmin-total-suite.php:387
 msgid ""
 "Remove ALL cron tasks detected as orphaned?\n"
 "\n"
@@ -1372,17 +1431,17 @@ msgid ""
 msgstr ""
 
 #. translators: %s: value.
-#: sysadmin-total-suite.php:388
+#: sysadmin-total-suite.php:389
 #, php-format
 msgid "Orphan cron tasks removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:389
+#: sysadmin-total-suite.php:390
 msgid "Cleaned hooks:"
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:393
+#: sysadmin-total-suite.php:394
 #, php-format
 msgid ""
 "Are you sure you want to DELETE the user?\n"
@@ -1393,7 +1452,7 @@ msgid ""
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:395
+#: sysadmin-total-suite.php:396
 #, php-format
 msgid ""
 "Final confirmation.\n"
@@ -1403,42 +1462,69 @@ msgid ""
 "Continue with permanent deletion?"
 msgstr ""
 
-#: sysadmin-total-suite.php:396
+#: sysadmin-total-suite.php:397
 msgid "Could not delete the user"
 msgstr ""
 
-#: sysadmin-total-suite.php:398
-#: sysadmin-total-suite.php:410
+#: sysadmin-total-suite.php:399
+#: sysadmin-total-suite.php:411
 msgid "Preparing the scan..."
 msgstr ""
 
 #. translators: 1: plugins checked so far, 2: total plugins.
-#: sysadmin-total-suite.php:400
+#: sysadmin-total-suite.php:401
 #, php-format
 msgid "Checking plugins: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:401
-#: sysadmin-total-suite.php:413
+#: sysadmin-total-suite.php:402
+#: sysadmin-total-suite.php:414
 msgid "Scan complete. Reloading..."
 msgstr ""
 
-#: sysadmin-total-suite.php:404
+#: sysadmin-total-suite.php:405
 msgid "Listing folders..."
 msgstr ""
 
 #. translators: 1: folders measured so far, 2: total folders.
-#: sysadmin-total-suite.php:406
+#: sysadmin-total-suite.php:407
 #, php-format
 msgid "Measuring folders: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:407
+#: sysadmin-total-suite.php:408
 msgid "Measurement complete. Reloading..."
 msgstr ""
 
 #. translators: 1: current step, 2: total steps.
-#: sysadmin-total-suite.php:412
+#: sysadmin-total-suite.php:413
 #, php-format
 msgid "Looking for references: step %1$s of %2$s..."
+msgstr ""
+
+#: sysadmin-total-suite.php:416
+msgid "Select at least one item first."
+msgstr ""
+
+#. translators: %s: number of selected media items.
+#: sysadmin-total-suite.php:418
+#, php-format
+msgid ""
+"Move %s media item(s) to quarantine?\n"
+"\n"
+"They will be hidden from the media library and their files moved to a protected folder. Any page that still uses them will show a broken image until you restore them. Nothing is deleted."
+msgstr ""
+
+#: sysadmin-total-suite.php:419
+msgid ""
+"Empty the quarantine?\n"
+"\n"
+"Every media item in it and all its files will be PERMANENTLY deleted."
+msgstr ""
+
+#: sysadmin-total-suite.php:420
+msgid ""
+"Final confirmation.\n"
+"\n"
+"This cannot be undone. Continue with permanent deletion?"
 msgstr ""

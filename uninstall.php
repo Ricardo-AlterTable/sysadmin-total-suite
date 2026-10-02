@@ -24,9 +24,77 @@ $stsuite_options = [
 ];
 
 /**
+ * Devuelve a su sitio los medios que sigan en cuarentena: desinstalar el
+ * plugin no debe borrar ni dejar ocultos datos del usuario. Si un archivo no se
+ * puede devolver (ya existe otro con el mismo nombre), ese adjunto conserva su
+ * marca y sus archivos siguen en la carpeta de cuarentena, que no se borra.
+ */
+function stsuite_uninstall_restore_quarantine() {
+    global $wpdb;
+    $upload = wp_upload_dir(null, false);
+    if (!empty($upload['error']) || empty($upload['basedir'])) {
+        return;
+    }
+    $base = untrailingslashit(wp_normalize_path($upload['basedir']));
+    $qdir = $base . '/sysadmin-total-suite-quarantine';
+
+    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Desinstalación: listado único de adjuntos en cuarentena.
+    $ids = $wpdb->get_col($wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s", '_stsuite_quarantine'));
+    $pending = false;
+    foreach (array_map('intval', $ids) as $id) {
+        $data = get_post_meta($id, '_stsuite_quarantine', true);
+        $left = false;
+        if (is_array($data) && preg_match('#^\d{4}/\d{2}$#', (string) ($data['dir'] ?? ''))) {
+            foreach ((array) $data['files'] as $name) {
+                $name = basename((string) $name);
+                $src  = $qdir . '/' . $data['dir'] . '/' . $name;
+                $dst  = $base . '/' . $data['dir'] . '/' . $name;
+                if (!is_file($src)) {
+                    continue;
+                }
+                // Desinstalación sin WP_Filesystem garantizado; no sobrescribe (se comprueba antes) y el resultado se comprueba.
+                if (file_exists($dst) || !wp_mkdir_p(dirname($dst)) || !@rename($src, $dst)) { // phpcs:ignore WordPress.WP.AlternativeFunctions.rename_rename, WordPress.PHP.NoSilencedErrors.Discouraged
+                    $left = true;
+                }
+            }
+        }
+        if ($left) {
+            $pending = true;
+        } else {
+            delete_post_meta($id, '_stsuite_quarantine');
+        }
+    }
+
+    // La carpeta solo se elimina si ya no guarda ningún medio.
+    if (!$pending && is_dir($qdir)) {
+        $items = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($qdir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($items as $item) {
+            $name = $item->getFilename();
+            if ($item->isFile() && !in_array($name, ['.htaccess', 'index.php'], true)) {
+                return; // queda algo inesperado: no se toca
+            }
+        }
+        foreach ($items as $item) {
+            if ($item->isDir()) {
+                // Carpetas vacías del propio plugin; si alguna no lo está, se deja.
+                @rmdir($item->getPathname()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
+            } else {
+                wp_delete_file($item->getPathname());
+            }
+        }
+        // Carpeta propia del plugin, ya vacía; si no lo está, se deja.
+        @rmdir($qdir); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
+    }
+}
+
+/**
  * Borra las opciones y transitorios del sitio actual.
  */
 function stsuite_uninstall_clean_site($options) {
+    stsuite_uninstall_restore_quarantine();
     foreach ($options as $option) {
         delete_option($option);
     }

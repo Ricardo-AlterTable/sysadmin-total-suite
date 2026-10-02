@@ -289,6 +289,28 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Casilla "seleccionar todo" de una tabla.
+    $(document).on('change', '.stsuite-check-all', function () {
+        $(this).closest('table').find('tbody input[type="checkbox"]').prop('checked', this.checked);
+    });
+
+    // Formularios con confirmación (una o dos). data-confirm / data-confirm2 son
+    // claves de STSUITE_AJAX.i18n; data-require-selection exige alguna casilla.
+    $(document).on('submit', '.stsuite-confirm-form', function (e) {
+        const form = $(this);
+        const count = form.find('tbody input[type="checkbox"]:checked').length;
+        if (form.data('require-selection') && count === 0) {
+            e.preventDefault();
+            alert(T.selectSomething);
+            return;
+        }
+        const first = T[form.data('confirm')];
+        const second = T[form.data('confirm2')];
+        if ((first && !confirm(fmt(first, count))) || (second && !confirm(fmt(second, count)))) {
+            e.preventDefault();
+        }
+    });
+
     // Bloqueo bots IA: aplicar a todos (bloquear / permitir)
     $(document).on('click', '.stsuite-bots-block-all', function (e) {
         e.preventDefault();
