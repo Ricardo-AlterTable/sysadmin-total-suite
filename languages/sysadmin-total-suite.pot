@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T12:15:39+00:00\n"
+"POT-Creation-Date: 2026-10-02T12:24:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -46,8 +46,8 @@ msgstr ""
 #: includes/audit.php:327
 #: includes/audit.php:371
 #: includes/diff.php:37
-#: includes/disk.php:299
-#: includes/disk.php:326
+#: includes/disk.php:309
+#: includes/disk.php:336
 #: includes/users.php:11
 #: includes/wpo.php:262
 #: includes/wpo.php:289
@@ -299,11 +299,13 @@ msgstr ""
 
 #. translators: %s: the word "Active" in bold.
 #: admin/audit.php:156
+#: admin/disk.php:222
 #: admin/wpo.php:35
 msgid "Active"
 msgstr ""
 
 #: admin/audit.php:158
+#: admin/disk.php:226
 msgid "Inactive"
 msgstr ""
 
@@ -430,7 +432,7 @@ msgstr ""
 #. translators: %s: number of items.
 #: admin/dashboard.php:137
 #: admin/dashboard.php:207
-#: admin/disk.php:117
+#: admin/disk.php:136
 #, php-format
 msgid "%s item"
 msgid_plural "%s items"
@@ -514,45 +516,45 @@ msgstr ""
 msgid "Loose files"
 msgstr ""
 
-#: admin/disk.php:88
+#: admin/disk.php:107
 #: sysadmin-total-suite.php:310
 #: sysadmin-total-suite.php:311
 msgid "Disk usage"
 msgstr ""
 
-#: admin/disk.php:89
+#: admin/disk.php:108
 msgid "Measures the space used by the site files and the database. This is a read-only report: nothing is modified."
 msgstr ""
 
 #. translators: %s: the "Measure now" button label in bold.
-#: admin/disk.php:92
-#: admin/disk.php:97
+#: admin/disk.php:111
+#: admin/disk.php:116
 #: sysadmin-total-suite.php:387
 msgid "Measure now"
 msgstr ""
 
 #. translators: %s: the "Measure now" button label in bold.
-#: admin/disk.php:97
+#: admin/disk.php:116
 #, php-format
 msgid "No measurement available. Run %s to get results."
 msgstr ""
 
 #. translators: %s: date and time of the last measurement.
-#: admin/disk.php:104
+#: admin/disk.php:123
 #, php-format
 msgid "Last measurement: %s"
 msgstr ""
 
-#: admin/disk.php:112
+#: admin/disk.php:131
 msgid "Summary"
 msgstr ""
 
-#: admin/disk.php:114
+#: admin/disk.php:133
 msgid "Files:"
 msgstr ""
 
 #. translators: %s: number of files.
-#: admin/disk.php:115
+#: admin/disk.php:134
 #, php-format
 msgid "%s file"
 msgid_plural "%s files"
@@ -560,96 +562,126 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s: number of files.
-#: admin/disk.php:116
+#: admin/disk.php:135
 msgid "Database:"
 msgstr ""
 
-#: admin/disk.php:117
+#: admin/disk.php:136
 msgid "Media library:"
 msgstr ""
 
 #. translators: 1: free space, 2: total disk size, 3: percentage used.
-#: admin/disk.php:125
+#: admin/disk.php:144
 #, php-format
 msgid "Server disk: %1$s free of %2$s (%3$s%% used)"
 msgstr ""
 
-#: admin/disk.php:133
+#: admin/disk.php:152
 msgid "On shared hosting this figure may refer to the whole server, not to your plan quota."
 msgstr ""
 
-#: admin/disk.php:150
+#: admin/disk.php:169
 msgid "Some folders could not be read because of their permissions and are counted as 0: the real size may be larger."
 msgstr ""
 
 #. translators: %d: seconds.
-#: admin/disk.php:157
+#: admin/disk.php:176
 #, php-format
 msgid "Some folders took more than %d seconds and were only partially measured (marked with *): the real size is larger."
 msgstr ""
 
-#: admin/disk.php:171
+#: admin/disk.php:190
 msgid "Folders in the site root that are not part of WordPress: other applications, old copies or backups. Check whether you still need them."
 msgstr ""
 
-#: admin/disk.php:173
+#: admin/disk.php:192
 msgid "Cache, languages, upgrade leftovers and data from plugins (for example their backups) usually live here."
 msgstr ""
 
-#: admin/disk.php:178
+#: admin/disk.php:197
 msgid "Folder"
 msgstr ""
 
-#: admin/disk.php:179
-#: admin/disk.php:239
+#: admin/disk.php:198
+#: admin/disk.php:314
 #: admin/wpo.php:72
 msgid "Size"
 msgstr ""
 
-#: admin/disk.php:180
+#: admin/disk.php:199
 msgid "Files"
 msgstr ""
 
-#: admin/disk.php:208
+#: admin/disk.php:224
+msgid "Parent theme"
+msgstr ""
+
+#. translators: %s: link to the Integrity screen.
+#: admin/disk.php:236
+#, php-format
+msgid "Copies of the official WordPress package used by this plugin to show diffs. You can delete them from %s."
+msgstr ""
+
+#: admin/disk.php:237
+msgid "Integrity → Purge cache"
+msgstr ""
+
+#: admin/disk.php:243
 msgid "Not readable"
 msgstr ""
 
-#: admin/disk.php:220
+#. translators: %s: number of folders.
+#: admin/disk.php:264
+#, php-format
+msgid "%s folder with files"
+msgid_plural "%s folders with files"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of empty folders.
+#: admin/disk.php:267
+#, php-format
+msgid "%s empty"
+msgid_plural "%s empty"
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/disk.php:295
 #: admin/wpo.php:203
 msgid "Database"
 msgstr ""
 
-#: admin/disk.php:222
+#: admin/disk.php:297
 msgid "The table sizes could not be read (the database user may not have access to information_schema)."
 msgstr ""
 
 #. translators: %s: amount of space.
-#: admin/disk.php:229
+#: admin/disk.php:304
 #, php-format
 msgid "Reclaimable space (overhead): %s. It is recovered by optimizing the tables from your hosting panel or phpMyAdmin."
 msgstr ""
 
-#: admin/disk.php:238
+#: admin/disk.php:313
 msgid "Table"
 msgstr ""
 
-#: admin/disk.php:240
+#: admin/disk.php:315
 msgid "Rows (approx.)"
 msgstr ""
 
-#: admin/disk.php:241
+#: admin/disk.php:316
 msgid "Overhead"
 msgstr ""
 
 #. translators: 1: number of tables, 2: their total size.
-#: admin/disk.php:262
+#: admin/disk.php:337
 #, php-format
 msgid "The database also contains %1$s table from another application or prefix (%2$s), not included above."
 msgid_plural "The database also contains %1$s tables from other applications or prefixes (%2$s), not included above."
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/disk.php:272
+#: admin/disk.php:347
 msgid "Sizes are the sum of the file sizes; the space actually used on disk and your hosting quota (which may also include email, logs or other sites) can differ."
 msgstr ""
 
@@ -1041,7 +1073,7 @@ msgid "403 Forbidden"
 msgstr ""
 
 #: includes/audit.php:333
-#: includes/disk.php:332
+#: includes/disk.php:342
 msgid "No scan in progress."
 msgstr ""
 
@@ -1066,7 +1098,7 @@ msgid "Could not read the current file: %s"
 msgstr ""
 
 #: includes/diff.php:70
-#: includes/diff.php:168
+#: includes/diff.php:191
 msgid "Could not fetch the original file."
 msgstr ""
 
@@ -1074,21 +1106,21 @@ msgstr ""
 msgid "No differences found."
 msgstr ""
 
-#: includes/diff.php:102
+#: includes/diff.php:123
 msgid "The ZipArchive class is not available in your PHP version."
 msgstr ""
 
-#: includes/diff.php:110
+#: includes/diff.php:131
 msgid "Could not create the cache directory. Check permissions."
 msgstr ""
 
-#: includes/diff.php:143
-#: includes/diff.php:151
+#: includes/diff.php:166
+#: includes/diff.php:174
 msgid "corrupt ZIP"
 msgstr ""
 
 #. translators: %s: file path inside the ZIP.
-#: includes/diff.php:165
+#: includes/diff.php:188
 #, php-format
 msgid "does not contain %s"
 msgstr ""

@@ -561,9 +561,11 @@ body {
     border-radius: 999px;
     background: var(--stsuite-grad);
 }
-.wrap details summary { cursor: pointer; color: var(--stsuite-text); }
+.stsuite-table tr.stsuite-subrow > td { padding-top: 0; }
+.stsuite-table tr.stsuite-subrow:hover { background: transparent; }
+.wrap details summary { cursor: pointer; color: var(--stsuite-muted); font-size: 12px; }
 .wrap details[open] summary { margin-bottom: 6px; }
-.stsuite-table--nested { margin: 4px 0 0; background: transparent; border: 0; }
+.stsuite-table--nested { width: 100%; margin: 4px 0 0; background: rgba(255, 255, 255, 0.02); border: 0; }
 .stsuite-table--nested td { padding: 4px 10px; font-size: 12px; }
 
 /* ---- Responsive ---- */

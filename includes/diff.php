@@ -81,6 +81,27 @@ add_action('wp_ajax_stsuite_show_diff', function () {
 });
 
 /**
+ * Borra de la caché los ZIP oficiales que no corresponden a la versión e
+ * idioma actuales. Sin esto, cada actualización de WordPress dejaba atrás
+ * ~30-40 MB por paquete. Solo actúa sobre los ficheros propios del plugin
+ * (stsuite-<md5>.zip) dentro de su carpeta de caché.
+ *
+ * @param string   $cache_dir Carpeta de caché (con barra final).
+ * @param string[] $keep_urls URL de los paquetes vigentes.
+ */
+function stsuite_prune_zip_cache(string $cache_dir, array $keep_urls): void {
+    $keep = [];
+    foreach ($keep_urls as $url) {
+        $keep['stsuite-' . md5($url) . '.zip'] = true;
+    }
+    foreach ((array) glob($cache_dir . 'stsuite-*.zip') as $file) {
+        if (is_string($file) && preg_match('/^stsuite-[0-9a-f]{32}\.zip$/', basename($file)) && !isset($keep[basename($file)])) {
+            wp_delete_file($file);
+        }
+    }
+}
+
+/**
  * Descargar el ZIP oficial de WordPress y extraer solo el archivo solicitado.
  *
  * Para instalaciones traducidas (locale != en_US) los builds localizados
@@ -132,6 +153,8 @@ function stsuite_fetch_core_file_from_zip(string $version, string $relative_path
                 if (file_exists($zip_path)) wp_delete_file($zip_path);
                 continue;
             }
+            // Recién descargado: los ZIP de otras versiones ya no sirven.
+            stsuite_prune_zip_cache($cache_dir, $urls);
         }
 
         // El handle del ZIP se reutiliza durante toda la petición para no

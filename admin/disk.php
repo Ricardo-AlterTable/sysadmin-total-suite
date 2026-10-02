@@ -67,6 +67,25 @@ if ($stsuite_done) {
     }
 }
 
+// Estado de temas y plugins para etiquetar las carpetas (activo / padre / inactivo).
+$stsuite_theme_state = [];
+foreach (wp_get_themes() as $stsuite_slug => $stsuite_theme) {
+    $stsuite_theme_state[(string) $stsuite_slug] = 'inactive';
+}
+$stsuite_theme_state[get_template()]   = 'parent';
+$stsuite_theme_state[get_stylesheet()] = 'active';
+
+if (!function_exists('get_plugins')) {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+}
+$stsuite_plugin_active = [];
+foreach (array_keys(get_plugins()) as $stsuite_pfile) {
+    $stsuite_pdir = dirname($stsuite_pfile);
+    if ($stsuite_pdir === '.') continue; // plugins sueltos: van en "Loose files"
+    $stsuite_on = is_plugin_active($stsuite_pfile) || (is_multisite() && is_plugin_active_for_network($stsuite_pfile));
+    $stsuite_plugin_active[$stsuite_pdir] = !empty($stsuite_plugin_active[$stsuite_pdir]) || $stsuite_on;
+}
+
 $stsuite_db       = $stsuite_results['db'] ?? null;
 $stsuite_db_total = 0;
 $stsuite_db_free  = 0;
@@ -183,32 +202,88 @@ $stsuite_bar = function ($stsuite_part, $stsuite_whole) {
                     </thead>
                     <tbody>
                         <?php foreach ($stsuite_groups[$stsuite_g]['items'] as $stsuite_name => $stsuite_item): ?>
+                            <?php
+                            $stsuite_name  = (string) $stsuite_name;
+                            $stsuite_state = '';
+                            if ($stsuite_g === 'themes' && isset($stsuite_theme_state[$stsuite_name])) {
+                                $stsuite_state = $stsuite_theme_state[$stsuite_name];
+                            } elseif ($stsuite_g === 'plugins' && isset($stsuite_plugin_active[$stsuite_name])) {
+                                $stsuite_state = $stsuite_plugin_active[$stsuite_name] ? '' : 'inactive';
+                            }
+                            ?>
                             <tr>
                                 <td>
                                     <?php if (!empty($stsuite_item['children'])): ?>
-                                        <details>
-                                            <summary><strong><?php echo esc_html((string) $stsuite_name); ?></strong></summary>
-                                            <table class="stsuite-table stsuite-table--nested">
-                                                <?php foreach ($stsuite_item['children'] as $stsuite_cname => $stsuite_child): ?>
-                                                    <tr>
-                                                        <td><?php echo esc_html((string) $stsuite_cname); ?></td>
-                                                        <td class="stsuite-num"><?php echo esc_html(size_format($stsuite_child['bytes'], 1)); ?></td>
-                                                        <td class="stsuite-num"><?php echo esc_html(number_format_i18n($stsuite_child['files'])); ?></td>
-                                                    </tr>
-                                                <?php endforeach; ?>
-                                            </table>
-                                        </details>
+                                        <strong><?php echo esc_html($stsuite_name); ?></strong>
                                     <?php else: ?>
-                                        <?php echo esc_html((string) $stsuite_name); ?>
-                                        <?php if ($stsuite_item['path'] !== ''): ?>
-                                            <br><code class="stsuite-file-path"><?php echo esc_html($stsuite_item['path']); ?></code>
-                                        <?php endif; ?>
+                                        <?php echo esc_html($stsuite_name); ?>
+                                    <?php endif; ?>
+                                    <?php if ($stsuite_state === 'active'): ?>
+                                        <span class="stsuite-tag stsuite-tag--ok"><?php esc_html_e('Active', 'sysadmin-total-suite'); ?></span>
+                                    <?php elseif ($stsuite_state === 'parent'): ?>
+                                        <span class="stsuite-tag stsuite-tag--ok"><?php esc_html_e('Parent theme', 'sysadmin-total-suite'); ?></span>
+                                    <?php elseif ($stsuite_state === 'inactive'): ?>
+                                        <span class="stsuite-tag stsuite-tag--muted"><?php esc_html_e('Inactive', 'sysadmin-total-suite'); ?></span>
+                                    <?php endif; ?>
+                                    <?php if ($stsuite_item['path'] !== ''): ?>
+                                        <br><code class="stsuite-file-path"><?php echo esc_html($stsuite_item['path']); ?></code>
+                                    <?php endif; ?>
+                                    <?php if ($stsuite_g === 'uploads' && $stsuite_name === 'sysadmin-total-suite-cache/'): ?>
+                                        <br><span class="stsuite-muted">
+                                            <?php
+                                            printf(
+                                                /* translators: %s: link to the Integrity screen. */
+                                                esc_html__('Copies of the official WordPress package used by this plugin to show diffs. You can delete them from %s.', 'sysadmin-total-suite'),
+                                                '<a href="' . esc_url(admin_url('admin.php?page=sysadmin-total-suite')) . '">' . esc_html__('Integrity → Purge cache', 'sysadmin-total-suite') . '</a>'
+                                            );
+                                            ?>
+                                        </span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="stsuite-num"><?php echo esc_html(size_format($stsuite_item['bytes'], 1) ?: '0 B'); ?><?php echo $stsuite_item['partial'] ? ' *' : ''; ?><?php if ($stsuite_item['unreadable']): ?><br><span class="stsuite-num-warn"><?php esc_html_e('Not readable', 'sysadmin-total-suite'); ?></span><?php endif; ?></td>
                                 <td class="stsuite-num"><?php echo esc_html(number_format_i18n($stsuite_item['files'])); ?></td>
                                 <td class="stsuite-bar-cell"><?php echo $stsuite_bar($stsuite_item['bytes'], $stsuite_groups[$stsuite_g]['bytes']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado arriba con esc_attr. ?></td>
                             </tr>
+                            <?php if (!empty($stsuite_item['children'])): ?>
+                                <?php
+                                // Meses del más reciente al más antiguo; los vacíos solo se cuentan.
+                                $stsuite_children = array_filter($stsuite_item['children'], fn($stsuite_c) => $stsuite_c['files'] > 0);
+                                $stsuite_empty    = count($stsuite_item['children']) - count($stsuite_children);
+                                uksort($stsuite_children, function ($stsuite_a, $stsuite_b) {
+                                    $stsuite_ma = preg_match('/^\d{2}$/', (string) $stsuite_a);
+                                    $stsuite_mb = preg_match('/^\d{2}$/', (string) $stsuite_b);
+                                    return $stsuite_ma !== $stsuite_mb ? $stsuite_mb <=> $stsuite_ma : strcmp((string) $stsuite_b, (string) $stsuite_a);
+                                });
+                                ?>
+                                <tr class="stsuite-subrow">
+                                    <td colspan="4">
+                                        <details>
+                                            <summary>
+                                                <?php
+                                                /* translators: %s: number of folders. */
+                                                echo esc_html(sprintf(_n('%s folder with files', '%s folders with files', count($stsuite_children), 'sysadmin-total-suite'), number_format_i18n(count($stsuite_children))));
+                                                if ($stsuite_empty > 0) {
+                                                    /* translators: %s: number of empty folders. */
+                                                    echo ' · ' . esc_html(sprintf(_n('%s empty', '%s empty', $stsuite_empty, 'sysadmin-total-suite'), number_format_i18n($stsuite_empty)));
+                                                }
+                                                ?>
+                                            </summary>
+                                            <?php if (!empty($stsuite_children)): ?>
+                                                <table class="stsuite-table stsuite-table--nested">
+                                                    <?php foreach ($stsuite_children as $stsuite_cname => $stsuite_child): ?>
+                                                        <tr>
+                                                            <td><?php echo esc_html(preg_match('/^\d{2}$/', (string) $stsuite_cname) ? $stsuite_name . '/' . $stsuite_cname : $stsuite_name . ' · ' . $stsuite_cname); ?></td>
+                                                            <td class="stsuite-num"><?php echo esc_html(size_format($stsuite_child['bytes'], 1) ?: '0 B'); ?></td>
+                                                            <td class="stsuite-num"><?php echo esc_html(number_format_i18n($stsuite_child['files'])); ?></td>
+                                                            <td class="stsuite-bar-cell"><?php echo $stsuite_bar($stsuite_child['bytes'], $stsuite_item['bytes']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado arriba con esc_attr. ?></td>
+                                                        </tr>
+                                                    <?php endforeach; ?>
+                                                </table>
+                                            <?php endif; ?>
+                                        </details>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
                         <?php endforeach; ?>
                     </tbody>
                 </table>

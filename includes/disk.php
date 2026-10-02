@@ -268,7 +268,10 @@ function stsuite_disk_db_tables(): ?array {
             'engine' => (string) $r['engine'],
             'rows'   => (int) $r['row_count'],
             'bytes'  => $size,
-            'free'   => (int) $r['free_bytes'],
+            // En InnoDB, DATA_FREE es espacio reservado del tablespace (extents
+            // preasignados), no "overhead" recuperable: solo se informa para
+            // MyISAM/Aria, igual que phpMyAdmin.
+            'free'   => in_array(strtolower((string) $r['engine']), ['myisam', 'aria'], true) ? (int) $r['free_bytes'] : 0,
         ];
     }
     usort($tables, fn($a, $b) => $b['bytes'] <=> $a['bytes']);

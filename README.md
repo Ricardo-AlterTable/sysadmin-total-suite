@@ -173,7 +173,7 @@ Convenciones: todas las funciones, opciones, transitorios, nonces y acciones AJA
 
 ## Changelog
 
-- **5.3** — Nuevas secciones **Auditoría de plugins** (actualizaciones, plugins cerrados/abandonados y vulnerabilidades conocidas vía WPVulnerability, opcional) y **Espacio en disco** (solo lectura). `readme.txt` sin menciones a la restauración del core y con todos los servicios externos documentados. Probado hasta WordPress 7.1.
+- **5.3** — Nuevas secciones **Auditoría de plugins** (actualizaciones, plugins cerrados/abandonados y vulnerabilidades conocidas vía WPVulnerability, opcional) y **Espacio en disco** (solo lectura). `readme.txt` sin menciones a la restauración del core y con todos los servicios externos documentados. La caché del diff borra los paquetes oficiales de versiones anteriores de WordPress. Probado hasta WordPress 7.1.
 - **5.2** — Corregido un falso positivo: los sitios con el paquete internacional de WordPress y un idioma traducido marcaban como modificados archivos como `wp-includes/version.php`. Ahora, antes de marcar un archivo, se compara también con los checksums del paquete internacional (`en_US`).
 - **5.1** — Prefijo `stsuite_` en las variables de las vistas del admin, para que el análisis estático no las detecte como globales sin prefijo.
 - **5.0** — La sección de Integridad pasa a ser un **informe de solo lectura**: se eliminan la restauración de archivos, la restauración desde copia, el gestor de copias y el borrado de archivos extra, siguiendo las indicaciones del equipo de revisión de WordPress.org. Se enlaza a la reinstalación oficial del core.

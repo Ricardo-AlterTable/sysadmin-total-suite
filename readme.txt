@@ -123,6 +123,7 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 * New "Plugin audit" section: pending updates, plugins closed or not updated on WordPress.org for more than two years and, only after you enable it, publicly known vulnerabilities (CVE and others) of the installed versions, from the free WPVulnerability database. Only plugin slugs are sent; the version comparison is done locally.
 * New "Disk usage" section: read-only report of the space used by the core, uploads (by year and month), plugins, themes, other wp-content folders, non-WordPress folders in the site root and database tables, plus the free disk space. Measured in batches to avoid timeouts.
 * In multisite, both new sections require network administrator capabilities.
+* The diff cache now deletes the official packages of previous WordPress versions instead of keeping them after every core update.
 * The readme no longer mentions restoring core files, which was removed in 5.0. The external services section now documents every service used.
 * Uninstall also removes the option used for the old prefix migration.
 * Tested up to WordPress 7.1.
