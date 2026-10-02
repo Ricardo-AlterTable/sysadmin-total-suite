@@ -1,0 +1,6 @@
+# Excluidos del ZIP que genera GitHub (Download ZIP / git archive): son
+# archivos de desarrollo que Plugin Check rechaza en el paquete del plugin.
+/.gitattributes   export-ignore
+/.gitignore       export-ignore
+/.distignore      export-ignore
+/phpcs.xml.dist   export-ignore
