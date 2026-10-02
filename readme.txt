@@ -138,6 +138,7 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 = 5.4 =
 * New "Unused media" section: finds media items that are not referenced anywhere on the site and files in the year/month upload folders that do not belong to any media item; copies of original images kept by optimization plugins (name.bk.ext) are listed apart. Unused items can be moved to a reversible quarantine (hidden from the library, files moved aside) and restored at any time; only emptying the quarantine deletes them, with a double confirmation. Uninstalling restores anything still in quarantine.
 * The audit now covers WordPress core and themes too: pending updates, themes closed or abandoned on WordPress.org and, if enabled, known vulnerabilities of the installed versions. The section is now called "Audit".
+* Because the vulnerability check now also sends theme slugs and the WordPress version, sites that had enabled it in 5.3 must enable it again: it stays paused, with a notice, until the new text is accepted.
 * The diff viewer now shows a real unified diff (the same engine WordPress uses for revisions) with three lines of context: a line added near the top no longer marks the rest of the file as changed.
 * Asset URLs include the file modification time, so browsers and server caches always load the current scripts and styles after an update.
 * The names of the robots.txt-only AI crawlers are now translatable.

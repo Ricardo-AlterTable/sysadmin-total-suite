@@ -168,6 +168,9 @@ $stsuite_render_badges = function (array $stsuite_sum) use ($stsuite_scanned_vul
     <!-- Consentimiento para el servicio externo de vulnerabilidades -->
     <div class="stsuite-card">
         <h2><?php esc_html_e('Vulnerability database', 'sysadmin-total-suite'); ?></h2>
+        <?php if ($stsuite_settings['needs_reconsent']): ?>
+            <p class="stsuite-status stsuite-status--warn"><?php esc_html_e('The vulnerability check now also covers themes and the WordPress core, so it sends more data than when you enabled it. It is paused until you review the text below and enable it again.', 'sysadmin-total-suite'); ?></p>
+        <?php endif; ?>
         <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
             <?php wp_nonce_field('stsuite_audit_settings_nonce'); ?>
             <input type="hidden" name="action" value="stsuite_save_audit">

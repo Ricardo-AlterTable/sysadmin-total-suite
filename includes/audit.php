@@ -6,6 +6,13 @@ if (!defined('ABSPATH')) exit;
 if (!defined('STSUITE_AUDIT_OPTION')) {
     define('STSUITE_AUDIT_OPTION', 'stsuite_audit_results');
 }
+/**
+ * Versión del texto de consentimiento de WPVulnerability.
+ * 1 = 5.3: slugs de plugins. 2 = 5.4: también slugs de temas y versión de WordPress.
+ */
+if (!defined('STSUITE_AUDIT_CONSENT_VERSION')) {
+    define('STSUITE_AUDIT_CONSENT_VERSION', 2);
+}
 if (!defined('STSUITE_AUDIT_SETTINGS')) {
     define('STSUITE_AUDIT_SETTINGS', 'stsuite_audit_settings');
 }
@@ -39,7 +46,16 @@ function stsuite_audit_settings(): array {
     $s = get_option(STSUITE_AUDIT_SETTINGS, []);
     if (!is_array($s)) $s = [];
 
-    return ['vuln_enabled' => !empty($s['vuln_enabled'])];
+    // El consentimiento vale para lo que se explicó al darlo. Si después se
+    // amplían los datos enviados, hay que pedirlo de nuevo: no basta con que la
+    // casilla estuviera marcada (directriz 7 de WordPress.org).
+    $given   = !empty($s['vuln_enabled']);
+    $current = $given && (int) ($s['consent'] ?? 1) >= STSUITE_AUDIT_CONSENT_VERSION;
+
+    return [
+        'vuln_enabled'   => $current,
+        'needs_reconsent' => $given && !$current,
+    ];
 }
 
 /**
@@ -468,7 +484,7 @@ add_action('admin_post_stsuite_save_audit', function () {
     check_admin_referer('stsuite_audit_settings_nonce');
 
     $enabled = !empty($_POST['stsuite_audit_vuln_enabled']);
-    update_option(STSUITE_AUDIT_SETTINGS, ['vuln_enabled' => $enabled], false);
+    update_option(STSUITE_AUDIT_SETTINGS, ['vuln_enabled' => $enabled, 'consent' => STSUITE_AUDIT_CONSENT_VERSION], false);
 
     // Al retirar el consentimiento se descartan también los datos obtenidos.
     if (!$enabled) {
