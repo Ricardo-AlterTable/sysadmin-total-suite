@@ -253,7 +253,8 @@ jQuery(document).ready(function ($) {
         button.prop('disabled', true);
         progress.text(opts.labels.starting);
         request(opts.start, function (data) {
-            showProgress(0, data.total);
+            // 'first' indica que el progreso se cuenta por pasos (1..N) y no por elementos (0..N).
+            showProgress(data.first || 0, data.total);
             step();
         });
     }

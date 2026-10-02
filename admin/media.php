@@ -11,6 +11,7 @@ $stsuite_limit   = 300; // filas máximas por tabla
 
 $stsuite_unused  = $stsuite_done ? (array) $stsuite_results['unused'] : [];
 $stsuite_orphans = $stsuite_done ? (array) $stsuite_results['orphans'] : [];
+$stsuite_backups = $stsuite_done ? (array) ($stsuite_results['backups'] ?? []) : [];
 
 // Mayores primero: es donde más espacio se gana.
 usort($stsuite_unused, fn($stsuite_a, $stsuite_b) => $stsuite_b['bytes'] <=> $stsuite_a['bytes']);
@@ -18,6 +19,7 @@ usort($stsuite_orphans, fn($stsuite_a, $stsuite_b) => $stsuite_b['bytes'] <=> $s
 
 $stsuite_unused_bytes = (int) array_sum(array_column($stsuite_unused, 'bytes'));
 $stsuite_orphan_bytes = (int) array_sum(array_column($stsuite_orphans, 'bytes'));
+$stsuite_backup_bytes = (int) array_sum(array_column($stsuite_backups, 'bytes'));
 $stsuite_date_format  = get_option('date_format');
 ?>
 <div class="wrap">
@@ -49,6 +51,9 @@ $stsuite_date_format  = get_option('date_format');
                 <?php esc_html_e('Media items checked:', 'sysadmin-total-suite'); ?> <strong><?php echo esc_html(number_format_i18n((int) $stsuite_results['checked'])); ?></strong>
                 · <?php esc_html_e('Apparently unused:', 'sysadmin-total-suite'); ?> <strong><?php echo esc_html(number_format_i18n(count($stsuite_unused))); ?></strong> (<?php echo esc_html(size_format($stsuite_unused_bytes, 1) ?: '0 B'); ?>)
                 · <?php esc_html_e('Orphan files:', 'sysadmin-total-suite'); ?> <strong><?php echo esc_html(number_format_i18n(count($stsuite_orphans))); ?></strong> (<?php echo esc_html(size_format($stsuite_orphan_bytes, 1) ?: '0 B'); ?>)
+                <?php if (!empty($stsuite_backups)): ?>
+                    · <?php esc_html_e('Optimization backups:', 'sysadmin-total-suite'); ?> <strong><?php echo esc_html(number_format_i18n(count($stsuite_backups))); ?></strong> (<?php echo esc_html(size_format($stsuite_backup_bytes, 1)); ?>)
+                <?php endif; ?>
             </p>
             <p class="stsuite-status stsuite-status--warn">
                 <?php esc_html_e('⚠ This is an estimate. An item is reported only when no reference to it was found in posts, pages, custom fields, page builders, widgets, theme settings or term and user data. Images used only from theme files, external sites, emails or newsletters cannot be detected. Review every item before deleting it.', 'sysadmin-total-suite'); ?>
@@ -111,6 +116,15 @@ $stsuite_date_format  = get_option('date_format');
                 <?php endif; ?>
             <?php endif; ?>
         </div>
+
+        <?php if (!empty($stsuite_backups)): ?>
+            <!-- Copias de optimización -->
+            <div class="stsuite-card">
+                <h2><?php esc_html_e('Image optimization backups', 'sysadmin-total-suite'); ?> · <?php echo esc_html(size_format($stsuite_backup_bytes, 1)); ?></h2>
+                <p><?php /* translators: %s: number of files. */ echo esc_html(sprintf(_n('%s copy of an original image (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache.', '%s copies of original images (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache.', count($stsuite_backups), 'sysadmin-total-suite'), number_format_i18n(count($stsuite_backups)))); ?></p>
+                <p class="description"><?php esc_html_e('They are not orphans: they allow the plugin to restore the original images. If you no longer need that, remove them from the optimization plugin itself (in LiteSpeed Cache, in its Image Optimization tools), not by FTP, so that it keeps its records consistent.', 'sysadmin-total-suite'); ?></p>
+            </div>
+        <?php endif; ?>
 
         <!-- Archivos huérfanos -->
         <div class="stsuite-card">

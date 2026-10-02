@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T12:49:48+00:00\n"
+"POT-Creation-Date: 2026-10-02T12:56:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -49,15 +49,15 @@ msgstr ""
 #: includes/diff.php:37
 #: includes/disk.php:309
 #: includes/disk.php:336
-#: includes/media.php:402
-#: includes/media.php:433
+#: includes/media.php:418
+#: includes/media.php:450
 #: includes/users.php:11
 #: includes/wpo.php:262
 #: includes/wpo.php:289
 #: includes/wpo.php:326
-#: sysadmin-total-suite.php:492
-#: sysadmin-total-suite.php:640
-#: sysadmin-total-suite.php:664
+#: sysadmin-total-suite.php:503
+#: sysadmin-total-suite.php:651
+#: sysadmin-total-suite.php:675
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -214,20 +214,20 @@ msgstr ""
 #. translators: %s: the button label in bold.
 #: admin/audit.php:83
 #: admin/audit.php:88
-#: sysadmin-total-suite.php:391
+#: sysadmin-total-suite.php:402
 msgid "Scan plugins"
 msgstr ""
 
 #. translators: %s: the button label in bold.
 #: admin/audit.php:88
-#: admin/media.php:33
+#: admin/media.php:35
 #, php-format
 msgid "No scan available. Run %s to get results."
 msgstr ""
 
 #. translators: %s: date and time of the last scan.
 #: admin/audit.php:95
-#: admin/media.php:40
+#: admin/media.php:42
 #, php-format
 msgid "Last scan: %s"
 msgstr ""
@@ -445,7 +445,7 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: admin/dashboard.php:148
-#: admin/media.php:126
+#: admin/media.php:140
 msgid "Modified"
 msgstr ""
 
@@ -535,7 +535,7 @@ msgstr ""
 #. translators: %s: the "Measure now" button label in bold.
 #: admin/disk.php:111
 #: admin/disk.php:116
-#: sysadmin-total-suite.php:397
+#: sysadmin-total-suite.php:408
 msgid "Measure now"
 msgstr ""
 
@@ -552,7 +552,7 @@ msgid "Last measurement: %s"
 msgstr ""
 
 #: admin/disk.php:131
-#: admin/media.php:47
+#: admin/media.php:49
 msgid "Summary"
 msgstr ""
 
@@ -611,8 +611,8 @@ msgstr ""
 
 #: admin/disk.php:198
 #: admin/disk.php:315
-#: admin/media.php:71
-#: admin/media.php:127
+#: admin/media.php:76
+#: admin/media.php:141
 #: admin/wpo.php:72
 msgid "Size"
 msgstr ""
@@ -694,95 +694,116 @@ msgstr[1] ""
 msgid "Sizes are the sum of the file sizes; the space actually used on disk and your hosting quota (which may also include email, logs or other sites) can differ."
 msgstr ""
 
-#: admin/media.php:24
+#: admin/media.php:26
 #: sysadmin-total-suite.php:320
 #: sysadmin-total-suite.php:321
 msgid "Unused media"
 msgstr ""
 
-#: admin/media.php:25
+#: admin/media.php:27
 msgid "Finds media library items that do not seem to be used anywhere on the site, and files in the uploads folders that do not belong to any media item. This is a read-only report: nothing is moved or deleted."
 msgstr ""
 
 #. translators: %s: the button label in bold.
-#: admin/media.php:28
-#: admin/media.php:33
-#: sysadmin-total-suite.php:403
+#: admin/media.php:30
+#: admin/media.php:35
+#: sysadmin-total-suite.php:414
 msgid "Scan media"
 msgstr ""
 
-#: admin/media.php:49
+#: admin/media.php:51
 msgid "Media items checked:"
 msgstr ""
 
-#: admin/media.php:50
+#: admin/media.php:52
 msgid "Apparently unused:"
 msgstr ""
 
-#: admin/media.php:51
+#: admin/media.php:53
 msgid "Orphan files:"
 msgstr ""
 
-#: admin/media.php:54
+#: admin/media.php:55
+msgid "Optimization backups:"
+msgstr ""
+
+#: admin/media.php:59
 msgid "⚠ This is an estimate. An item is reported only when no reference to it was found in posts, pages, custom fields, page builders, widgets, theme settings or term and user data. Images used only from theme files, external sites, emails or newsletters cannot be detected. Review every item before deleting it."
 msgstr ""
 
-#: admin/media.php:60
+#: admin/media.php:65
 msgid "Media items without references"
 msgstr ""
 
-#: admin/media.php:62
+#: admin/media.php:67
 msgid "No unused media items were found."
 msgstr ""
 
-#: admin/media.php:64
+#: admin/media.php:69
 msgid "To delete one, open it in the media library and use \"Delete permanently\". Its size includes every generated thumbnail."
 msgstr ""
 
-#: admin/media.php:69
+#: admin/media.php:74
 msgid "Media item"
 msgstr ""
 
-#: admin/media.php:70
+#: admin/media.php:75
 msgid "Uploaded"
 msgstr ""
 
-#: admin/media.php:72
+#: admin/media.php:77
 #: admin/users.php:39
 #: admin/wpo.php:116
 msgid "Actions"
 msgstr ""
 
 #. translators: %s: title of the post the media item was uploaded to.
-#: admin/media.php:88
+#: admin/media.php:93
 #, php-format
 msgid "Uploaded to: %s"
 msgstr ""
 
-#: admin/media.php:100
+#: admin/media.php:105
 msgid "Open in library"
 msgstr ""
 
 #. translators: 1: rows shown, 2: total rows.
-#: admin/media.php:109
-#: admin/media.php:142
+#: admin/media.php:114
+#: admin/media.php:156
 #, php-format
 msgid "Showing the %1$s largest of %2$s."
 msgstr ""
 
-#: admin/media.php:117
+#: admin/media.php:123
+msgid "Image optimization backups"
+msgstr ""
+
+#. translators: %s: number of files.
+#: admin/media.php:124
+#, php-format
+msgid "%s copy of an original image (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache."
+msgid_plural "%s copies of original images (name.bk.ext) kept by an image optimization plugin such as LiteSpeed Cache."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of files.
+#: admin/media.php:125
+msgid "They are not orphans: they allow the plugin to restore the original images. If you no longer need that, remove them from the optimization plugin itself (in LiteSpeed Cache, in its Image Optimization tools), not by FTP, so that it keeps its records consistent."
+msgstr ""
+
+#: admin/media.php:131
 msgid "Orphan files in uploads"
 msgstr ""
 
-#: admin/media.php:119
+#: admin/media.php:133
 msgid "No orphan files were found in the year/month upload folders."
 msgstr ""
 
-#: admin/media.php:121
+#: admin/media.php:135
 msgid "Files inside the year/month upload folders that do not belong to any media item: usually thumbnails of sizes no longer registered, leftovers of deleted items or files uploaded by FTP. WebP/AVIF copies made by optimization plugins are not listed. They can only be removed by FTP or from your hosting file manager."
 msgstr ""
 
-#: admin/media.php:125
+#: admin/media.php:139
 msgid "File"
 msgstr ""
 
@@ -912,7 +933,7 @@ msgstr ""
 
 #: admin/users.php:67
 #: admin/wpo.php:142
-#: sysadmin-total-suite.php:364
+#: sysadmin-total-suite.php:375
 msgid "Delete"
 msgstr ""
 
@@ -994,7 +1015,7 @@ msgid "Expired (junk):"
 msgstr ""
 
 #: admin/wpo.php:66
-#: sysadmin-total-suite.php:370
+#: sysadmin-total-suite.php:381
 msgid "Clean up expired transients"
 msgstr ""
 
@@ -1051,7 +1072,7 @@ msgid "Junk from removed plugins"
 msgstr ""
 
 #: admin/wpo.php:110
-#: sysadmin-total-suite.php:379
+#: sysadmin-total-suite.php:390
 msgid "Clean up all orphan cron tasks"
 msgstr ""
 
@@ -1170,7 +1191,7 @@ msgstr ""
 
 #: includes/audit.php:333
 #: includes/disk.php:342
-#: includes/media.php:439
+#: includes/media.php:456
 msgid "No scan in progress."
 msgstr ""
 
@@ -1285,55 +1306,55 @@ msgstr ""
 msgid "Integrity"
 msgstr ""
 
-#: sysadmin-total-suite.php:357
+#: sysadmin-total-suite.php:368
 msgid "The operation timed out."
 msgstr ""
 
-#: sysadmin-total-suite.php:358
+#: sysadmin-total-suite.php:369
 msgid "Communication error with the server."
 msgstr ""
 
 #. translators: %s: error message.
-#: sysadmin-total-suite.php:360
+#: sysadmin-total-suite.php:371
 #, php-format
 msgid "Error: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:361
+#: sysadmin-total-suite.php:372
 msgid "Loading diff..."
 msgstr ""
 
-#: sysadmin-total-suite.php:362
+#: sysadmin-total-suite.php:373
 msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
 msgstr ""
 
-#: sysadmin-total-suite.php:363
+#: sysadmin-total-suite.php:374
 msgid "Deleting..."
 msgstr ""
 
-#: sysadmin-total-suite.php:366
+#: sysadmin-total-suite.php:377
 msgid ""
 "Clean up expired transients?\n"
 "\n"
 "This is safe: they are expired temporary data and WordPress regenerates them when needed."
 msgstr ""
 
-#: sysadmin-total-suite.php:367
+#: sysadmin-total-suite.php:378
 msgid "Cleaning..."
 msgstr ""
 
 #. translators: %d: number of transients removed.
-#: sysadmin-total-suite.php:369
+#: sysadmin-total-suite.php:380
 #, php-format
 msgid "Expired transients removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:371
+#: sysadmin-total-suite.php:382
 msgid "Could not clean up"
 msgstr ""
 
 #. translators: %s: cron hook name.
-#: sysadmin-total-suite.php:374
+#: sysadmin-total-suite.php:385
 #, php-format
 msgid ""
 "Remove the cron tasks for this hook?\n"
@@ -1343,7 +1364,7 @@ msgid ""
 "It appears orphaned (no code attached right now), but a plugin may register it only on the front end. A copy of the schedule is saved beforehand so it can be restored manually."
 msgstr ""
 
-#: sysadmin-total-suite.php:375
+#: sysadmin-total-suite.php:386
 msgid ""
 "Remove ALL cron tasks detected as orphaned?\n"
 "\n"
@@ -1351,17 +1372,17 @@ msgid ""
 msgstr ""
 
 #. translators: %s: value.
-#: sysadmin-total-suite.php:377
+#: sysadmin-total-suite.php:388
 #, php-format
 msgid "Orphan cron tasks removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:378
+#: sysadmin-total-suite.php:389
 msgid "Cleaned hooks:"
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:382
+#: sysadmin-total-suite.php:393
 #, php-format
 msgid ""
 "Are you sure you want to DELETE the user?\n"
@@ -1372,7 +1393,7 @@ msgid ""
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:384
+#: sysadmin-total-suite.php:395
 #, php-format
 msgid ""
 "Final confirmation.\n"
@@ -1382,42 +1403,42 @@ msgid ""
 "Continue with permanent deletion?"
 msgstr ""
 
-#: sysadmin-total-suite.php:385
+#: sysadmin-total-suite.php:396
 msgid "Could not delete the user"
 msgstr ""
 
-#: sysadmin-total-suite.php:387
-#: sysadmin-total-suite.php:399
+#: sysadmin-total-suite.php:398
+#: sysadmin-total-suite.php:410
 msgid "Preparing the scan..."
 msgstr ""
 
 #. translators: 1: plugins checked so far, 2: total plugins.
-#: sysadmin-total-suite.php:389
+#: sysadmin-total-suite.php:400
 #, php-format
 msgid "Checking plugins: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:390
-#: sysadmin-total-suite.php:402
+#: sysadmin-total-suite.php:401
+#: sysadmin-total-suite.php:413
 msgid "Scan complete. Reloading..."
 msgstr ""
 
-#: sysadmin-total-suite.php:393
+#: sysadmin-total-suite.php:404
 msgid "Listing folders..."
 msgstr ""
 
 #. translators: 1: folders measured so far, 2: total folders.
-#: sysadmin-total-suite.php:395
+#: sysadmin-total-suite.php:406
 #, php-format
 msgid "Measuring folders: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:396
+#: sysadmin-total-suite.php:407
 msgid "Measurement complete. Reloading..."
 msgstr ""
 
 #. translators: 1: current step, 2: total steps.
-#: sysadmin-total-suite.php:401
+#: sysadmin-total-suite.php:412
 #, php-format
 msgid "Looking for references: step %1$s of %2$s..."
 msgstr ""

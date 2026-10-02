@@ -337,17 +337,28 @@ add_action('admin_menu', function () {
 // =============================
 // Assets
 // =============================
+
+/**
+ * Versión de un asset para la URL (?ver=): la del plugin más la fecha de
+ * modificación del archivo. Así un cambio en el archivo invalida la caché del
+ * navegador y la de servidores como LiteSpeed aunque no se suba la versión.
+ */
+function stsuite_asset_ver(string $rel): string {
+    $mtime = @filemtime(STSUITE_PLUGIN_DIR . $rel); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Si no existe, se usa solo la versión del plugin.
+    return $mtime ? STSUITE_VERSION . '.' . $mtime : STSUITE_VERSION;
+}
+
 add_action('admin_enqueue_scripts', function ($hook) {
     if (strpos($hook, 'sysadmin-total-suite') === false) return;
 
-    wp_enqueue_style('stsuite-admin-css', STSUITE_PLUGIN_URL . 'admin/assets/admin.css', [], STSUITE_VERSION);
-    wp_enqueue_script('stsuite-admin-js', STSUITE_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], STSUITE_VERSION, true);
+    wp_enqueue_style('stsuite-admin-css', STSUITE_PLUGIN_URL . 'admin/assets/admin.css', [], stsuite_asset_ver('admin/assets/admin.css'));
+    wp_enqueue_script('stsuite-admin-js', STSUITE_PLUGIN_URL . 'admin/assets/admin.js', ['jquery'], stsuite_asset_ver('admin/assets/admin.js'), true);
 
     // Chart.js y la lógica de la pantalla de Profiling: solo se cargan ahí.
     // Chart.js va empaquetada en el plugin (no se permiten CDN externos).
     if (strpos($hook, 'sysadmin-total-suite-profiling') !== false) {
         wp_enqueue_script('stsuite-chartjs', STSUITE_PLUGIN_URL . 'admin/assets/chart.min.js', [], '4.5.1', true);
-        wp_enqueue_script('stsuite-profiler-js', STSUITE_PLUGIN_URL . 'admin/assets/profiler.js', ['stsuite-chartjs'], STSUITE_VERSION, true);
+        wp_enqueue_script('stsuite-profiler-js', STSUITE_PLUGIN_URL . 'admin/assets/profiler.js', ['stsuite-chartjs'], stsuite_asset_ver('admin/assets/profiler.js'), true);
     }
 
     wp_localize_script('stsuite-admin-js', 'STSUITE_AJAX', [

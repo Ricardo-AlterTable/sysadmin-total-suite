@@ -252,9 +252,9 @@ function stsuite_media_run_phase(array &$s): bool {
             }
             $dir = $s['month_dirs'][$cursor] ?? null;
             if ($dir !== null) {
-                foreach (stsuite_media_orphans_in($dir) as $orphan) {
-                    $s['orphans'][] = $orphan;
-                }
+                $found = stsuite_media_orphans_in($dir);
+                foreach ($found['orphans'] as $orphan) $s['orphans'][] = $orphan;
+                foreach ($found['backups'] as $backup) $s['backups'][] = $backup;
                 $cursor++;
                 $rows = [1]; // hay más trabajo mientras queden carpetas
             } else {
@@ -327,13 +327,18 @@ function stsuite_media_month_dirs(): array {
  * escalado, las copias de edición (backup sizes) y los derivados de plugins de
  * optimización con el mismo nombre (foto.jpg.webp, foto-300x200.webp...).
  *
- * @return array<int,array{file:string,bytes:int,mtime:int}>
+ * Las copias del original que guardan los optimizadores (LiteSpeed Cache:
+ * foto.bk.jpg) se devuelven aparte en 'backups': no son basura sin dueño, sino
+ * lo que permite "restaurar el original" desde ese plugin, que es donde deben
+ * eliminarse.
+ *
+ * @return array{orphans:array<int,array{file:string,bytes:int,mtime:int}>,backups:array<int,array{file:string,bytes:int,mtime:int}>}
  */
 function stsuite_media_orphans_in(string $rel_dir): array {
     global $wpdb;
     $base = stsuite_media_upload_basedir();
     $abs  = $base . '/' . $rel_dir;
-    if ($base === '' || !is_dir($abs)) return [];
+    if ($base === '' || !is_dir($abs)) return ['orphans' => [], 'backups' => []];
 
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Adjuntos de una carpeta concreta; no hay API que filtre por ruta.
     $ids = $wpdb->get_col($wpdb->prepare(
@@ -343,6 +348,7 @@ function stsuite_media_orphans_in(string $rel_dir): array {
 
     $known = [];  // nombres exactos
     $bases = [];  // nombres sin extensión
+    $roots = [];  // imagen base de cada adjunto, sin tamaño ni -scaled (para las copias .bk)
     if ($ids) {
         update_meta_cache('post', array_map('intval', $ids));
     }
@@ -360,6 +366,7 @@ function stsuite_media_orphans_in(string $rel_dir): array {
         foreach ((array) get_post_meta($id, '_wp_attachment_backup_sizes', true) as $backup) {
             if (is_array($backup) && !empty($backup['file'])) $names[] = (string) $backup['file'];
         }
+        $roots[basename(stsuite_media_key($file))] = true;
         foreach ($names as $n) {
             $n = strtolower(basename($n));
             $known[$n] = true;
@@ -368,6 +375,7 @@ function stsuite_media_orphans_in(string $rel_dir): array {
     }
 
     $orphans = [];
+    $backups = [];
     foreach ((array) glob($abs . '/*') as $path) {
         if (!is_string($path) || !is_file($path) || is_link($path)) continue;
         $name = strtolower(basename($path));
@@ -377,13 +385,21 @@ function stsuite_media_orphans_in(string $rel_dir): array {
         if (isset($known[$name]) || isset($known[$no_ext]) || isset($bases[$no_ext])) {
             continue; // archivo del adjunto o derivado (foto.jpg.webp / foto.webp)
         }
-        $orphans[] = [
+        $entry = [
             'file'  => $rel_dir . '/' . basename($path),
             'bytes' => (int) filesize($path),
             'mtime' => (int) filemtime($path),
         ];
+        // Copia de optimización de un archivo conocido: foto-300x200.bk.jpg.
+        // Se asocia por la imagen base, porque puede ser la copia de una miniatura
+        // de un tamaño que ya no existe (foto-1280x900.bk.png).
+        if (preg_match('/^(.+)\.bk\.([a-z0-9]{2,5})$/', $name, $bk) && isset($roots[basename(stsuite_media_key($bk[1] . '.' . $bk[2]))])) {
+            $backups[] = $entry;
+            continue;
+        }
+        $orphans[] = $entry;
     }
-    return $orphans;
+    return ['orphans' => $orphans, 'backups' => $backups];
 }
 
 /**
@@ -420,9 +436,10 @@ add_action('wp_ajax_stsuite_media_start', function () {
         'checked'         => 0,
         'unused'          => [],
         'orphans'         => [],
+        'backups'         => [],
     ], false);
 
-    wp_send_json_success(['total' => count(stsuite_media_phases()), 'phase' => 'posts']);
+    wp_send_json_success(['total' => count(stsuite_media_phases()), 'phase' => 'posts', 'first' => 1]);
 });
 
 /**
@@ -463,6 +480,7 @@ add_action('wp_ajax_stsuite_media_step', function () {
     wp_send_json_success([
         'done'      => $done,
         'total'     => count($phases),
-        'processed' => $done ? count($phases) : (int) array_search($s['phase'], $phases, true),
+        // Paso actual (1..N) mientras se trabaja; N al terminar.
+        'processed' => $done ? count($phases) : (int) array_search($s['phase'], $phases, true) + 1,
     ]);
 });
