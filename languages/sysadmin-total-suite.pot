@@ -1,275 +1,75 @@
 # Copyright (C) 2026 Ricardo Morales
-# This file is distributed under the GPLv2 or later license.
-# This file is distributed under the same license as the Sysadmin Total Suite package.
+# This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sysadmin Total Suite 5.2\n"
-"Report-Msgid-Bugs-To: https://github.com/Ricardo-AlterTable\n"
-"POT-Creation-Date: 2026-08-18 12:59+0200\n"
-"PO-Revision-Date: 2026-08-18 12:20+0200\n"
-"Last-Translator: Ricardo Morales\n"
-"Language-Team: Ricardo Morales\n"
-"Language: en_US\n"
+"Project-Id-Version: Sysadmin Total Suite 5.3\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sysadmin-total-suite\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"POT-Creation-Date: 2026-10-02T12:15:39+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: sysadmin-total-suite\n"
 
-#: sysadmin-total-suite.php:276 sysadmin-total-suite.php:277
-msgid "Integrity"
+#. Plugin Name of the plugin
+#: sysadmin-total-suite.php
+msgid "Sysadmin Total Suite"
 msgstr ""
 
-#: sysadmin-total-suite.php:285 sysadmin-total-suite.php:286
-#: admin/profiler.php:11
-msgid "Profiling"
+#. Description of the plugin
+#: sysadmin-total-suite.php
+msgid "Core integrity checks, plugin vulnerability audit, load-time profiling, disk usage, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel."
 msgstr ""
 
-#: sysadmin-total-suite.php:294 sysadmin-total-suite.php:295 admin/users.php:15
-msgid "Check WP users"
+#. Author of the plugin
+#: sysadmin-total-suite.php
+msgid "Ricardo Morales"
 msgstr ""
 
-#: sysadmin-total-suite.php:303 sysadmin-total-suite.php:304 admin/wpo.php:22
-msgid "WPO"
+#. Author URI of the plugin
+#: sysadmin-total-suite.php
+msgid "https://github.com/Ricardo-AlterTable"
 msgstr ""
 
-#: sysadmin-total-suite.php:312 sysadmin-total-suite.php:313
-#: admin/aibots.php:14
-msgid "AI bot blocking"
-msgstr ""
-
-#: sysadmin-total-suite.php:340
-msgid "The operation timed out."
-msgstr ""
-
-#: sysadmin-total-suite.php:341
-msgid "Communication error with the server."
-msgstr ""
-
-#. translators: %s: error message.
-#: sysadmin-total-suite.php:343
-#, php-format
-msgid "Error: %s"
-msgstr ""
-
-#: sysadmin-total-suite.php:344
-msgid "Loading diff..."
-msgstr ""
-
-#: sysadmin-total-suite.php:345
-msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
-msgstr ""
-
-#: sysadmin-total-suite.php:346
-msgid "Deleting..."
-msgstr ""
-
-#: sysadmin-total-suite.php:347 admin/users.php:67 admin/wpo.php:142
-msgid "Delete"
-msgstr ""
-
-#: sysadmin-total-suite.php:349
-msgid ""
-"Clean up expired transients?\n"
-"\n"
-"This is safe: they are expired temporary data and WordPress regenerates them "
-"when needed."
-msgstr ""
-
-#: sysadmin-total-suite.php:350
-msgid "Cleaning..."
-msgstr ""
-
-#. translators: %d: number of transients removed.
-#: sysadmin-total-suite.php:352
-#, php-format
-msgid "Expired transients removed: %s"
-msgstr ""
-
-#: sysadmin-total-suite.php:353 admin/wpo.php:66
-msgid "Clean up expired transients"
-msgstr ""
-
-#: sysadmin-total-suite.php:354
-msgid "Could not clean up"
-msgstr ""
-
-#. translators: %s: cron hook name.
-#: sysadmin-total-suite.php:357
-#, php-format
-msgid ""
-"Remove the cron tasks for this hook?\n"
-"\n"
-"%s\n"
-"\n"
-"It appears orphaned (no code attached right now), but a plugin may register "
-"it only on the front end. A copy of the schedule is saved beforehand so it "
-"can be restored manually."
-msgstr ""
-
-#: sysadmin-total-suite.php:358
-msgid ""
-"Remove ALL cron tasks detected as orphaned?\n"
-"\n"
-"Some may belong to plugins that register their hook only on the front end, "
-"so review the list first. A copy of the schedule is saved beforehand so it "
-"can be restored manually."
-msgstr ""
-
-#. translators: %s: value.
-#: sysadmin-total-suite.php:360
-#, php-format
-msgid "Orphan cron tasks removed: %s"
-msgstr ""
-
-#: sysadmin-total-suite.php:361
-msgid "Cleaned hooks:"
-msgstr ""
-
-#: sysadmin-total-suite.php:362 admin/wpo.php:110
-msgid "Clean up all orphan cron tasks"
-msgstr ""
-
-#. translators: %s: user login name.
-#: sysadmin-total-suite.php:365
-#, php-format
-msgid ""
-"Are you sure you want to DELETE the user?\n"
-"\n"
-"%s\n"
-"\n"
-"⚠ This action is IRREVERSIBLE: the user is permanently removed and cannot be "
-"undone."
-msgstr ""
-
-#. translators: %s: user login name.
-#: sysadmin-total-suite.php:367
-#, php-format
-msgid ""
-"Final confirmation.\n"
-"\n"
-"The user \"%s\" and the content they authored will be removed.\n"
-"\n"
-"Continue with permanent deletion?"
-msgstr ""
-
-#: sysadmin-total-suite.php:368
-msgid "Could not delete the user"
-msgstr ""
-
-#: sysadmin-total-suite.php:445 sysadmin-total-suite.php:593
-#: sysadmin-total-suite.php:617 includes/aibots.php:119 includes/diff.php:37
-#: includes/users.php:11 includes/wpo.php:262 includes/wpo.php:289
-#: includes/wpo.php:326 admin/aibots.php:5 admin/dashboard.php:5
-#: admin/profiler.php:5 admin/users.php:5 admin/wpo.php:5
+#: admin/aibots.php:5
+#: admin/audit.php:5
+#: admin/dashboard.php:5
+#: admin/disk.php:5
+#: admin/profiler.php:5
+#: admin/users.php:5
+#: admin/wpo.php:5
+#: includes/aibots.php:119
+#: includes/audit.php:298
+#: includes/audit.php:327
+#: includes/audit.php:371
+#: includes/diff.php:37
+#: includes/disk.php:299
+#: includes/disk.php:326
+#: includes/users.php:11
+#: includes/wpo.php:262
+#: includes/wpo.php:289
+#: includes/wpo.php:326
+#: sysadmin-total-suite.php:472
+#: sysadmin-total-suite.php:620
+#: sysadmin-total-suite.php:644
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/aibots.php:109
-msgid "403 Forbidden"
-msgstr ""
-
-#: includes/diff.php:43
-msgid "Invalid path"
-msgstr ""
-
-#. translators: %s: file path.
-#: includes/diff.php:51
-#, php-format
-msgid "File not found: %s"
-msgstr ""
-
-#: includes/diff.php:55
-msgid "Only WordPress core files can be compared."
-msgstr ""
-
-#. translators: %s: file path.
-#: includes/diff.php:61
-#, php-format
-msgid "Could not read the current file: %s"
-msgstr ""
-
-#: includes/diff.php:70 includes/diff.php:169
-msgid "Could not fetch the original file."
-msgstr ""
-
-#: includes/diff.php:76
-msgid "No differences found."
-msgstr ""
-
-#: includes/diff.php:102
-msgid "The ZipArchive class is not available in your PHP version."
-msgstr ""
-
-#: includes/diff.php:110
-msgid "Could not create the cache directory. Check permissions."
-msgstr ""
-
-#: includes/diff.php:144 includes/diff.php:152
-msgid "corrupt ZIP"
-msgstr ""
-
-#. translators: %s: file path inside the ZIP.
-#: includes/diff.php:166
-#, php-format
-msgid "does not contain %s"
-msgstr ""
-
-#: includes/users.php:17
-msgid "Invalid user ID"
-msgstr ""
-
-#: includes/users.php:21
-msgid "You cannot delete your own user."
-msgstr ""
-
-#: includes/users.php:26
-msgid "The user does not exist."
-msgstr ""
-
-#: includes/users.php:32
-msgid "You are not allowed to delete this user."
-msgstr ""
-
-#: includes/users.php:47
-msgid "Could not delete the user."
-msgstr ""
-
-#. translators: %s: user login name.
-#: includes/users.php:52
-#, php-format
-msgid "User deleted: %s"
-msgstr ""
-
-#: includes/wpo.php:268
-msgid "Invalid hook"
-msgstr ""
-
-#: includes/wpo.php:271
-msgid ""
-"That hook has a registered action; it is not orphaned and will not be "
-"removed."
-msgstr ""
-
-#. translators: %s: cron hook name.
-#: includes/wpo.php:278
-#, php-format
-msgid "Tasks removed from hook: %s"
-msgstr ""
-
-#. translators: %d: number of transients removed.
-#: includes/wpo.php:342
-#, php-format
-msgid "Expired transients removed: %d"
+#: admin/aibots.php:14
+#: sysadmin-total-suite.php:319
+#: sysadmin-total-suite.php:320
+msgid "AI bot blocking"
 msgstr ""
 
 #: admin/aibots.php:15
-msgid ""
-"Mark as Blocked every AI crawler you do not want to allow. A blocked bot is "
-"added to robots.txt and, if its User-Agent is real, it is also blocked with "
-"a 403 on the front end."
+msgid "Mark as Blocked every AI crawler you do not want to allow. A blocked bot is added to robots.txt and, if its User-Agent is real, it is also blocked with a 403 on the front end."
 msgstr ""
 
 #: admin/aibots.php:18
+#: admin/audit.php:53
 msgid "Settings saved."
 msgstr ""
 
@@ -306,17 +106,11 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: admin/aibots.php:54
-msgid ""
-"⚠ A physical robots.txt exists in the site root: WordPress does not apply "
-"its virtual robots.txt, so the rules will not be added to that file. Edit it "
-"manually or remove it to use the virtual one. (The 403 blocking still works.)"
+msgid "⚠ A physical robots.txt exists in the site root: WordPress does not apply its virtual robots.txt, so the rules will not be added to that file. Edit it manually or remove it to use the virtual one. (The 403 blocking still works.)"
 msgstr ""
 
 #: admin/aibots.php:58
-msgid ""
-"The User-Agent can be spoofed, so the 403 complements — it does not replace "
-"— robots.txt. With page caching (LiteSpeed), the 403 response is marked as "
-"non-cacheable. Remember to press Save changes after modifying the selection."
+msgid "The User-Agent can be spoofed, so the 403 complements — it does not replace — robots.txt. With page caching (LiteSpeed), the 403 response is marked as non-cacheable. Remember to press Save changes after modifying the selection."
 msgstr ""
 
 #. translators: %d: total number of bots in the list.
@@ -333,7 +127,8 @@ msgstr ""
 msgid "User-Agent token"
 msgstr ""
 
-#: admin/aibots.php:77 admin/wpo.php:116
+#: admin/aibots.php:77
+#: admin/wpo.php:116
 msgid "Status"
 msgstr ""
 
@@ -357,6 +152,222 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
+#: admin/audit.php:20
+msgid "Critical"
+msgstr ""
+
+#: admin/audit.php:21
+msgid "High"
+msgstr ""
+
+#: admin/audit.php:22
+msgid "Medium"
+msgstr ""
+
+#: admin/audit.php:23
+msgid "Low"
+msgstr ""
+
+#: admin/audit.php:24
+msgid "None"
+msgstr ""
+
+#: admin/audit.php:25
+msgid "Unrated"
+msgstr ""
+
+#: admin/audit.php:49
+#: sysadmin-total-suite.php:274
+#: sysadmin-total-suite.php:275
+msgid "Plugin audit"
+msgstr ""
+
+#: admin/audit.php:50
+msgid "Checks the installed plugins for pending updates, plugins closed or abandoned on WordPress.org and, optionally, publicly known vulnerabilities."
+msgstr ""
+
+#: admin/audit.php:58
+msgid "Vulnerability database"
+msgstr ""
+
+#: admin/audit.php:65
+msgid "Check installed plugins against the WPVulnerability database"
+msgstr ""
+
+#. translators: 1: link to the WPVulnerability website, 2: link to its privacy policy.
+#: admin/audit.php:72
+#, php-format
+msgid "When enabled, each scan sends the slug of every installed plugin (not its version, nor your site address) to %1$s, a free external service, to look up known vulnerabilities. The version comparison is done on your site. See its %2$s."
+msgstr ""
+
+#: admin/audit.php:74
+msgid "privacy policy"
+msgstr ""
+
+#: admin/audit.php:78
+msgid "Save"
+msgstr ""
+
+#. translators: %s: the "Scan plugins" button label in bold.
+#: admin/audit.php:83
+#: admin/audit.php:88
+#: sysadmin-total-suite.php:381
+msgid "Scan plugins"
+msgstr ""
+
+#. translators: %s: the "Scan plugins" button label in bold.
+#: admin/audit.php:88
+#, php-format
+msgid "No scan available. Run %s to get results."
+msgstr ""
+
+#. translators: %s: date and time of the last scan.
+#: admin/audit.php:95
+#, php-format
+msgid "Last scan: %s"
+msgstr ""
+
+#: admin/audit.php:102
+msgid "Plugins:"
+msgstr ""
+
+#. translators: %d: number of plugins.
+#: admin/audit.php:104
+#, php-format
+msgid "%d with an update"
+msgid_plural "%d with updates"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of plugins.
+#: admin/audit.php:108
+#, php-format
+msgid "%d vulnerable"
+msgid_plural "%d vulnerable"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of plugins.
+#: admin/audit.php:112
+#, php-format
+msgid "%d closed"
+msgid_plural "%d closed"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of plugins.
+#: admin/audit.php:115
+#, php-format
+msgid "%d possibly abandoned"
+msgid_plural "%d possibly abandoned"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %d: number of plugins.
+#: admin/audit.php:119
+#, php-format
+msgid "%d not in the directory"
+msgid_plural "%d not in the directory"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: link to the WordPress updates screen.
+#: admin/audit.php:129
+#, php-format
+msgid "Install pending updates from %s."
+msgstr ""
+
+#: admin/audit.php:130
+msgid "Dashboard → Updates"
+msgstr ""
+
+#: admin/audit.php:139
+msgid "Plugin"
+msgstr ""
+
+#: admin/audit.php:140
+msgid "Update"
+msgstr ""
+
+#: admin/audit.php:141
+msgid "WordPress.org"
+msgstr ""
+
+#: admin/audit.php:142
+msgid "Known vulnerabilities"
+msgstr ""
+
+#. translators: %s: the word "Active" in bold.
+#: admin/audit.php:156
+#: admin/wpo.php:35
+msgid "Active"
+msgstr ""
+
+#: admin/audit.php:158
+msgid "Inactive"
+msgstr ""
+
+#: admin/audit.php:161
+msgid "Removed since the last scan."
+msgstr ""
+
+#. translators: %s: currently installed version.
+#: admin/audit.php:164
+#, php-format
+msgid "Now %s: scan again to refresh."
+msgstr ""
+
+#: admin/audit.php:173
+msgid "Up to date"
+msgstr ""
+
+#. translators: %s: human-readable time difference, e.g. "3 months".
+#: admin/audit.php:183
+#, php-format
+msgid "Updated %s ago"
+msgstr ""
+
+#: admin/audit.php:185
+msgid "Possibly abandoned"
+msgstr ""
+
+#. translators: %s: WordPress version.
+#: admin/audit.php:189
+#, php-format
+msgid "Tested up to %s"
+msgstr ""
+
+#: admin/audit.php:193
+msgid "Closed"
+msgstr ""
+
+#: admin/audit.php:199
+msgid "Not in the directory (premium or custom plugin)"
+msgstr ""
+
+#: admin/audit.php:202
+#: admin/audit.php:213
+msgid "Could not be checked"
+msgstr ""
+
+#: admin/audit.php:211
+msgid "Not checked"
+msgstr ""
+
+#: admin/audit.php:215
+msgid "None known"
+msgstr ""
+
+#: admin/audit.php:225
+msgid "No fix available"
+msgstr ""
+
+#. translators: %d: number of years.
+#: admin/audit.php:247
+#, php-format
+msgid "\"Possibly abandoned\" means no release on WordPress.org in more than %d years. Plugins that are not in the directory cannot be checked for updates or closure. The absence of known vulnerabilities does not guarantee that a plugin is secure."
+msgstr ""
+
 #: admin/dashboard.php:12
 msgid "Core integrity"
 msgstr ""
@@ -365,7 +376,9 @@ msgstr ""
 msgid "Plugin cache purged. The next analysis will start from scratch."
 msgstr ""
 
-#: admin/dashboard.php:24 admin/dashboard.php:169
+#. translators: %s: the "Analyze now" button label in bold.
+#: admin/dashboard.php:24
+#: admin/dashboard.php:169
 msgid "Analyze now"
 msgstr ""
 
@@ -392,29 +405,32 @@ msgstr ""
 #. translators: %s: link to the WordPress core reinstall screen.
 #: admin/dashboard.php:71
 #, php-format
-msgid ""
-"To repair the core, use %s, which is WordPress's own mechanism and replaces "
-"the original files safely."
+msgid "To repair the core, use %s, which is WordPress's own mechanism and replaces the original files safely."
 msgstr ""
 
 #: admin/dashboard.php:72
 msgid "Dashboard → Updates → Reinstall now"
 msgstr ""
 
-#: admin/dashboard.php:121 admin/dashboard.php:159
+#: admin/dashboard.php:121
+#: admin/dashboard.php:159
 msgid "Modified / missing files"
 msgstr ""
 
-#: admin/dashboard.php:130 admin/dashboard.php:200
+#: admin/dashboard.php:130
+#: admin/dashboard.php:200
 msgid "All"
 msgstr ""
 
-#: admin/dashboard.php:132 admin/dashboard.php:202
+#: admin/dashboard.php:132
+#: admin/dashboard.php:202
 msgid "Apply"
 msgstr ""
 
 #. translators: %s: number of items.
-#: admin/dashboard.php:137 admin/dashboard.php:207
+#: admin/dashboard.php:137
+#: admin/dashboard.php:207
+#: admin/disk.php:117
 #, php-format
 msgid "%s item"
 msgid_plural "%s items"
@@ -460,29 +476,205 @@ msgid "Extra files detected"
 msgstr ""
 
 #: admin/dashboard.php:188
-msgid ""
-"These files are not part of the official WordPress core. Review them and "
-"remove any you do not recognise using your hosting file manager or FTP "
-"client."
+msgid "These files are not part of the official WordPress core. Review them and remove any you do not recognise using your hosting file manager or FTP client."
 msgstr ""
 
 #: admin/dashboard.php:228
 msgid "Close"
 msgstr ""
 
+#: admin/disk.php:12
+msgid "WordPress core"
+msgstr ""
+
+#: admin/disk.php:13
+msgid "Uploads (media library)"
+msgstr ""
+
+#: admin/disk.php:14
+#: admin/profiler.php:46
+msgid "Plugins"
+msgstr ""
+
+#: admin/disk.php:15
+msgid "Themes"
+msgstr ""
+
+#: admin/disk.php:16
+msgid "Other wp-content folders"
+msgstr ""
+
+#: admin/disk.php:17
+msgid "Other folders in the site root"
+msgstr ""
+
+#: admin/disk.php:45
+#: includes/disk.php:133
+#: includes/disk.php:143
+msgid "Loose files"
+msgstr ""
+
+#: admin/disk.php:88
+#: sysadmin-total-suite.php:310
+#: sysadmin-total-suite.php:311
+msgid "Disk usage"
+msgstr ""
+
+#: admin/disk.php:89
+msgid "Measures the space used by the site files and the database. This is a read-only report: nothing is modified."
+msgstr ""
+
+#. translators: %s: the "Measure now" button label in bold.
+#: admin/disk.php:92
+#: admin/disk.php:97
+#: sysadmin-total-suite.php:387
+msgid "Measure now"
+msgstr ""
+
+#. translators: %s: the "Measure now" button label in bold.
+#: admin/disk.php:97
+#, php-format
+msgid "No measurement available. Run %s to get results."
+msgstr ""
+
+#. translators: %s: date and time of the last measurement.
+#: admin/disk.php:104
+#, php-format
+msgid "Last measurement: %s"
+msgstr ""
+
+#: admin/disk.php:112
+msgid "Summary"
+msgstr ""
+
+#: admin/disk.php:114
+msgid "Files:"
+msgstr ""
+
+#. translators: %s: number of files.
+#: admin/disk.php:115
+#, php-format
+msgid "%s file"
+msgid_plural "%s files"
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of files.
+#: admin/disk.php:116
+msgid "Database:"
+msgstr ""
+
+#: admin/disk.php:117
+msgid "Media library:"
+msgstr ""
+
+#. translators: 1: free space, 2: total disk size, 3: percentage used.
+#: admin/disk.php:125
+#, php-format
+msgid "Server disk: %1$s free of %2$s (%3$s%% used)"
+msgstr ""
+
+#: admin/disk.php:133
+msgid "On shared hosting this figure may refer to the whole server, not to your plan quota."
+msgstr ""
+
+#: admin/disk.php:150
+msgid "Some folders could not be read because of their permissions and are counted as 0: the real size may be larger."
+msgstr ""
+
+#. translators: %d: seconds.
+#: admin/disk.php:157
+#, php-format
+msgid "Some folders took more than %d seconds and were only partially measured (marked with *): the real size is larger."
+msgstr ""
+
+#: admin/disk.php:171
+msgid "Folders in the site root that are not part of WordPress: other applications, old copies or backups. Check whether you still need them."
+msgstr ""
+
+#: admin/disk.php:173
+msgid "Cache, languages, upgrade leftovers and data from plugins (for example their backups) usually live here."
+msgstr ""
+
+#: admin/disk.php:178
+msgid "Folder"
+msgstr ""
+
+#: admin/disk.php:179
+#: admin/disk.php:239
+#: admin/wpo.php:72
+msgid "Size"
+msgstr ""
+
+#: admin/disk.php:180
+msgid "Files"
+msgstr ""
+
+#: admin/disk.php:208
+msgid "Not readable"
+msgstr ""
+
+#: admin/disk.php:220
+#: admin/wpo.php:203
+msgid "Database"
+msgstr ""
+
+#: admin/disk.php:222
+msgid "The table sizes could not be read (the database user may not have access to information_schema)."
+msgstr ""
+
+#. translators: %s: amount of space.
+#: admin/disk.php:229
+#, php-format
+msgid "Reclaimable space (overhead): %s. It is recovered by optimizing the tables from your hosting panel or phpMyAdmin."
+msgstr ""
+
+#: admin/disk.php:238
+msgid "Table"
+msgstr ""
+
+#: admin/disk.php:240
+msgid "Rows (approx.)"
+msgstr ""
+
+#: admin/disk.php:241
+msgid "Overhead"
+msgstr ""
+
+#. translators: 1: number of tables, 2: their total size.
+#: admin/disk.php:262
+#, php-format
+msgid "The database also contains %1$s table from another application or prefix (%2$s), not included above."
+msgid_plural "The database also contains %1$s tables from other applications or prefixes (%2$s), not included above."
+msgstr[0] ""
+msgstr[1] ""
+
+#: admin/disk.php:272
+msgid "Sizes are the sum of the file sizes; the space actually used on disk and your hosting quota (which may also include email, logs or other sites) can differ."
+msgstr ""
+
+#: admin/profiler.php:11
+#: sysadmin-total-suite.php:283
+#: sysadmin-total-suite.php:284
+msgid "Profiling"
+msgstr ""
+
 #: admin/profiler.php:11
 msgid "No data yet. Use the button below to force a test:"
 msgstr ""
 
-#: admin/profiler.php:16 admin/profiler.php:66
+#: admin/profiler.php:16
+#: admin/profiler.php:66
 msgid "Reset history"
 msgstr ""
 
-#: admin/profiler.php:19 admin/profiler.php:70
+#: admin/profiler.php:19
+#: admin/profiler.php:70
 msgid "Run test"
 msgstr ""
 
-#: admin/profiler.php:20 admin/profiler.php:71
+#: admin/profiler.php:20
+#: admin/profiler.php:71
 msgid "Running test..."
 msgstr ""
 
@@ -490,15 +682,12 @@ msgstr ""
 msgid "Core"
 msgstr ""
 
-#: admin/profiler.php:46
-msgid "Plugins"
-msgstr ""
-
 #: admin/profiler.php:47
 msgid "Theme"
 msgstr ""
 
-#: admin/profiler.php:48 admin/profiler.php:84
+#: admin/profiler.php:48
+#: admin/profiler.php:84
 msgid "MySQL"
 msgstr ""
 
@@ -548,6 +737,12 @@ msgstr ""
 msgid "Total time (ms)"
 msgstr ""
 
+#: admin/users.php:15
+#: sysadmin-total-suite.php:292
+#: sysadmin-total-suite.php:293
+msgid "Check WP users"
+msgstr ""
+
 #: admin/users.php:17
 msgid "Users registered in this WordPress:"
 msgstr ""
@@ -555,9 +750,7 @@ msgstr ""
 #. translators: %s: the word "irreversible" in bold.
 #: admin/users.php:25
 #, php-format
-msgid ""
-"⚠ Deleting a user is %s: it is permanently removed (along with the content "
-"they authored) and cannot be undone."
+msgid "⚠ Deleting a user is %s: it is permanently removed (along with the content they authored) and cannot be undone."
 msgstr ""
 
 #: admin/users.php:26
@@ -580,12 +773,25 @@ msgstr ""
 msgid "Role / Capabilities"
 msgstr ""
 
-#: admin/users.php:39 admin/wpo.php:116
+#: admin/users.php:39
+#: admin/wpo.php:116
 msgid "Actions"
 msgstr ""
 
 #: admin/users.php:56
 msgid "(you)"
+msgstr ""
+
+#: admin/users.php:67
+#: admin/wpo.php:142
+#: sysadmin-total-suite.php:354
+msgid "Delete"
+msgstr ""
+
+#: admin/wpo.php:22
+#: sysadmin-total-suite.php:301
+#: sysadmin-total-suite.php:302
+msgid "WPO"
 msgstr ""
 
 #: admin/wpo.php:23
@@ -622,10 +828,6 @@ msgstr ""
 msgid "%s plugins load on every request; they are the ones impacting speed:"
 msgstr ""
 
-#: admin/wpo.php:35
-msgid "Active"
-msgstr ""
-
 #: admin/wpo.php:37
 msgid "Active plugin"
 msgstr ""
@@ -650,7 +852,8 @@ msgstr ""
 msgid "High (>1 MB)"
 msgstr ""
 
-#: admin/wpo.php:56 admin/wpo.php:135
+#: admin/wpo.php:56
+#: admin/wpo.php:135
 msgid "OK"
 msgstr ""
 
@@ -662,21 +865,17 @@ msgstr ""
 msgid "Expired (junk):"
 msgstr ""
 
-#: admin/wpo.php:70
-msgid ""
-"Largest autoload options (check whether any belongs to an uninstalled "
-"plugin):"
+#: admin/wpo.php:66
+#: sysadmin-total-suite.php:360
+msgid "Clean up expired transients"
 msgstr ""
 
-#: admin/wpo.php:72
-msgid "Size"
+#: admin/wpo.php:70
+msgid "Largest autoload options (check whether any belongs to an uninstalled plugin):"
 msgstr ""
 
 #: admin/wpo.php:82
-msgid ""
-"Automatic deletion of these options is not offered for safety: they could "
-"belong to active plugins. Remove them manually only if you recognize them as "
-"belonging to a removed plugin."
+msgid "Automatic deletion of these options is not offered for safety: they could belong to active plugins. Remove them manually only if you recognize them as belonging to a removed plugin."
 msgstr ""
 
 #: admin/wpo.php:88
@@ -721,6 +920,11 @@ msgstr ""
 
 #: admin/wpo.php:104
 msgid "Junk from removed plugins"
+msgstr ""
+
+#: admin/wpo.php:110
+#: sysadmin-total-suite.php:369
+msgid "Clean up all orphan cron tasks"
 msgstr ""
 
 #: admin/wpo.php:116
@@ -783,7 +987,8 @@ msgstr ""
 msgid "Page cache (LiteSpeed, server level):"
 msgstr ""
 
-#: admin/wpo.php:175 admin/wpo.php:188
+#: admin/wpo.php:175
+#: admin/wpo.php:188
 msgid "enabled"
 msgstr ""
 
@@ -804,10 +1009,7 @@ msgid "state not readable"
 msgstr ""
 
 #: admin/wpo.php:184
-msgid ""
-"LiteSpeed caches on the server, which is why it does not use WP_CACHE or "
-"advanced-cache.php. You can confirm it with the x-litespeed-cache: hit "
-"header on the front end."
+msgid "LiteSpeed caches on the server, which is why it does not use WP_CACHE or advanced-cache.php. You can confirm it with the x-litespeed-cache: hit header on the front end."
 msgstr ""
 
 #: admin/wpo.php:187
@@ -834,6 +1036,251 @@ msgstr ""
 msgid "Environment versions"
 msgstr ""
 
-#: admin/wpo.php:203
-msgid "Database"
+#: includes/aibots.php:109
+msgid "403 Forbidden"
+msgstr ""
+
+#: includes/audit.php:333
+#: includes/disk.php:332
+msgid "No scan in progress."
+msgstr ""
+
+#: includes/diff.php:43
+msgid "Invalid path"
+msgstr ""
+
+#. translators: %s: file path.
+#: includes/diff.php:51
+#, php-format
+msgid "File not found: %s"
+msgstr ""
+
+#: includes/diff.php:55
+msgid "Only WordPress core files can be compared."
+msgstr ""
+
+#. translators: %s: file path.
+#: includes/diff.php:61
+#, php-format
+msgid "Could not read the current file: %s"
+msgstr ""
+
+#: includes/diff.php:70
+#: includes/diff.php:168
+msgid "Could not fetch the original file."
+msgstr ""
+
+#: includes/diff.php:76
+msgid "No differences found."
+msgstr ""
+
+#: includes/diff.php:102
+msgid "The ZipArchive class is not available in your PHP version."
+msgstr ""
+
+#: includes/diff.php:110
+msgid "Could not create the cache directory. Check permissions."
+msgstr ""
+
+#: includes/diff.php:143
+#: includes/diff.php:151
+msgid "corrupt ZIP"
+msgstr ""
+
+#. translators: %s: file path inside the ZIP.
+#: includes/diff.php:165
+#, php-format
+msgid "does not contain %s"
+msgstr ""
+
+#: includes/disk.php:113
+msgid "Files in the site root"
+msgstr ""
+
+#: includes/disk.php:128
+msgid "(network sites)"
+msgstr ""
+
+#: includes/disk.php:155
+msgid "Files in wp-content"
+msgstr ""
+
+#: includes/users.php:17
+msgid "Invalid user ID"
+msgstr ""
+
+#: includes/users.php:21
+msgid "You cannot delete your own user."
+msgstr ""
+
+#: includes/users.php:26
+msgid "The user does not exist."
+msgstr ""
+
+#: includes/users.php:32
+msgid "You are not allowed to delete this user."
+msgstr ""
+
+#: includes/users.php:47
+msgid "Could not delete the user."
+msgstr ""
+
+#. translators: %s: user login name.
+#: includes/users.php:52
+#, php-format
+msgid "User deleted: %s"
+msgstr ""
+
+#: includes/wpo.php:268
+msgid "Invalid hook"
+msgstr ""
+
+#: includes/wpo.php:271
+msgid "That hook has a registered action; it is not orphaned and will not be removed."
+msgstr ""
+
+#. translators: %s: cron hook name.
+#: includes/wpo.php:278
+#, php-format
+msgid "Tasks removed from hook: %s"
+msgstr ""
+
+#. translators: %d: number of transients removed.
+#: includes/wpo.php:342
+#, php-format
+msgid "Expired transients removed: %d"
+msgstr ""
+
+#: sysadmin-total-suite.php:265
+#: sysadmin-total-suite.php:266
+msgid "Integrity"
+msgstr ""
+
+#: sysadmin-total-suite.php:347
+msgid "The operation timed out."
+msgstr ""
+
+#: sysadmin-total-suite.php:348
+msgid "Communication error with the server."
+msgstr ""
+
+#. translators: %s: error message.
+#: sysadmin-total-suite.php:350
+#, php-format
+msgid "Error: %s"
+msgstr ""
+
+#: sysadmin-total-suite.php:351
+msgid "Loading diff..."
+msgstr ""
+
+#: sysadmin-total-suite.php:352
+msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
+msgstr ""
+
+#: sysadmin-total-suite.php:353
+msgid "Deleting..."
+msgstr ""
+
+#: sysadmin-total-suite.php:356
+msgid ""
+"Clean up expired transients?\n"
+"\n"
+"This is safe: they are expired temporary data and WordPress regenerates them when needed."
+msgstr ""
+
+#: sysadmin-total-suite.php:357
+msgid "Cleaning..."
+msgstr ""
+
+#. translators: %d: number of transients removed.
+#: sysadmin-total-suite.php:359
+#, php-format
+msgid "Expired transients removed: %s"
+msgstr ""
+
+#: sysadmin-total-suite.php:361
+msgid "Could not clean up"
+msgstr ""
+
+#. translators: %s: cron hook name.
+#: sysadmin-total-suite.php:364
+#, php-format
+msgid ""
+"Remove the cron tasks for this hook?\n"
+"\n"
+"%s\n"
+"\n"
+"It appears orphaned (no code attached right now), but a plugin may register it only on the front end. A copy of the schedule is saved beforehand so it can be restored manually."
+msgstr ""
+
+#: sysadmin-total-suite.php:365
+msgid ""
+"Remove ALL cron tasks detected as orphaned?\n"
+"\n"
+"Some may belong to plugins that register their hook only on the front end, so review the list first. A copy of the schedule is saved beforehand so it can be restored manually."
+msgstr ""
+
+#. translators: %s: value.
+#: sysadmin-total-suite.php:367
+#, php-format
+msgid "Orphan cron tasks removed: %s"
+msgstr ""
+
+#: sysadmin-total-suite.php:368
+msgid "Cleaned hooks:"
+msgstr ""
+
+#. translators: %s: user login name.
+#: sysadmin-total-suite.php:372
+#, php-format
+msgid ""
+"Are you sure you want to DELETE the user?\n"
+"\n"
+"%s\n"
+"\n"
+"⚠ This action is IRREVERSIBLE: the user is permanently removed and cannot be undone."
+msgstr ""
+
+#. translators: %s: user login name.
+#: sysadmin-total-suite.php:374
+#, php-format
+msgid ""
+"Final confirmation.\n"
+"\n"
+"The user \"%s\" and the content they authored will be removed.\n"
+"\n"
+"Continue with permanent deletion?"
+msgstr ""
+
+#: sysadmin-total-suite.php:375
+msgid "Could not delete the user"
+msgstr ""
+
+#: sysadmin-total-suite.php:377
+msgid "Preparing the scan..."
+msgstr ""
+
+#. translators: 1: plugins checked so far, 2: total plugins.
+#: sysadmin-total-suite.php:379
+#, php-format
+msgid "Checking plugins: %1$s of %2$s..."
+msgstr ""
+
+#: sysadmin-total-suite.php:380
+msgid "Scan complete. Reloading..."
+msgstr ""
+
+#: sysadmin-total-suite.php:383
+msgid "Listing folders..."
+msgstr ""
+
+#. translators: 1: folders measured so far, 2: total folders.
+#: sysadmin-total-suite.php:385
+#, php-format
+msgid "Measuring folders: %1$s of %2$s..."
+msgstr ""
+
+#: sysadmin-total-suite.php:386
+msgid "Measurement complete. Reloading..."
 msgstr ""

@@ -207,60 +207,74 @@ jQuery(document).ready(function ($) {
         });
     });
 
-    // Auditoría de plugins: escaneo por lotes (una petición AJAX por lote) para
-    // no superar el tiempo máximo de ejecución en sitios con muchos plugins.
-    $(document).on('click', '.stsuite-audit-scan', function (e) {
-        e.preventDefault();
-        const button = $(this);
+    // Escaneo por lotes (auditoría de plugins, espacio en disco): una petición
+    // AJAX de inicio y luego una por lote, para no superar el tiempo máximo de
+    // ejecución en sitios grandes. Al terminar se recarga la página.
+    function runBatches(button, opts) {
         const nonce = button.data('nonce');
-        const progress = $('#stsuiteAuditProgress');
+        const progress = $(opts.progress);
 
+        function showProgress(done, total) {
+            progress.text(String(opts.labels.progress || '').replace('%1$s', done).replace('%2$s', total));
+        }
         function fail(msg) {
             progress.text(fmt(T.errorPrefix, msg));
-            button.prop('disabled', false).text(T.auditScan);
+            button.prop('disabled', false).text(opts.labels.button);
         }
-
-        function step() {
+        function request(action, onSuccess) {
             $.ajax({
                 url: STSUITE_AJAX.ajax_url,
                 type: 'POST',
-                data: { action: 'stsuite_audit_step', nonce: nonce },
+                data: { action: action, nonce: nonce },
                 timeout: 120000,
                 success: function (res) {
                     if (!res || !res.success) {
                         return fail(res && res.data && res.data.message ? res.data.message : T.commError);
                     }
-                    if (res.data.done) {
-                        progress.text(T.auditDone);
-                        location.reload();
-                        return;
-                    }
-                    progress.text(String(T.auditProgress || '').replace('%1$s', res.data.processed).replace('%2$s', res.data.total));
-                    step();
+                    onSuccess(res.data);
                 },
                 error: function (jqXHR, textStatus) {
                     fail(serverErrorMessage(jqXHR, textStatus));
                 }
             });
         }
+        function step() {
+            request(opts.step, function (data) {
+                if (data.done) {
+                    progress.text(opts.labels.done);
+                    location.reload();
+                    return;
+                }
+                showProgress(data.processed, data.total);
+                step();
+            });
+        }
 
         button.prop('disabled', true);
-        progress.text(T.auditStarting);
-        $.ajax({
-            url: STSUITE_AJAX.ajax_url,
-            type: 'POST',
-            data: { action: 'stsuite_audit_start', nonce: nonce },
-            timeout: 60000,
-            success: function (res) {
-                if (!res || !res.success) {
-                    return fail(res && res.data && res.data.message ? res.data.message : T.commError);
-                }
-                progress.text(String(T.auditProgress || '').replace('%1$s', 0).replace('%2$s', res.data.total));
-                step();
-            },
-            error: function (jqXHR, textStatus) {
-                fail(serverErrorMessage(jqXHR, textStatus));
-            }
+        progress.text(opts.labels.starting);
+        request(opts.start, function (data) {
+            showProgress(0, data.total);
+            step();
+        });
+    }
+
+    $(document).on('click', '.stsuite-audit-scan', function (e) {
+        e.preventDefault();
+        runBatches($(this), {
+            start: 'stsuite_audit_start',
+            step: 'stsuite_audit_step',
+            progress: '#stsuiteAuditProgress',
+            labels: { starting: T.auditStarting, progress: T.auditProgress, done: T.auditDone, button: T.auditScan }
+        });
+    });
+
+    $(document).on('click', '.stsuite-disk-scan', function (e) {
+        e.preventDefault();
+        runBatches($(this), {
+            start: 'stsuite_disk_start',
+            step: 'stsuite_disk_step',
+            progress: '#stsuiteDiskProgress',
+            labels: { starting: T.diskStarting, progress: T.diskProgress, done: T.diskDone, button: T.diskScan }
         });
     });
 

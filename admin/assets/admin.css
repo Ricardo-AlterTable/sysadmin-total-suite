@@ -544,6 +544,28 @@ body {
 .diff-del { color: #ff5c5c; }
 .diff-ctx { color: #8aa0b4; }
 
+/* ---- Espacio en disco ---- */
+.stsuite-table .stsuite-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.stsuite-bar-cell { width: 28%; }
+.stsuite-bar {
+    display: block;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    overflow: hidden;
+}
+.stsuite-bar > span {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    border-radius: 999px;
+    background: var(--stsuite-grad);
+}
+.wrap details summary { cursor: pointer; color: var(--stsuite-text); }
+.wrap details[open] summary { margin-bottom: 6px; }
+.stsuite-table--nested { margin: 4px 0 0; background: transparent; border: 0; }
+.stsuite-table--nested td { padding: 4px 10px; font-size: 12px; }
+
 /* ---- Responsive ---- */
 @media (max-width: 782px) {
     .stsuite-file-path { max-width: 100%; }

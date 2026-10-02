@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Sysadmin Total Suite
- * Description: Core integrity checks, plugin vulnerability audit, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 5.2
+ * Description: Core integrity checks, plugin vulnerability audit, load-time profiling, disk usage, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
+ * Version: 5.3
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -15,7 +15,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('STSUITE_VERSION', '5.2');
+define('STSUITE_VERSION', '5.3');
 define('STSUITE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('STSUITE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -29,6 +29,7 @@ require_once STSUITE_PLUGIN_DIR . 'includes/users.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/wpo.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/aibots.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/audit.php';
+require_once STSUITE_PLUGIN_DIR . 'includes/disk.php';
 
 /**
  * Migración única de los datos guardados con el prefijo anterior ('wps_'),
@@ -306,6 +307,15 @@ add_action('admin_menu', function () {
 
     add_submenu_page(
         'sysadmin-total-suite',
+        esc_html__('Disk usage', 'sysadmin-total-suite'),
+        esc_html__('Disk usage', 'sysadmin-total-suite'),
+        stsuite_disk_capability(),
+        'sysadmin-total-suite-disk',
+        'stsuite_profiler_disk_page'
+    );
+
+    add_submenu_page(
+        'sysadmin-total-suite',
         esc_html__('AI bot blocking', 'sysadmin-total-suite'),
         esc_html__('AI bot blocking', 'sysadmin-total-suite'),
         'manage_options',
@@ -369,6 +379,12 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'auditProgress'    => __('Checking plugins: %1$s of %2$s...', 'sysadmin-total-suite'),
             'auditDone'        => __('Scan complete. Reloading...', 'sysadmin-total-suite'),
             'auditScan'        => __('Scan plugins', 'sysadmin-total-suite'),
+            // Disk usage
+            'diskStarting'     => __('Listing folders...', 'sysadmin-total-suite'),
+            /* translators: 1: folders measured so far, 2: total folders. */
+            'diskProgress'     => __('Measuring folders: %1$s of %2$s...', 'sysadmin-total-suite'),
+            'diskDone'         => __('Measurement complete. Reloading...', 'sysadmin-total-suite'),
+            'diskScan'         => __('Measure now', 'sysadmin-total-suite'),
         ],
     ]);
 });
@@ -394,6 +410,10 @@ function stsuite_profiler_users_page() {
 
 function stsuite_profiler_wpo_page() {
     include STSUITE_PLUGIN_DIR . 'admin/wpo.php';
+}
+
+function stsuite_profiler_disk_page() {
+    include STSUITE_PLUGIN_DIR . 'admin/disk.php';
 }
 
 function stsuite_profiler_aibots_page() {

@@ -2,13 +2,13 @@
 Contributors: ricardomorales
 Tags: security, performance, integrity, profiling, ai-bots
 Requires at least: 5.3
-Tested up to: 7.0
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.2
+Stable tag: 5.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Core integrity, plugin vulnerability audit, load-time profiling, user review, performance diagnostics and AI bot blocking in one admin panel.
+Core integrity, plugin vulnerability audit, profiling, disk usage, user review, WPO diagnostics and AI bot blocking in one admin panel.
 
 == Description ==
 
@@ -17,6 +17,7 @@ This plugin brings together several maintenance tools for WordPress in one admin
 * **Core integrity**: verifies your WordPress files against the official checksums and reports which ones are modified, missing or not part of the core. For a modified file it can show a diff against the official copy, so you can see exactly what changed. The plugin never modifies your files: to repair the core it points you to Dashboard > Updates > Reinstall now, which is WordPress's own mechanism.
 * **Plugin audit**: lists the installed plugins with their pending updates and flags the ones that have been closed on WordPress.org or have not been updated in more than two years. Optionally, and only after you enable it, it checks them against the free WPVulnerability database and shows the publicly known vulnerabilities that affect the installed version, with their severity and references (CVE and others). Updates are always installed through WordPress's own Updates screen.
 * **Profiling**: measures the front page load time (core, plugins, theme, SQL and outgoing HTTP calls), keeps a history and displays it as charts.
+* **Disk usage**: a read-only report of the space used by the WordPress core, the uploads (by year and month), each plugin and theme, the other wp-content folders (cache, plugin backups...) and any non-WordPress folder in the site root, plus the size and overhead of every database table and the free space on the server disk. Large sites are measured in batches to avoid timeouts.
 * **Check users**: lists the registered users (name, registration date, role) and lets you delete them with a double confirmation.
 * **WPO (Web Performance Optimization)**: active plugins, size of the autoloaded options, expired transients, WP-Cron status including cleanup of orphaned tasks, cache detection and environment versions (PHP, MySQL/MariaDB, WordPress).
 * **AI bot blocking**: robots.txt opt-out plus real User-Agent blocking (HTTP 403) for AI crawlers, selectable bot by bot.
@@ -45,7 +46,7 @@ The official package is used **only** as a read-only reference copy of the core,
 
 1. Upload the plugin folder to `/wp-content/plugins/` or install it from your WordPress dashboard.
 2. Activate the plugin through the Plugins menu.
-3. Open the plugin menu and its sections: Integrity, Plugin audit, Profiling, Check users, WPO and AI bot blocking.
+3. Open the plugin menu and its sections: Integrity, Plugin audit, Profiling, Check users, WPO, Disk usage and AI bot blocking.
 
 Optional: to measure the SQL query time in the Profiling section, add `define('SAVEQUERIES', true);` to `wp-config.php`. Leaving it permanently enabled in production is not recommended because of its overhead.
 
@@ -97,6 +98,14 @@ No. It only means that the database has no public report affecting the installed
 
 It is a premium or custom plugin that is not hosted on WordPress.org, so its updates and closure status cannot be checked there. Its vulnerability check still runs by slug, but if a different plugin shares that slug the result may not apply.
 
+= Why does Disk usage show a different size than my hosting panel? =
+
+The plugin adds up the size of the files it can read inside the WordPress installation and the size of its database tables. Your hosting quota may also count email, logs, other sites or the space taken by file system blocks, and some folders may not be readable because of their permissions (they are flagged in the report).
+
+= Does Disk usage delete anything? =
+
+No. It is a read-only report.
+
 = Does the plugin update or install plugins? =
 
 No. It only reports. Updates are installed from Dashboard > Updates, which is WordPress's own mechanism.
@@ -109,6 +118,14 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 4. AI bot blocking: per-bot selection.
 
 == Changelog ==
+
+= 5.3 =
+* New "Plugin audit" section: pending updates, plugins closed or not updated on WordPress.org for more than two years and, only after you enable it, publicly known vulnerabilities (CVE and others) of the installed versions, from the free WPVulnerability database. Only plugin slugs are sent; the version comparison is done locally.
+* New "Disk usage" section: read-only report of the space used by the core, uploads (by year and month), plugins, themes, other wp-content folders, non-WordPress folders in the site root and database tables, plus the free disk space. Measured in batches to avoid timeouts.
+* In multisite, both new sections require network administrator capabilities.
+* The readme no longer mentions restoring core files, which was removed in 5.0. The external services section now documents every service used.
+* Uninstall also removes the option used for the old prefix migration.
+* Tested up to WordPress 7.1.
 
 = 5.2 =
 * Fixed a false positive: a site running the international WordPress package while using a translated locale reported core files such as wp-includes/version.php as modified. Files are now also compared against the international package before being flagged.
@@ -174,6 +191,9 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 * Integrity limited to the real core; locale alignment in diff and restore; nonce and interface fixes.
 
 == Upgrade Notice ==
+
+= 5.3 =
+New Plugin audit (updates, closed or abandoned plugins and optional vulnerability check) and Disk usage sections.
 
 = 5.0 =
 The integrity section becomes a read-only report; file restore, backups and extra file deletion have been removed.

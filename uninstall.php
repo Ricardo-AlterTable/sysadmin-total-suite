@@ -19,6 +19,7 @@ $stsuite_options = [
     'stsuite_migrated_prefix',
     'stsuite_audit_results',
     'stsuite_audit_settings',
+    'stsuite_disk_results',
 ];
 
 /**
