@@ -85,7 +85,7 @@ uasort($stsuite_items, function ($stsuite_a, $stsuite_b) {
     </div>
 
     <?php if (empty($stsuite_items)): ?>
-        <p><?php /* translators: %s: the "Scan plugins" button label in bold. */ printf(esc_html__('No scan available. Run %s to get results.', 'sysadmin-total-suite'), '<strong>' . esc_html__('Scan plugins', 'sysadmin-total-suite') . '</strong>'); ?></p>
+        <p><?php /* translators: %s: the button label in bold. */ printf(esc_html__('No scan available. Run %s to get results.', 'sysadmin-total-suite'), '<strong>' . esc_html__('Scan plugins', 'sysadmin-total-suite') . '</strong>'); ?></p>
     <?php else: ?>
 
         <p class="stsuite-kv">
