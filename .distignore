@@ -1,0 +1,36 @@
+# Archivos que no forman parte del paquete distribuible (wp dist-archive / SVN de WordPress.org).
+
+# Contexto y herramientas de desarrollo
+/.claude
+/CLAUDE.md
+/docs
+/README.md
+
+# Control de versiones y CI
+/.git
+/.github
+/.gitignore
+/.gitattributes
+/.distignore
+
+# Dependencias y herramientas
+/node_modules
+/vendor
+/composer.json
+/composer.lock
+/package.json
+/package-lock.json
+/phpcs.xml
+/phpcs.xml.dist
+/phpstan.neon
+/phpstan.neon.dist
+/phpunit.xml
+/phpunit.xml.dist
+/tests
+
+# Sistema / editores
+.DS_Store
+Thumbs.db
+*.log
+.idea
+.vscode

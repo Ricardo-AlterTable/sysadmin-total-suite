@@ -1,0 +1,10 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Contexto de desarrollo (solo local, no se publica)
+/CLAUDE.md
+/docs/
+/.claude/
+# Depende de docs/phpstan-bootstrap.php, que es local
+/phpstan.neon.dist

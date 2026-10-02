@@ -207,6 +207,63 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    // Auditoría de plugins: escaneo por lotes (una petición AJAX por lote) para
+    // no superar el tiempo máximo de ejecución en sitios con muchos plugins.
+    $(document).on('click', '.stsuite-audit-scan', function (e) {
+        e.preventDefault();
+        const button = $(this);
+        const nonce = button.data('nonce');
+        const progress = $('#stsuiteAuditProgress');
+
+        function fail(msg) {
+            progress.text(fmt(T.errorPrefix, msg));
+            button.prop('disabled', false).text(T.auditScan);
+        }
+
+        function step() {
+            $.ajax({
+                url: STSUITE_AJAX.ajax_url,
+                type: 'POST',
+                data: { action: 'stsuite_audit_step', nonce: nonce },
+                timeout: 120000,
+                success: function (res) {
+                    if (!res || !res.success) {
+                        return fail(res && res.data && res.data.message ? res.data.message : T.commError);
+                    }
+                    if (res.data.done) {
+                        progress.text(T.auditDone);
+                        location.reload();
+                        return;
+                    }
+                    progress.text(String(T.auditProgress || '').replace('%1$s', res.data.processed).replace('%2$s', res.data.total));
+                    step();
+                },
+                error: function (jqXHR, textStatus) {
+                    fail(serverErrorMessage(jqXHR, textStatus));
+                }
+            });
+        }
+
+        button.prop('disabled', true);
+        progress.text(T.auditStarting);
+        $.ajax({
+            url: STSUITE_AJAX.ajax_url,
+            type: 'POST',
+            data: { action: 'stsuite_audit_start', nonce: nonce },
+            timeout: 60000,
+            success: function (res) {
+                if (!res || !res.success) {
+                    return fail(res && res.data && res.data.message ? res.data.message : T.commError);
+                }
+                progress.text(String(T.auditProgress || '').replace('%1$s', 0).replace('%2$s', res.data.total));
+                step();
+            },
+            error: function (jqXHR, textStatus) {
+                fail(serverErrorMessage(jqXHR, textStatus));
+            }
+        });
+    });
+
     // Bloqueo bots IA: aplicar a todos (bloquear / permitir)
     $(document).on('click', '.stsuite-bots-block-all', function (e) {
         e.preventDefault();

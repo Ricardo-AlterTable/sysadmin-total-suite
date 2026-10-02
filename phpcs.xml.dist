@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!--
+  Reglas equivalentes a las de Plugin Check (WordPress.org): seguridad, base de
+  datos, API de WordPress, prefijos, i18n y compatibilidad de versiones.
+  No incluye las reglas de formato (espacios, Yoda...) porque el plugin no sigue
+  ese estilo y Plugin Check no las exige.
+-->
+<ruleset name="Sysadmin Total Suite">
+    <description>Comprobaciones tipo Plugin Check para Sysadmin Total Suite.</description>
+
+    <file>.</file>
+    <exclude-pattern>/.claude/*</exclude-pattern>
+    <exclude-pattern>/docs/*</exclude-pattern>
+    <exclude-pattern>/vendor/*</exclude-pattern>
+    <exclude-pattern>/node_modules/*</exclude-pattern>
+    <exclude-pattern>*.min.js</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <!-- Versiones mínimas declaradas en la cabecera del plugin. -->
+    <config name="testVersion" value="7.4-"/>
+    <config name="minimum_wp_version" value="5.3"/>
+
+    <!-- Compatibilidad PHP 7.4+ -->
+    <rule ref="PHPCompatibilityWP"/>
+
+    <!-- Seguridad: escapado, nonces, saneado -->
+    <rule ref="WordPress.Security"/>
+
+    <!-- Base de datos -->
+    <rule ref="WordPress.DB"/>
+
+    <!-- API de WordPress: funciones alternativas, obsoletas, i18n... -->
+    <rule ref="WordPress.WP">
+        <!-- Regla de estilo, no la exige Plugin Check. -->
+        <exclude name="WordPress.WP.CapitalPDangit"/>
+    </rule>
+    <rule ref="WordPress.WP.I18n">
+        <properties>
+            <property name="text_domain" type="array">
+                <element value="sysadmin-total-suite"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Prefijos únicos -->
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" type="array">
+                <element value="stsuite"/>
+            </property>
+        </properties>
+    </rule>
+
+    <!-- Funciones PHP desaconsejadas / de desarrollo / restringidas -->
+    <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>
+    <rule ref="WordPress.PHP.DevelopmentFunctions"/>
+    <rule ref="WordPress.PHP.RestrictedPHPFunctions"/>
+    <rule ref="WordPress.PHP.NoSilencedErrors">
+        <properties>
+            <property name="usePHPFunctionsList" value="true"/>
+        </properties>
+    </rule>
+    <rule ref="WordPress.PHP.IniSet"/>
+    <rule ref="WordPress.PHP.DontExtract"/>
+    <rule ref="WordPress.PHP.PregQuoteDelimiter"/>
+    <rule ref="WordPress.PHP.RestrictedPHPFunctions"/>
+    <rule ref="Squiz.PHP.Eval"/>
+    <rule ref="Squiz.PHP.DiscouragedFunctions"/>
+    <rule ref="Generic.PHP.DisallowShortOpenTag"/>
+    <rule ref="Generic.PHP.DisallowAlternativePHPTags"/>
+    <rule ref="Generic.PHP.BacktickOperator"/>
+
+    <!-- Análisis de código -->
+    <rule ref="WordPress.CodeAnalysis"/>
+    <rule ref="Generic.CodeAnalysis.EmptyStatement"/>
+</ruleset>

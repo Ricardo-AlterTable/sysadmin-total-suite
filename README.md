@@ -1,12 +1,13 @@
 # Sysadmin Total Suite
 
-Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, cinco utilidades de mantenimiento del sitio:
+Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, seis utilidades de mantenimiento del sitio:
 
 1. **Integridad del core** — verifica los archivos de WordPress contra los checksums oficiales y muestra las diferencias de los modificados. **Informe de solo lectura**: el plugin no modifica ningún archivo.
-2. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
-3. **Comprobar usuarios WP** — lista los usuarios (nombre, alta, rol) y permite eliminarlos con doble confirmación.
-4. **WPO** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
-5. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
+2. **Auditoría de plugins** — actualizaciones pendientes, plugins cerrados o abandonados en WordPress.org y, si se activa, vulnerabilidades conocidas (CVE) de la versión instalada.
+3. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
+4. **Comprobar usuarios WP** — lista los usuarios (nombre, alta, rol) y permite eliminarlos con doble confirmación.
+5. **WPO** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
+6. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
 
 > ⚠️ Herramienta de administración. Todas las acciones requieren capacidades de administrador y están protegidas con nonces. El plugin **no escribe ni borra nada dentro de los directorios del core** (`wp-admin`, `wp-includes`, raíz). Las operaciones que sí cambian algo (borrar un usuario, limpiar transitorios caducados, eliminar tareas cron huérfanas) actúan sobre la base de datos y piden confirmación.
 
@@ -22,6 +23,13 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **Ver diferencias** (diff) de cualquier archivo modificado contra el original del ZIP oficial, descargado según el **idioma** del sitio (p. ej. `es_ES`) con *fallback* al internacional.
 - Los ficheros ocultos y de configuración de la raíz (`.user.ini`, `ads.txt`, verificaciones de buscadores…) no se marcan como intrusos.
 - Para **reparar** el core, enlaza a *Escritorio → Actualizaciones → Reinstalar ahora*, que es el mecanismo propio de WordPress.
+
+### 🔎 Auditoría de plugins
+- Lista todos los plugins instalados (activos e inactivos) con su **actualización pendiente**, leída de los datos que WordPress ya mantiene.
+- Consulta la API de plugins de **WordPress.org** para detectar plugins **cerrados** (con fecha y motivo), **posiblemente abandonados** (más de 2 años sin versión nueva), la versión con la que se han probado y los que **no están en el directorio** (premium o propios).
+- **Vulnerabilidades conocidas** (opcional, **desactivado por defecto**): consulta la base de datos libre y gratuita [WPVulnerability](https://www.wpvulnerability.com/). Solo se envía el *slug* de cada plugin, nunca la versión ni la URL del sitio: la comparación de versiones se hace en local. Muestra la gravedad (CVSS), si hay parche y las referencias (CVE, Wordfence, WPScan, Patchstack…).
+- El escaneo se hace **por lotes vía AJAX** con barra de progreso, para no agotar el tiempo de ejecución en sitios con muchos plugins.
+- No actualiza ni instala nada: enlaza a *Escritorio → Actualizaciones*.
 
 ### 📊 Profiling
 - Mide el tiempo de la portada desde el **inicio real de la petición** (`$timestart`): Core, Plugins, Tema, MySQL y llamadas HTTP externas.
@@ -55,7 +63,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - WordPress 5.3 o superior.
 - PHP 7.4 o superior.
 - Extensión **ZipArchive** habilitada (necesaria para mostrar el diff contra el paquete oficial).
-- Conexión saliente a `api.wordpress.org` y `*.wordpress.org` (checksums y ZIP oficiales).
+- Conexión saliente a `api.wordpress.org` y `*.wordpress.org` (checksums, ZIP oficiales y datos de plugins) y, solo si activas la comprobación de vulnerabilidades, a `www.wpvulnerability.net`.
 
 ---
 
@@ -63,7 +71,7 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 
 1. Copia la carpeta del plugin en `wp-content/plugins/sysadmin-total-suite/`.
 2. Actívalo desde **Plugins** en el escritorio de WordPress.
-3. Encontrarás el menú **Sysadmin Total Suite** con sus secciones: Integridad, Profiling, Comprobar usuarios WP, WPO y Bloqueo bots IA.
+3. Encontrarás el menú **Sysadmin Total Suite** con sus secciones: Integridad, Auditoría de plugins, Profiling, Comprobar usuarios WP, WPO y Bloqueo bots IA.
 
 > Si usas un plugin/servidor de caché (p. ej. **LiteSpeed**), purga la caché tras actualizar el plugin para que se sirvan los assets nuevos.
 
@@ -84,6 +92,7 @@ El plugin está internacionalizado con **inglés como idioma base**. Solo se inc
 ## Uso
 
 - **Integridad → Analizar ahora**: ejecuta la verificación. Revisa modificados/faltantes/extra y usa *Mostrar cambios* para ver el diff. *Purgar Caché* borra la caché interna del plugin (transient y ZIP descargados).
+- **Auditoría de plugins → Escanear plugins**: revisa actualizaciones, plugins cerrados/abandonados y, si lo has activado, vulnerabilidades conocidas.
 - **Profiling → Lanzar prueba**: genera una medición del home y actualiza las gráficas.
 - **Comprobar usuarios WP**: revisa la tabla y elimina usuarios si es necesario (doble confirmación).
 - **WPO**: revisa los indicadores y usa los botones de limpieza (transitorios caducados, tareas cron huérfanas).
@@ -101,6 +110,7 @@ El plugin está internacionalizado con **inglés como idioma base**. Solo se inc
 - La prueba de profiling (`stsuite_profiling_test`) exige **nonce y `manage_options`**; las visitas normales al home escriben como máximo una medición por minuto.
 - La limpieza de cron solo actúa sobre hooks **sin acción registrada** (huérfanos) y **respalda** la programación en `stsuite_cron_backup` antes de tocar nada.
 - Las consultas a base de datos usan `$wpdb->prepare()` cuando llevan parámetros, con `esc_like()` en los `LIKE`.
+- La consulta a **WPVulnerability** (servicio externo) requiere **consentimiento explícito** (directriz 7 de WordPress.org) y está documentada en `readme.txt`; al desactivarla se borran los datos obtenidos. Los datos externos se sanean al guardarse (solo enlaces `http(s)`, operadores de versión en lista blanca) y se escapan al mostrarse.
 - Las URL de descarga se construyen con la versión y el idioma **saneados** (`[0-9.]` y `[a-zA-Z_]`), evitando la inyección de host (SSRF).
 - Sin `eval()`, `base64_decode()`, ejecución de comandos ni includes dinámicos.
 
@@ -121,12 +131,14 @@ includes/
   users.php                # AJAX: eliminar usuario
   wpo.php                  # Helpers de rendimiento (WPO) + AJAX: limpiar transitorios / cron
   aibots.php               # robots.txt + bloqueo 403 por User-Agent de bots de IA
+  audit.php                # Auditoría de plugins: WordPress.org + WPVulnerability, AJAX por lotes
 admin/
   dashboard.php            # Página Integridad
   profiler.php             # Página Profiling
   users.php                # Página Comprobar usuarios WP
   wpo.php                  # Página WPO
   aibots.php               # Página Bloqueo de bots de IA
+  audit.php                # Página Auditoría de plugins
   assets/
     admin.css              # Tema del panel (paleta en variables CSS)
     admin.js               # Lógica de UI (AJAX, modales, confirmaciones)
@@ -150,6 +162,8 @@ Convenciones: todas las funciones, opciones, transitorios, nonces y acciones AJA
 
 ## Changelog
 
+- **5.2** — Corregido un falso positivo: los sitios con el paquete internacional de WordPress y un idioma traducido marcaban como modificados archivos como `wp-includes/version.php`. Ahora, antes de marcar un archivo, se compara también con los checksums del paquete internacional (`en_US`).
+- **5.1** — Prefijo `stsuite_` en las variables de las vistas del admin, para que el análisis estático no las detecte como globales sin prefijo.
 - **5.0** — La sección de Integridad pasa a ser un **informe de solo lectura**: se eliminan la restauración de archivos, la restauración desde copia, el gestor de copias y el borrado de archivos extra, siguiendo las indicaciones del equipo de revisión de WordPress.org. Se enlaza a la reinstalación oficial del core.
 - **4.2** — Renombrado a *Sysadmin Total Suite* con prefijo `stsuite_` en todo el código; scripts en línea movidos a ficheros encolados; Chart.js actualizada a 4.5.1; se retiran los ficheros de traducción y `load_plugin_textdomain()`; menú en posición no destacada.
 - **3.9 – 4.1** — Cumplimiento de Plugin Check (0 errores / 0 advertencias): comentarios `translators`, escapado de salidas, API de ficheros de WordPress, `LIKE` preparados, `wp_safe_redirect()` y saneado de variables de servidor. Readme en inglés.

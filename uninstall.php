@@ -3,8 +3,9 @@
  * Desinstalación: elimina los datos que crea el plugin.
  *
  * Solo se ejecuta cuando el usuario borra el plugin desde WordPress.
- * NO se eliminan las copias de seguridad de archivos del core: son datos que el
- * usuario ha pedido conservar explícitamente y su borrado sería irreversible.
+ * NO se eliminan las copias de seguridad de archivos del core que pudieran haber
+ * creado versiones anteriores a la 5.0: son datos que el usuario pidió conservar
+ * explícitamente y su borrado sería irreversible.
  */
 
 if (!defined('WP_UNINSTALL_PLUGIN')) {
@@ -15,6 +16,9 @@ $stsuite_options = [
     'stsuite_profiling_history',
     'stsuite_aibots_settings',
     'stsuite_cron_backup',
+    'stsuite_migrated_prefix',
+    'stsuite_audit_results',
+    'stsuite_audit_settings',
 ];
 
 /**

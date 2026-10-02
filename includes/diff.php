@@ -134,9 +134,8 @@ function stsuite_fetch_core_file_from_zip(string $version, string $relative_path
             }
         }
 
-        // El handle del ZIP se reutiliza durante toda la petición: en una
-        // restauración masiva, reabrir un archivo de ~30 MB por cada fichero
-        // agotaba el tiempo de ejecución y dejaba el core a medio restaurar.
+        // El handle del ZIP se reutiliza durante toda la petición para no
+        // reabrir un archivo de ~30 MB cada vez que se lee un fichero de él.
         static $handles = [];
         if (!isset($handles[$zip_path])) {
             $zip = new ZipArchive();

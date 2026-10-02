@@ -246,6 +246,29 @@ body {
 }
 .stsuite-tag--danger { background: rgba(251, 92, 116, 0.16); color: #ff9caa; }
 .stsuite-tag--warn   { background: rgba(251, 191, 36, 0.16); color: var(--stsuite-warn); }
+.stsuite-tag--ok     { background: rgba(52, 211, 153, 0.16); color: var(--stsuite-ok); }
+.stsuite-tag--muted  { background: rgba(152, 162, 192, 0.14); color: var(--stsuite-muted); }
+
+/* Auditoría de plugins: gravedad de vulnerabilidades (CVSS). */
+.stsuite-vuln-list { margin: 0; padding: 0; list-style: none; }
+.stsuite-vuln-list li { margin: 0 0 10px; line-height: 1.5; }
+.stsuite-vuln-list li:last-child { margin-bottom: 0; }
+.stsuite-sev {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 1px 7px;
+    border-radius: 4px;
+    margin-right: 6px;
+}
+.stsuite-sev--critical { background: rgba(251, 92, 116, 0.28); color: #ffb3bf; }
+.stsuite-sev--high     { background: rgba(251, 92, 116, 0.16); color: #ff9caa; }
+.stsuite-sev--medium   { background: rgba(251, 191, 36, 0.16); color: var(--stsuite-warn); }
+.stsuite-sev--low,
+.stsuite-sev--none,
+.stsuite-sev--unrated  { background: rgba(152, 162, 192, 0.14); color: var(--stsuite-muted); }
+.wrap a.stsuite-vuln-src { font-size: 12px; margin-right: 10px; }
 
 .stsuite-num-warn { color: var(--stsuite-warn); }
 .stsuite-ok-text  { color: var(--stsuite-ok); }

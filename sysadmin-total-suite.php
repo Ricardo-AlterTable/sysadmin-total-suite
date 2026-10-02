@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: Sysadmin Total Suite
- * Description: Core integrity checks, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
+ * Description: Core integrity checks, plugin vulnerability audit, load-time profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
  * Version: 5.2
  * Requires at least: 5.3
  * Requires PHP: 7.4
@@ -28,6 +28,7 @@ require_once STSUITE_PLUGIN_DIR . 'includes/profiler.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/users.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/wpo.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/aibots.php';
+require_once STSUITE_PLUGIN_DIR . 'includes/audit.php';
 
 /**
  * Migración única de los datos guardados con el prefijo anterior ('wps_'),
@@ -56,7 +57,7 @@ add_action('admin_init', function () {
  * Indica si una ruta relativa pertenece realmente al core de WordPress.
  * Solo wp-admin/, wp-includes/ y los ficheros sueltos de la raíz forman parte
  * del ZIP oficial. wp-content/ (temas y plugins) queda fuera: no se puede
- * verificar contra los checksums del core ni restaurar desde él.
+ * verificar contra los checksums del core ni comparar con el ZIP oficial.
  */
 function stsuite_is_core_path($rel) {
     $rel = ltrim(str_replace('\\', '/', $rel), '/');
@@ -68,8 +69,8 @@ function stsuite_is_core_path($rel) {
 
 /**
  * Resuelve una ruta relativa a una ruta absoluta dentro de ABSPATH, de forma
- * segura y SIN exigir que el archivo exista (necesario para restaurar archivos
- * faltantes, donde realpath() devolvería false).
+ * segura. No exige que el archivo exista (realpath() devolvería false), así
+ * que quien la llame debe comprobarlo si lo necesita.
  *
  * Normaliza la ruta resolviendo '.' y '..' de forma léxica y comprueba que el
  * resultado siga dentro de la raíz del sitio. Además, si el directorio padre ya
@@ -138,8 +139,9 @@ function stsuite_relative_site_path($abs) {
  * Protege un directorio frente a listado y acceso directo por HTTP.
  *
  * Nota: .htaccess solo lo respetan Apache/LiteSpeed. En nginx hay que denegar
- * la ruta en la configuración del servidor, por eso el contenido se guarda
- * además con una extensión neutralizada (.bak) para que no sea ejecutable.
+ * la ruta en la configuración del servidor. Lo único que se guarda ahí es el
+ * ZIP oficial de WordPress (público y no ejecutable), así que no se expone nada
+ * sensible si el servidor no aplica la protección.
  */
 function stsuite_protect_dir($dir) {
     $dir = trailingslashit($dir);
@@ -181,20 +183,6 @@ function stsuite_plugin_dir_in_uploads($name, $subdir = '') {
     $rel  = str_replace($root, '', wp_normalize_path(trailingslashit($dir)));
 
     return ['dir' => trailingslashit($dir), 'rel' => $rel];
-}
-
-
-
-/**
- * Borra un archivo y devuelve si ha desaparecido.
- *
- * wp_delete_file() no devuelve valor, de ahí este envoltorio para los sitios
- * donde hay que informar del resultado al usuario.
- */
-function stsuite_delete_file($path) {
-    wp_delete_file($path);
-    clearstatcache(true, $path);
-    return !file_exists($path);
 }
 
 /**
@@ -243,8 +231,8 @@ function stsuite_delete_dir($dir) {
 }
 
 /**
- * Eleva los límites de ejecución/memoria en operaciones largas (análisis de
- * miles de ficheros, restauración masiva) para no morir a mitad del proceso.
+ * Eleva los límites de ejecución/memoria en operaciones largas (el análisis
+ * recorre miles de ficheros) para no morir a mitad del proceso.
  */
 function stsuite_raise_limits() {
     if (function_exists('wp_raise_memory_limit')) {
@@ -278,6 +266,15 @@ add_action('admin_menu', function () {
         'manage_options',
         'sysadmin-total-suite',
         'stsuite_profiler_dashboard'
+    );
+
+    add_submenu_page(
+        'sysadmin-total-suite',
+        esc_html__('Plugin audit', 'sysadmin-total-suite'),
+        esc_html__('Plugin audit', 'sysadmin-total-suite'),
+        stsuite_audit_capability(),
+        'sysadmin-total-suite-audit',
+        'stsuite_profiler_audit_page'
     );
 
     add_submenu_page(
@@ -366,6 +363,12 @@ add_action('admin_enqueue_scripts', function ($hook) {
             /* translators: %s: user login name. */
             'confirmDeleteUser2'=> __("Final confirmation.\n\nThe user \"%s\" and the content they authored will be removed.\n\nContinue with permanent deletion?", 'sysadmin-total-suite'),
             'deleteUserError'  => __('Could not delete the user', 'sysadmin-total-suite'),
+            // Plugin audit
+            'auditStarting'    => __('Preparing the scan...', 'sysadmin-total-suite'),
+            /* translators: 1: plugins checked so far, 2: total plugins. */
+            'auditProgress'    => __('Checking plugins: %1$s of %2$s...', 'sysadmin-total-suite'),
+            'auditDone'        => __('Scan complete. Reloading...', 'sysadmin-total-suite'),
+            'auditScan'        => __('Scan plugins', 'sysadmin-total-suite'),
         ],
     ]);
 });
@@ -375,6 +378,10 @@ add_action('admin_enqueue_scripts', function ($hook) {
 // =============================
 function stsuite_profiler_dashboard() {
     include STSUITE_PLUGIN_DIR . 'admin/dashboard.php';
+}
+
+function stsuite_profiler_audit_page() {
+    include STSUITE_PLUGIN_DIR . 'admin/audit.php';
 }
 
 function stsuite_profiler_profiling_page() {
