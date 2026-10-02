@@ -244,9 +244,10 @@ $stsuite_bar = function ($stsuite_part, $stsuite_whole) {
                                 <td class="stsuite-num"><?php echo esc_html(number_format_i18n($stsuite_item['files'])); ?></td>
                                 <td class="stsuite-bar-cell"><?php echo $stsuite_bar($stsuite_item['bytes'], $stsuite_groups[$stsuite_g]['bytes']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- HTML generado arriba con esc_attr. ?></td>
                             </tr>
-                            <?php if (!empty($stsuite_item['children'])): ?>
+                            <?php if (!empty($stsuite_item['children']) && $stsuite_item['files'] > 0): ?>
                                 <?php
                                 // Meses del más reciente al más antiguo; los vacíos solo se cuentan.
+                                // Un año sin ningún archivo no lleva desglose.
                                 $stsuite_children = array_filter($stsuite_item['children'], fn($stsuite_c) => $stsuite_c['files'] > 0);
                                 $stsuite_empty    = count($stsuite_item['children']) - count($stsuite_children);
                                 uksort($stsuite_children, function ($stsuite_a, $stsuite_b) {
