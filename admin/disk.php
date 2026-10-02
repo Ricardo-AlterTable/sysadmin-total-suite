@@ -228,7 +228,7 @@ $stsuite_bar = function ($stsuite_part, $stsuite_whole) {
                                     <?php if ($stsuite_item['path'] !== ''): ?>
                                         <br><code class="stsuite-file-path"><?php echo esc_html($stsuite_item['path']); ?></code>
                                     <?php endif; ?>
-                                    <?php if ($stsuite_g === 'uploads' && $stsuite_name === 'sysadmin-total-suite-quarantine/'): ?>
+                                    <?php if ($stsuite_g === 'uploads' && strpos($stsuite_name, 'sysadmin-total-suite-quarantine') === 0): ?>
                                         <br><span class="stsuite-muted">
                                             <?php
                                             printf(

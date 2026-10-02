@@ -18,11 +18,42 @@ if (!defined('STSUITE_QUARANTINE_DIR')) {
 }
 
 /**
- * Carpeta de cuarentena (protegida frente a acceso HTTP), o '' si no se puede crear.
+ * Nombre de la carpeta de cuarentena: prefijo + clave aleatoria por sitio.
+ *
+ * El .htaccess que protege la carpeta no se aplica en todos los servidores
+ * (nginx no lo lee y LiteSpeed sirve los archivos estáticos sin aplicarlo:
+ * comprobado en producción), así que la protección real es que la ruta no se
+ * pueda adivinar.
  */
-function stsuite_quarantine_dir(): string {
-    $dir = stsuite_plugin_dir_in_uploads(STSUITE_QUARANTINE_DIR);
-    return $dir ? untrailingslashit(wp_normalize_path($dir['dir'])) : '';
+function stsuite_quarantine_dirname(): string {
+    $key = (string) get_option('stsuite_quarantine_key', '');
+    if (!preg_match('/^[a-z0-9]{20}$/', $key)) {
+        $key = strtolower(wp_generate_password(20, false, false));
+        update_option('stsuite_quarantine_key', $key, false);
+    }
+    return STSUITE_QUARANTINE_DIR . '-' . $key;
+}
+
+/**
+ * Valida el nombre de carpeta guardado en un elemento en cuarentena. Los
+ * enviados antes de la clave aleatoria usan el nombre sin sufijo.
+ */
+function stsuite_quarantine_valid_dirname($name): string {
+    $name = (string) $name;
+    return preg_match('/^' . preg_quote(STSUITE_QUARANTINE_DIR, '/') . '(-[a-z0-9]{20})?$/', $name) ? $name : STSUITE_QUARANTINE_DIR;
+}
+
+/**
+ * Ruta absoluta de una carpeta de cuarentena. Con $create, la crea protegida.
+ */
+function stsuite_quarantine_dir(string $name = '', bool $create = true): string {
+    $name = $name !== '' ? stsuite_quarantine_valid_dirname($name) : stsuite_quarantine_dirname();
+    if ($create) {
+        $dir = stsuite_plugin_dir_in_uploads($name);
+        return $dir ? untrailingslashit(wp_normalize_path($dir['dir'])) : '';
+    }
+    $base = stsuite_media_upload_basedir();
+    return $base !== '' ? $base . '/' . $name : '';
 }
 
 /**
@@ -149,8 +180,9 @@ function stsuite_quarantine_add(int $id): string {
     if (get_post_meta($id, STSUITE_QUARANTINE_META, true)) return 'ok';
     if (stsuite_quarantine_is_referenced($id)) return 'referenced';
 
-    $set = stsuite_quarantine_collect($id);
-    $q   = stsuite_quarantine_dir();
+    $set   = stsuite_quarantine_collect($id);
+    $qname = stsuite_quarantine_dirname();
+    $q     = stsuite_quarantine_dir($qname);
     if ($set === null || $q === '') return 'not_supported';
 
     $base  = stsuite_media_upload_basedir();
@@ -173,6 +205,7 @@ function stsuite_quarantine_add(int $id): string {
     update_post_meta($id, STSUITE_QUARANTINE_META, [
         'at'    => time(),
         'by'    => get_current_user_id(),
+        'qdir'  => $qname,
         'dir'   => $set['dir'],
         'files' => $moved,
         'bytes' => $bytes,
@@ -190,7 +223,7 @@ function stsuite_quarantine_restore(int $id): string {
     if (!is_array($data) || empty($data['dir']) || !preg_match('#^\d{4}/\d{2}$#', (string) $data['dir'])) return 'not_found';
 
     $base = stsuite_media_upload_basedir();
-    $q    = stsuite_quarantine_dir();
+    $q    = stsuite_quarantine_dir((string) ($data['qdir'] ?? STSUITE_QUARANTINE_DIR), false);
     $left = [];
     foreach ((array) $data['files'] as $name) {
         $name = basename((string) $name);
@@ -216,7 +249,7 @@ function stsuite_quarantine_delete(int $id): bool {
     $data = get_post_meta($id, STSUITE_QUARANTINE_META, true);
     if (!is_array($data) || !current_user_can('delete_post', $id)) return false;
 
-    $q   = stsuite_quarantine_dir();
+    $q   = stsuite_quarantine_dir((string) ($data['qdir'] ?? STSUITE_QUARANTINE_DIR), false);
     $dir = preg_match('#^\d{4}/\d{2}$#', (string) ($data['dir'] ?? '')) ? (string) $data['dir'] : '';
 
     // API de WordPress: borra el registro, sus metadatos y lanza los hooks de
@@ -349,11 +382,39 @@ add_action('admin_post_stsuite_media_restore', function () {
     // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce comprobado arriba.
     $ids = !empty($_POST['stsuite_all']) ? array_column(stsuite_quarantine_list(), 'id') : stsuite_quarantine_posted_ids();
 
-    $counts = ['done' => 0, 'conflict' => 0];
+    $counts   = ['done' => 0, 'conflict' => 0];
+    $restored = [];
     foreach ($ids as $id) {
         $res = stsuite_quarantine_restore((int) $id);
-        if ($res === 'ok') $counts['done']++;
-        elseif ($res === 'conflict') $counts['conflict']++;
+        if ($res === 'ok') {
+            $counts['done']++;
+            $restored[] = (int) $id;
+        } elseif ($res === 'conflict') {
+            $counts['conflict']++;
+        }
+    }
+
+    // Lo restaurado vuelve a la lista de no usados si sigue sin referencias,
+    // para que no desaparezca del informe hasta el siguiente escaneo.
+    $scan = stsuite_media_results();
+    if ($restored && ($scan['status'] ?? '') === 'done') {
+        $listed = array_flip(array_map('intval', array_column((array) $scan['unused'], 'id')));
+        foreach ($restored as $id) {
+            if (isset($listed[$id]) || stsuite_quarantine_is_referenced($id)) continue;
+            $post = get_post($id);
+            if (!$post) continue;
+            $file = (string) get_post_meta($id, '_wp_attached_file', true);
+            $scan['unused'][] = [
+                'id'     => $id,
+                'title'  => (string) $post->post_title,
+                'file'   => $file,
+                'mime'   => (string) $post->post_mime_type,
+                'date'   => (string) $post->post_date_gmt,
+                'parent' => (int) $post->post_parent,
+                'bytes'  => stsuite_media_attachment_bytes($file, wp_get_attachment_metadata($id)),
+            ];
+        }
+        update_option(STSUITE_MEDIA_OPTION, $scan, false);
     }
     stsuite_quarantine_redirect('restore', $counts);
 });

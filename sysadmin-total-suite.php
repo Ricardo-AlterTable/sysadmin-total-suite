@@ -141,10 +141,12 @@ function stsuite_relative_site_path($abs) {
 /**
  * Protege un directorio frente a listado y acceso directo por HTTP.
  *
- * Nota: .htaccess solo lo respetan Apache/LiteSpeed. En nginx hay que denegar
- * la ruta en la configuración del servidor. Lo único que se guarda ahí es el
- * ZIP oficial de WordPress (público y no ejecutable), así que no se expone nada
- * sensible si el servidor no aplica la protección.
+ * Nota: el .htaccess solo lo aplica Apache por completo. nginx no lo lee y
+ * LiteSpeed sirve los archivos estáticos existentes sin aplicarlo (comprobado
+ * en producción: devuelve 403 para lo inexistente y 200 para un archivo real).
+ * Por eso lo que deba ser privado (la cuarentena) usa además una ruta con una
+ * clave aleatoria. La caché del diff solo guarda el ZIP oficial de WordPress,
+ * que es público, así que no expone nada.
  */
 function stsuite_protect_dir($dir) {
     $dir = trailingslashit($dir);

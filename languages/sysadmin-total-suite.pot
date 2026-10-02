@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T13:17:37+00:00\n"
+"POT-Creation-Date: 2026-10-02T13:29:04+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -49,24 +49,24 @@ msgstr ""
 #: includes/diff.php:37
 #: includes/disk.php:309
 #: includes/disk.php:336
-#: includes/media-quarantine.php:307
-#: includes/media-quarantine.php:344
-#: includes/media-quarantine.php:363
+#: includes/media-quarantine.php:340
+#: includes/media-quarantine.php:377
+#: includes/media-quarantine.php:424
 #: includes/media.php:421
 #: includes/media.php:453
 #: includes/users.php:11
 #: includes/wpo.php:262
 #: includes/wpo.php:289
 #: includes/wpo.php:326
-#: sysadmin-total-suite.php:509
-#: sysadmin-total-suite.php:657
-#: sysadmin-total-suite.php:681
+#: sysadmin-total-suite.php:511
+#: sysadmin-total-suite.php:659
+#: sysadmin-total-suite.php:683
 msgid "Insufficient permissions"
 msgstr ""
 
 #: admin/aibots.php:14
-#: sysadmin-total-suite.php:330
-#: sysadmin-total-suite.php:331
+#: sysadmin-total-suite.php:332
+#: sysadmin-total-suite.php:333
 msgid "AI bot blocking"
 msgstr ""
 
@@ -184,8 +184,8 @@ msgid "Unrated"
 msgstr ""
 
 #: admin/audit.php:49
-#: sysadmin-total-suite.php:276
-#: sysadmin-total-suite.php:277
+#: sysadmin-total-suite.php:278
+#: sysadmin-total-suite.php:279
 msgid "Plugin audit"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgstr ""
 #. translators: %s: the button label in bold.
 #: admin/audit.php:83
 #: admin/audit.php:88
-#: sysadmin-total-suite.php:403
+#: sysadmin-total-suite.php:405
 msgid "Scan plugins"
 msgstr ""
 
@@ -527,8 +527,8 @@ msgid "Loose files"
 msgstr ""
 
 #: admin/disk.php:107
-#: sysadmin-total-suite.php:312
-#: sysadmin-total-suite.php:313
+#: sysadmin-total-suite.php:314
+#: sysadmin-total-suite.php:315
 msgid "Disk usage"
 msgstr ""
 
@@ -539,7 +539,7 @@ msgstr ""
 #. translators: %s: the "Measure now" button label in bold.
 #: admin/disk.php:111
 #: admin/disk.php:116
-#: sysadmin-total-suite.php:409
+#: sysadmin-total-suite.php:411
 msgid "Measure now"
 msgstr ""
 
@@ -639,8 +639,8 @@ msgstr ""
 
 #: admin/disk.php:237
 #: admin/media.php:36
-#: sysadmin-total-suite.php:321
-#: sysadmin-total-suite.php:322
+#: sysadmin-total-suite.php:323
+#: sysadmin-total-suite.php:324
 msgid "Unused media"
 msgstr ""
 
@@ -766,7 +766,7 @@ msgstr ""
 #. translators: %s: the button label in bold.
 #: admin/media.php:120
 #: admin/media.php:125
-#: sysadmin-total-suite.php:415
+#: sysadmin-total-suite.php:417
 msgid "Scan media"
 msgstr ""
 
@@ -867,8 +867,8 @@ msgid "File"
 msgstr ""
 
 #: admin/profiler.php:11
-#: sysadmin-total-suite.php:285
-#: sysadmin-total-suite.php:286
+#: sysadmin-total-suite.php:287
+#: sysadmin-total-suite.php:288
 msgid "Profiling"
 msgstr ""
 
@@ -951,8 +951,8 @@ msgid "Total time (ms)"
 msgstr ""
 
 #: admin/users.php:15
-#: sysadmin-total-suite.php:294
-#: sysadmin-total-suite.php:295
+#: sysadmin-total-suite.php:296
+#: sysadmin-total-suite.php:297
 msgid "Check WP users"
 msgstr ""
 
@@ -992,13 +992,13 @@ msgstr ""
 
 #: admin/users.php:67
 #: admin/wpo.php:142
-#: sysadmin-total-suite.php:376
+#: sysadmin-total-suite.php:378
 msgid "Delete"
 msgstr ""
 
 #: admin/wpo.php:22
-#: sysadmin-total-suite.php:303
-#: sysadmin-total-suite.php:304
+#: sysadmin-total-suite.php:305
+#: sysadmin-total-suite.php:306
 msgid "WPO"
 msgstr ""
 
@@ -1074,7 +1074,7 @@ msgid "Expired (junk):"
 msgstr ""
 
 #: admin/wpo.php:66
-#: sysadmin-total-suite.php:382
+#: sysadmin-total-suite.php:384
 msgid "Clean up expired transients"
 msgstr ""
 
@@ -1131,7 +1131,7 @@ msgid "Junk from removed plugins"
 msgstr ""
 
 #: admin/wpo.php:110
-#: sysadmin-total-suite.php:391
+#: sysadmin-total-suite.php:393
 msgid "Clean up all orphan cron tasks"
 msgstr ""
 
@@ -1360,60 +1360,60 @@ msgstr ""
 msgid "Expired transients removed: %d"
 msgstr ""
 
-#: sysadmin-total-suite.php:267
-#: sysadmin-total-suite.php:268
+#: sysadmin-total-suite.php:269
+#: sysadmin-total-suite.php:270
 msgid "Integrity"
 msgstr ""
 
-#: sysadmin-total-suite.php:369
+#: sysadmin-total-suite.php:371
 msgid "The operation timed out."
 msgstr ""
 
-#: sysadmin-total-suite.php:370
+#: sysadmin-total-suite.php:372
 msgid "Communication error with the server."
 msgstr ""
 
 #. translators: %s: error message.
-#: sysadmin-total-suite.php:372
+#: sysadmin-total-suite.php:374
 #, php-format
 msgid "Error: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:373
+#: sysadmin-total-suite.php:375
 msgid "Loading diff..."
 msgstr ""
 
-#: sysadmin-total-suite.php:374
+#: sysadmin-total-suite.php:376
 msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
 msgstr ""
 
-#: sysadmin-total-suite.php:375
+#: sysadmin-total-suite.php:377
 msgid "Deleting..."
 msgstr ""
 
-#: sysadmin-total-suite.php:378
+#: sysadmin-total-suite.php:380
 msgid ""
 "Clean up expired transients?\n"
 "\n"
 "This is safe: they are expired temporary data and WordPress regenerates them when needed."
 msgstr ""
 
-#: sysadmin-total-suite.php:379
+#: sysadmin-total-suite.php:381
 msgid "Cleaning..."
 msgstr ""
 
 #. translators: %d: number of transients removed.
-#: sysadmin-total-suite.php:381
+#: sysadmin-total-suite.php:383
 #, php-format
 msgid "Expired transients removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:383
+#: sysadmin-total-suite.php:385
 msgid "Could not clean up"
 msgstr ""
 
 #. translators: %s: cron hook name.
-#: sysadmin-total-suite.php:386
+#: sysadmin-total-suite.php:388
 #, php-format
 msgid ""
 "Remove the cron tasks for this hook?\n"
@@ -1423,7 +1423,7 @@ msgid ""
 "It appears orphaned (no code attached right now), but a plugin may register it only on the front end. A copy of the schedule is saved beforehand so it can be restored manually."
 msgstr ""
 
-#: sysadmin-total-suite.php:387
+#: sysadmin-total-suite.php:389
 msgid ""
 "Remove ALL cron tasks detected as orphaned?\n"
 "\n"
@@ -1431,17 +1431,17 @@ msgid ""
 msgstr ""
 
 #. translators: %s: value.
-#: sysadmin-total-suite.php:389
+#: sysadmin-total-suite.php:391
 #, php-format
 msgid "Orphan cron tasks removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:390
+#: sysadmin-total-suite.php:392
 msgid "Cleaned hooks:"
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:394
+#: sysadmin-total-suite.php:396
 #, php-format
 msgid ""
 "Are you sure you want to DELETE the user?\n"
@@ -1452,7 +1452,7 @@ msgid ""
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:396
+#: sysadmin-total-suite.php:398
 #, php-format
 msgid ""
 "Final confirmation.\n"
@@ -1462,52 +1462,52 @@ msgid ""
 "Continue with permanent deletion?"
 msgstr ""
 
-#: sysadmin-total-suite.php:397
+#: sysadmin-total-suite.php:399
 msgid "Could not delete the user"
 msgstr ""
 
-#: sysadmin-total-suite.php:399
-#: sysadmin-total-suite.php:411
+#: sysadmin-total-suite.php:401
+#: sysadmin-total-suite.php:413
 msgid "Preparing the scan..."
 msgstr ""
 
 #. translators: 1: plugins checked so far, 2: total plugins.
-#: sysadmin-total-suite.php:401
+#: sysadmin-total-suite.php:403
 #, php-format
 msgid "Checking plugins: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:402
-#: sysadmin-total-suite.php:414
+#: sysadmin-total-suite.php:404
+#: sysadmin-total-suite.php:416
 msgid "Scan complete. Reloading..."
 msgstr ""
 
-#: sysadmin-total-suite.php:405
+#: sysadmin-total-suite.php:407
 msgid "Listing folders..."
 msgstr ""
 
 #. translators: 1: folders measured so far, 2: total folders.
-#: sysadmin-total-suite.php:407
+#: sysadmin-total-suite.php:409
 #, php-format
 msgid "Measuring folders: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:408
+#: sysadmin-total-suite.php:410
 msgid "Measurement complete. Reloading..."
 msgstr ""
 
 #. translators: 1: current step, 2: total steps.
-#: sysadmin-total-suite.php:413
+#: sysadmin-total-suite.php:415
 #, php-format
 msgid "Looking for references: step %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:416
+#: sysadmin-total-suite.php:418
 msgid "Select at least one item first."
 msgstr ""
 
 #. translators: %s: number of selected media items.
-#: sysadmin-total-suite.php:418
+#: sysadmin-total-suite.php:420
 #, php-format
 msgid ""
 "Move %s media item(s) to quarantine?\n"
@@ -1515,14 +1515,14 @@ msgid ""
 "They will be hidden from the media library and their files moved to a protected folder. Any page that still uses them will show a broken image until you restore them. Nothing is deleted."
 msgstr ""
 
-#: sysadmin-total-suite.php:419
+#: sysadmin-total-suite.php:421
 msgid ""
 "Empty the quarantine?\n"
 "\n"
 "Every media item in it and all its files will be PERMANENTLY deleted."
 msgstr ""
 
-#: sysadmin-total-suite.php:420
+#: sysadmin-total-suite.php:422
 msgid ""
 "Final confirmation.\n"
 "\n"

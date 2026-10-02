@@ -21,6 +21,7 @@ $stsuite_options = [
     'stsuite_audit_settings',
     'stsuite_disk_results',
     'stsuite_media_scan',
+    'stsuite_quarantine_key',
 ];
 
 /**
@@ -36,7 +37,12 @@ function stsuite_uninstall_restore_quarantine() {
         return;
     }
     $base = untrailingslashit(wp_normalize_path($upload['basedir']));
-    $qdir = $base . '/sysadmin-total-suite-quarantine';
+    // Carpetas posibles: la del nombre antiguo y la de la clave aleatoria del sitio.
+    $qdirs = [$base . '/sysadmin-total-suite-quarantine'];
+    $key   = (string) get_option('stsuite_quarantine_key', '');
+    if (preg_match('/^[a-z0-9]{20}$/', $key)) {
+        $qdirs[] = $base . '/sysadmin-total-suite-quarantine-' . $key;
+    }
 
     // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Desinstalación: listado único de adjuntos en cuarentena.
     $ids = $wpdb->get_col($wpdb->prepare("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s", '_stsuite_quarantine'));
@@ -44,10 +50,11 @@ function stsuite_uninstall_restore_quarantine() {
     foreach (array_map('intval', $ids) as $id) {
         $data = get_post_meta($id, '_stsuite_quarantine', true);
         $left = false;
+        $qname = (is_array($data) && preg_match('/^sysadmin-total-suite-quarantine(-[a-z0-9]{20})?$/', (string) ($data['qdir'] ?? ''))) ? $data['qdir'] : 'sysadmin-total-suite-quarantine';
         if (is_array($data) && preg_match('#^\d{4}/\d{2}$#', (string) ($data['dir'] ?? ''))) {
             foreach ((array) $data['files'] as $name) {
                 $name = basename((string) $name);
-                $src  = $qdir . '/' . $data['dir'] . '/' . $name;
+                $src  = $base . '/' . $qname . '/' . $data['dir'] . '/' . $name;
                 $dst  = $base . '/' . $data['dir'] . '/' . $name;
                 if (!is_file($src)) {
                     continue;
@@ -65,29 +72,41 @@ function stsuite_uninstall_restore_quarantine() {
         }
     }
 
-    // La carpeta solo se elimina si ya no guarda ningún medio.
-    if (!$pending && is_dir($qdir)) {
-        $items = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($qdir, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($items as $item) {
-            $name = $item->getFilename();
-            if ($item->isFile() && !in_array($name, ['.htaccess', 'index.php'], true)) {
-                return; // queda algo inesperado: no se toca
-            }
-        }
-        foreach ($items as $item) {
-            if ($item->isDir()) {
-                // Carpetas vacías del propio plugin; si alguna no lo está, se deja.
-                @rmdir($item->getPathname()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
-            } else {
-                wp_delete_file($item->getPathname());
-            }
-        }
-        // Carpeta propia del plugin, ya vacía; si no lo está, se deja.
-        @rmdir($qdir); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
+    // Las carpetas solo se eliminan si ya no guardan ningún medio.
+    if ($pending) {
+        return;
     }
+    foreach ($qdirs as $qdir) {
+        if (is_dir($qdir)) {
+            stsuite_uninstall_remove_empty_dir($qdir);
+        }
+    }
+}
+
+/**
+ * Elimina una carpeta propia del plugin si solo contiene sus ficheros de
+ * protección (.htaccess / index.php) y subcarpetas vacías.
+ */
+function stsuite_uninstall_remove_empty_dir($qdir) {
+    $items = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($qdir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+    foreach ($items as $item) {
+        if ($item->isFile() && !in_array($item->getFilename(), ['.htaccess', 'index.php'], true)) {
+            return; // queda algo inesperado: no se toca
+        }
+    }
+    foreach ($items as $item) {
+        if ($item->isDir()) {
+            // Carpetas vacías del propio plugin; si alguna no lo está, se deja.
+            @rmdir($item->getPathname()); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
+        } else {
+            wp_delete_file($item->getPathname());
+        }
+    }
+    // Carpeta propia del plugin, ya vacía; si no lo está, se deja.
+    @rmdir($qdir); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_rmdir, WordPress.PHP.NoSilencedErrors.Discouraged
 }
 
 /**
