@@ -38,7 +38,9 @@ jQuery(document).ready(function ($) {
         const frag = document.createDocumentFragment();
         text.split("\n").forEach(function (line, i) {
             const span = document.createElement('span');
-            if (line.charAt(0) === '+') {
+            if (line.indexOf('@@') === 0) {
+                span.className = 'diff-hunk';        // cabecera de bloque: @@ -a,b +c,d @@
+            } else if (line.charAt(0) === '+') {
                 span.className = 'diff-add';
             } else if (line.charAt(0) === '-') {
                 span.className = 'diff-del';

@@ -93,18 +93,69 @@ function stsuite_audit_local_plugins(): array {
 }
 
 /**
- * Consulta la ficha de un plugin en la API de WordPress.org.
+ * Inventario local de temas instalados con su actualización pendiente
+ * (transient update_themes, que WordPress ya mantiene).
+ *
+ * @return array<string,array> slug => datos
+ */
+function stsuite_audit_local_themes(): array {
+    $updates = get_site_transient('update_themes');
+    $active  = get_stylesheet();
+    $parent  = get_template();
+    $items   = [];
+
+    foreach (wp_get_themes() as $slug => $theme) {
+        $slug = (string) $slug;
+        $new_version = '';
+        if (is_object($updates) && isset($updates->response[$slug]['new_version'])) {
+            $new_version = (string) $updates->response[$slug]['new_version'];
+        }
+        $items[$slug] = [
+            'name'        => (string) $theme->get('Name'),
+            'version'     => (string) $theme->get('Version'),
+            'slug'        => sanitize_title($slug),
+            'state'       => $slug === $active ? 'active' : ($slug === $parent ? 'parent' : 'inactive'),
+            'new_version' => $new_version,
+            'wporg'       => null,
+            'vulns'       => null,
+        ];
+    }
+    return $items;
+}
+
+/**
+ * Versión del core y actualización disponible (transient update_core).
+ */
+function stsuite_audit_local_core(): array {
+    $version = (string) get_bloginfo('version');
+    $new     = '';
+    $updates = get_site_transient('update_core');
+    if (is_object($updates) && !empty($updates->updates)) {
+        foreach ((array) $updates->updates as $offer) {
+            if (isset($offer->response, $offer->current) && $offer->response === 'upgrade' && version_compare((string) $offer->current, $version, '>')) {
+                $new = (string) $offer->current;
+                break;
+            }
+        }
+    }
+    return ['version' => $version, 'new_version' => $new, 'vulns' => null];
+}
+
+/**
+ * Consulta la ficha de un plugin o tema en la API de WordPress.org.
  * Se piden solo los campos necesarios para que la respuesta sea mínima.
  *
+ * @param string $type 'plugin' | 'theme'.
  * @return array{status:string,last_updated?:int,tested?:string,latest?:string,closed_date?:string,closed_reason?:string,message?:string}
  */
-function stsuite_audit_fetch_wporg(string $slug): array {
+function stsuite_audit_fetch_wporg(string $slug, string $type = 'plugin'): array {
     $fields = [];
-    foreach (['sections', 'description', 'reviews', 'banners', 'icons', 'screenshots', 'contributors', 'versions', 'ratings', 'tags', 'donate_link', 'compatibility', 'downloadlink', 'active_installs'] as $f) {
+    foreach (['sections', 'description', 'reviews', 'banners', 'icons', 'screenshots', 'screenshot_url', 'contributors', 'versions', 'ratings', 'rating', 'tags', 'donate_link', 'compatibility', 'downloadlink', 'active_installs', 'downloaded'] as $f) {
         $fields[$f] = 0;
     }
-    $url = 'https://api.wordpress.org/plugins/info/1.2/?' . http_build_query([
-        'action'  => 'plugin_information',
+    $api = $type === 'theme' ? 'themes' : 'plugins';
+    $url = 'https://api.wordpress.org/' . $api . '/info/1.2/?' . http_build_query([
+        'action'  => $type === 'theme' ? 'theme_information' : 'plugin_information',
         'request' => ['slug' => $slug, 'fields' => $fields],
     ]);
 
@@ -132,7 +183,9 @@ function stsuite_audit_fetch_wporg(string $slug): array {
         return ($code === 404) ? ['status' => 'not_found'] : ['status' => 'error', 'message' => sanitize_text_field((string) $data['error'])];
     }
 
-    $last_updated = isset($data['last_updated']) ? strtotime((string) $data['last_updated']) : false;
+    // Los temas dan la fecha con hora en last_updated_time.
+    $raw_date     = (string) ($data['last_updated_time'] ?? ($data['last_updated'] ?? ''));
+    $last_updated = $raw_date !== '' ? strtotime($raw_date) : false;
 
     return [
         'status'       => 'ok',
@@ -192,17 +245,28 @@ function stsuite_audit_affects(array $vuln, string $version): bool {
 }
 
 /**
- * Consulta las vulnerabilidades conocidas de un plugin en WPVulnerability
- * (https://www.wpvulnerability.com/), un servicio gratuito y abierto.
+ * Consulta las vulnerabilidades conocidas de un plugin, tema o del core en
+ * WPVulnerability (https://www.wpvulnerability.com/), un servicio gratuito y
+ * abierto.
  *
- * Solo se envía el slug del plugin: la versión instalada NO sale del sitio, la
- * comparación se hace aquí. Se devuelven únicamente las vulnerabilidades que
- * afectan a la versión instalada, ya saneadas.
+ * Para plugins y temas solo se envía el slug: la versión instalada NO sale del
+ * sitio, la comparación se hace aquí. El core solo se puede consultar por
+ * versión (/core/X.Y.Z/ devuelve las que afectan a esa versión exacta), así que
+ * en ese caso se envía la versión de WordPress; está declarado en el texto de
+ * consentimiento y en el readme. Se devuelven únicamente las vulnerabilidades
+ * que afectan a la versión instalada, ya saneadas.
  *
+ * @param string $type 'plugin' | 'theme' | 'core' (en 'core', $slug se ignora).
  * @return array{status:string,items?:array,message?:string}
  */
-function stsuite_audit_fetch_vulns(string $slug, string $version): array {
-    $url = 'https://www.wpvulnerability.net/plugin/' . rawurlencode($slug) . '/';
+function stsuite_audit_fetch_vulns(string $slug, string $version, string $type = 'plugin'): array {
+    if ($type === 'core') {
+        $core = preg_replace('/[^0-9.]/', '', $version);
+        if ($core === '') return ['status' => 'error', 'message' => 'version'];
+        $url = 'https://www.wpvulnerability.net/core/' . $core . '/';
+    } else {
+        $url = 'https://www.wpvulnerability.net/' . ($type === 'theme' ? 'theme' : 'plugin') . '/' . rawurlencode($slug) . '/';
+    }
 
     $response = wp_remote_get($url, ['timeout' => 8]);
     if (is_wp_error($response)) {
@@ -234,7 +298,8 @@ function stsuite_audit_fetch_vulns(string $slug, string $version): array {
             'unfixed'      => !empty($op['unfixed']), // la API lo envía como "0" / "1"
         ];
 
-        if (!stsuite_audit_affects($vuln, $version)) continue;
+        // En el core la API ya filtra por la versión consultada.
+        if ($type !== 'core' && !stsuite_audit_affects($vuln, $version)) continue;
 
         // Referencias (CVE, Wordfence, WPScan, Patchstack...): solo enlaces http(s).
         $sources = [];
@@ -256,6 +321,17 @@ function stsuite_audit_fetch_vulns(string $slug, string $version): array {
             $name = (is_array($src) && isset($src['name'])) ? (string) $src['name'] : '';
             if ($name !== '' && stripos($name, 'CVE-') !== 0 && strlen($name) > strlen($title)) {
                 $title = $name;
+            }
+        }
+        // Sin nombre descriptivo (habitual en el core, cuyas fuentes son solo CVE):
+        // la descripción de la primera fuente, sin el prefijo de idioma "[en]".
+        if ($title === '') {
+            foreach ((array) ($v['source'] ?? []) as $src) {
+                $desc = (is_array($src) && !empty($src['description'])) ? trim(preg_replace('/^\[[a-z]{2}\]\s*/i', '', (string) $src['description'])) : '';
+                if ($desc !== '') {
+                    $title = function_exists('mb_strimwidth') ? mb_strimwidth($desc, 0, 160, '…', 'UTF-8') : substr($desc, 0, 160);
+                    break;
+                }
             }
         }
         if ($title === '') $title = (string) ($v['name'] ?? '');
@@ -304,19 +380,28 @@ add_action('wp_ajax_stsuite_audit_start', function () {
     if (function_exists('wp_update_plugins')) {
         wp_update_plugins();
     }
+    if (function_exists('wp_update_themes')) {
+        wp_update_themes();
+    }
 
-    $items = stsuite_audit_local_plugins();
+    $items  = stsuite_audit_local_plugins();
+    $themes = stsuite_audit_local_themes();
+
+    // Cola: 'core', 'theme:<slug>' y los ficheros de plugin.
+    $queue = array_merge(['core'], array_map(fn($slug) => 'theme:' . $slug, array_keys($themes)), array_keys($items));
 
     update_option(STSUITE_AUDIT_OPTION, [
         'status'       => 'running',
         'started_at'   => time(),
         'checked_at'   => 0,
         'vuln_enabled' => stsuite_audit_settings()['vuln_enabled'],
-        'queue'        => array_keys($items),
+        'queue'        => $queue,
         'items'        => $items,
+        'themes'       => $themes,
+        'core'         => stsuite_audit_local_core(),
     ], false);
 
-    wp_send_json_success(['total' => count($items)]);
+    wp_send_json_success(['total' => count($queue)]);
 });
 
 /**
@@ -335,16 +420,27 @@ add_action('wp_ajax_stsuite_audit_step', function () {
 
     stsuite_raise_limits();
 
+    $total = count($results['items']) + count((array) ($results['themes'] ?? [])) + 1;
+    $vulns = !empty($results['vuln_enabled']);
     $batch = array_splice($results['queue'], 0, STSUITE_AUDIT_BATCH);
-    foreach ($batch as $file) {
-        if (!isset($results['items'][$file])) continue;
-        $item = &$results['items'][$file];
-
-        $item['wporg'] = stsuite_audit_fetch_wporg($item['slug']);
-        if (!empty($results['vuln_enabled'])) {
-            $item['vulns'] = stsuite_audit_fetch_vulns($item['slug'], $item['version']);
+    foreach ($batch as $key) {
+        if ($key === 'core') {
+            if ($vulns && isset($results['core'])) {
+                $results['core']['vulns'] = stsuite_audit_fetch_vulns('', $results['core']['version'], 'core');
+            }
+        } elseif (strpos($key, 'theme:') === 0) {
+            $slug = substr($key, 6);
+            if (!isset($results['themes'][$slug])) continue;
+            $results['themes'][$slug]['wporg'] = stsuite_audit_fetch_wporg($results['themes'][$slug]['slug'], 'theme');
+            if ($vulns) {
+                $results['themes'][$slug]['vulns'] = stsuite_audit_fetch_vulns($results['themes'][$slug]['slug'], $results['themes'][$slug]['version'], 'theme');
+            }
+        } elseif (isset($results['items'][$key])) {
+            $results['items'][$key]['wporg'] = stsuite_audit_fetch_wporg($results['items'][$key]['slug']);
+            if ($vulns) {
+                $results['items'][$key]['vulns'] = stsuite_audit_fetch_vulns($results['items'][$key]['slug'], $results['items'][$key]['version']);
+            }
         }
-        unset($item);
     }
 
     $done = empty($results['queue']);
@@ -355,7 +451,6 @@ add_action('wp_ajax_stsuite_audit_step', function () {
     }
     update_option(STSUITE_AUDIT_OPTION, $results, false);
 
-    $total = count($results['items']);
     wp_send_json_success([
         'done'      => $done,
         'total'     => $total,
@@ -378,10 +473,13 @@ add_action('admin_post_stsuite_save_audit', function () {
     // Al retirar el consentimiento se descartan también los datos obtenidos.
     if (!$enabled) {
         $results = stsuite_audit_results();
-        if (!empty($results['items'])) {
-            foreach ($results['items'] as $file => $item) {
-                $results['items'][$file]['vulns'] = null;
+        if ($results) {
+            foreach (['items', 'themes'] as $group) {
+                foreach (array_keys((array) ($results[$group] ?? [])) as $key) {
+                    $results[$group][$key]['vulns'] = null;
+                }
             }
+            if (isset($results['core'])) $results['core']['vulns'] = null;
             $results['vuln_enabled'] = false;
             update_option(STSUITE_AUDIT_OPTION, $results, false);
         }

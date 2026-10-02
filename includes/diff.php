@@ -6,27 +6,96 @@ global $stsuite_fetch_last_error;
 $stsuite_fetch_last_error = '';
 
 /**
- * Simple unified diff renderer: prefer wp_text_diff if available, fallback to a simple line diff.
+ * Diff unificado (como `diff -u`) entre el original y el archivo actual, en
+ * texto plano: bloques "@@ -a,b +c,d @@" con $context líneas de contexto y
+ * líneas prefijadas con " ", "-" o "+".
+ *
+ * Usa Text_Diff, el motor que WordPress incluye para comparar revisiones
+ * (busca la subsecuencia común más larga), así que una línea añadida o
+ * borrada no desplaza el resto del archivo. Si no estuviera disponible, se
+ * recurre a una comparación línea a línea por posición.
+ *
+ * @param string|string[] $old
+ * @param string|string[] $new
+ * @return string '' si no hay diferencias de contenido (p. ej. solo saltos de línea).
  */
-if (!function_exists('stsuite_unified_diff')) {
-    function stsuite_unified_diff($old, $new, $context = 3) {
-        $a = is_array($old) ? $old : explode("\n", str_replace("\r", '', $old));
-        $b = is_array($new) ? $new : explode("\n", str_replace("\r", '', $new));
+function stsuite_unified_diff($old, $new, int $context = 3): string {
+    $a = is_array($old) ? $old : explode("\n", str_replace("\r", '', (string) $old));
+    $b = is_array($new) ? $new : explode("\n", str_replace("\r", '', (string) $new));
+    // El salto de línea final no es una línea más (como en diff).
+    foreach ([&$a, &$b] as &$lines) {
+        if (count($lines) > 1 && end($lines) === '') array_pop($lines);
+    }
+    unset($lines);
 
+    if (!class_exists('Text_Diff', false) && is_file(ABSPATH . WPINC . '/Text/Diff.php')) {
+        require_once ABSPATH . WPINC . '/Text/Diff.php';
+    }
+
+    // Filas: [tipo, texto, nº de línea en el original, nº en el actual].
+    $rows = [];
+    $o = 1;
+    $n = 1;
+    if (class_exists('Text_Diff', false)) {
+        $diff = new Text_Diff('auto', [$a, $b]);
+        foreach ($diff->getDiff() as $op) {
+            $orig  = is_array($op->orig) ? $op->orig : [];
+            $final = is_array($op->final) ? $op->final : [];
+            if ($op instanceof Text_Diff_Op_copy) {
+                foreach ($orig as $line) $rows[] = [' ', $line, $o++, $n++];
+            } else {
+                foreach ($orig as $line) $rows[] = ['-', $line, $o++, $n];
+                foreach ($final as $line) $rows[] = ['+', $line, $o, $n++];
+            }
+        }
+    } else {
         $max = max(count($a), count($b));
-        $lines = [];
         for ($i = 0; $i < $max; $i++) {
             $la = $a[$i] ?? null;
             $lb = $b[$i] ?? null;
             if ($la === $lb) {
-                $lines[] = '  ' . ($la ?? '');
+                $rows[] = [' ', (string) $la, $o++, $n++];
             } else {
-                if ($la !== null) $lines[] = '- ' . $la;
-                if ($lb !== null) $lines[] = '+ ' . $lb;
+                if ($la !== null) $rows[] = ['-', $la, $o++, $n];
+                if ($lb !== null) $rows[] = ['+', $lb, $o, $n++];
             }
         }
-        return implode("\n", $lines);
     }
+
+    // Rangos de filas que se muestran: cada cambio con su contexto, fusionando
+    // los que se solapan o se tocan.
+    $ranges = [];
+    foreach ($rows as $i => $row) {
+        if ($row[0] === ' ') continue;
+        $from = max(0, $i - $context);
+        $to   = min(count($rows) - 1, $i + $context);
+        $last = count($ranges) - 1;
+        if ($last >= 0 && $from <= $ranges[$last][1] + 1) {
+            $ranges[$last][1] = max($ranges[$last][1], $to);
+        } else {
+            $ranges[] = [$from, $to];
+        }
+    }
+    if (!$ranges) return '';
+
+    $out = [];
+    foreach ($ranges as [$from, $to]) {
+        $old_len = 0;
+        $new_len = 0;
+        $body    = [];
+        for ($i = $from; $i <= $to; $i++) {
+            [$type, $text] = $rows[$i];
+            if ($type !== '+') $old_len++;
+            if ($type !== '-') $new_len++;
+            $body[] = $type . $text;
+        }
+        // Como en diff -u: un bloque vacío en un lado empieza en la línea anterior.
+        $old_start = $old_len ? $rows[$from][2] : $rows[$from][2] - 1;
+        $new_start = $new_len ? $rows[$from][3] : $rows[$from][3] - 1;
+        $out[] = sprintf('@@ -%d,%d +%d,%d @@', $old_start, $old_len, $new_start, $new_len);
+        foreach ($body as $line) $out[] = $line;
+    }
+    return implode("\n", $out);
 }
 
 /**
@@ -77,6 +146,9 @@ add_action('wp_ajax_stsuite_show_diff', function () {
     }
 
     $diff = stsuite_unified_diff($original, $current, 3);
+    if ($diff === '') {
+        $diff = __('The contents are identical: the files only differ in their line endings (Windows/Unix).', 'sysadmin-total-suite');
+    }
     wp_send_json_success(['path' => $rel, 'diff' => $diff]);
 });
 

@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Sysadmin Total Suite
- * Description: Core integrity checks, plugin vulnerability audit, load-time profiling, disk usage, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 5.3
+ * Description: Core integrity, vulnerability audit of core, plugins and themes, unused media cleanup, disk usage, profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
+ * Version: 5.4
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -15,7 +15,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('STSUITE_VERSION', '5.3');
+define('STSUITE_VERSION', '5.4');
 define('STSUITE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('STSUITE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -167,27 +167,18 @@ function stsuite_protect_dir($dir) {
 /**
  * Ruta de un directorio de trabajo del plugin dentro de uploads, protegido.
  *
- * @param string $name   Nombre del directorio base.
- * @param string $subdir Subdirectorio opcional dentro del base.
- * @return array{dir:string,rel:string}|false
+ * @param string $name Nombre del directorio.
+ * @return array{dir:string}|false
  */
-function stsuite_plugin_dir_in_uploads($name, $subdir = '') {
+function stsuite_plugin_dir_in_uploads($name) {
     $upload = wp_upload_dir();
     if (!empty($upload['error']) || empty($upload['basedir'])) return false;
 
-    $base = trailingslashit($upload['basedir']) . $name . '/';
-    if (!wp_mkdir_p($base)) return false;
-    stsuite_protect_dir($base);
+    $dir = trailingslashit($upload['basedir']) . $name . '/';
+    if (!wp_mkdir_p($dir)) return false;
+    stsuite_protect_dir($dir);
 
-    $dir = $base . ($subdir !== '' ? trailingslashit($subdir) : '');
-    if ($subdir !== '' && !wp_mkdir_p($dir)) return false;
-
-    // Ruta relativa a la raíz del sitio, derivada de la real (soporta uploads
-    // personalizados y multisitio, donde basedir incluye /sites/N/).
-    $root = wp_normalize_path(trailingslashit(ABSPATH));
-    $rel  = str_replace($root, '', wp_normalize_path(trailingslashit($dir)));
-
-    return ['dir' => trailingslashit($dir), 'rel' => $rel];
+    return ['dir' => $dir];
 }
 
 /**
@@ -275,8 +266,8 @@ add_action('admin_menu', function () {
 
     add_submenu_page(
         'sysadmin-total-suite',
-        esc_html__('Plugin audit', 'sysadmin-total-suite'),
-        esc_html__('Plugin audit', 'sysadmin-total-suite'),
+        esc_html__('Audit', 'sysadmin-total-suite'),
+        esc_html__('Audit', 'sysadmin-total-suite'),
         stsuite_audit_capability(),
         'sysadmin-total-suite-audit',
         'stsuite_profiler_audit_page'
@@ -399,10 +390,10 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'deleteUserError'  => __('Could not delete the user', 'sysadmin-total-suite'),
             // Plugin audit
             'auditStarting'    => __('Preparing the scan...', 'sysadmin-total-suite'),
-            /* translators: 1: plugins checked so far, 2: total plugins. */
-            'auditProgress'    => __('Checking plugins: %1$s of %2$s...', 'sysadmin-total-suite'),
+            /* translators: 1: items checked so far, 2: total items (core, themes and plugins). */
+            'auditProgress'    => __('Checking: %1$s of %2$s...', 'sysadmin-total-suite'),
             'auditDone'        => __('Scan complete. Reloading...', 'sysadmin-total-suite'),
-            'auditScan'        => __('Scan plugins', 'sysadmin-total-suite'),
+            'auditScan'        => __('Scan now', 'sysadmin-total-suite'),
             // Disk usage
             'diskStarting'     => __('Listing folders...', 'sysadmin-total-suite'),
             /* translators: 1: folders measured so far, 2: total folders. */

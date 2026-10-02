@@ -32,8 +32,10 @@ function stsuite_aibots_list(): array {
         'cohere-ai'           => ['cohere-ai', true],
         'YouBot'              => ['YouBot', true],
         'DuckAssistBot'       => ['DuckAssistBot', true],
-        'Google-Extended'     => ['Google-Extended (solo robots.txt)', false],
-        'Applebot-Extended'   => ['Applebot-Extended (solo robots.txt)', false],
+        /* translators: %s: name of an AI crawler. */
+        'Google-Extended'     => [sprintf(__('%s (robots.txt only)', 'sysadmin-total-suite'), 'Google-Extended'), false],
+        /* translators: %s: name of an AI crawler. */
+        'Applebot-Extended'   => [sprintf(__('%s (robots.txt only)', 'sysadmin-total-suite'), 'Applebot-Extended'), false],
     ];
 }
 
@@ -87,7 +89,7 @@ add_action('send_headers', function () {
  * El UA es falsificable, así que esto complementa (no sustituye) a robots.txt.
  */
 add_action('init', function () {
-    if (is_admin() || (defined('DOING_CRON') && DOING_CRON)) return;
+    if (is_admin() || wp_doing_cron()) return;
 
     $blocked = stsuite_aibots_settings()['blocked'];
     if (empty($blocked)) return;

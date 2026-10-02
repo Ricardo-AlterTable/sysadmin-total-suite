@@ -1,14 +1,15 @@
 # Sysadmin Total Suite
 
-Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, siete utilidades de mantenimiento del sitio:
+Plugin de WordPress para **administradores** que reúne, en un panel con estética de *control panel* moderno, ocho utilidades de mantenimiento del sitio:
 
 1. **Integridad del core** — verifica los archivos de WordPress contra los checksums oficiales y muestra las diferencias de los modificados. **Informe de solo lectura**: el plugin no modifica ningún archivo.
-2. **Auditoría de plugins** — actualizaciones pendientes, plugins cerrados o abandonados en WordPress.org y, si se activa, vulnerabilidades conocidas (CVE) de la versión instalada.
+2. **Auditoría** — de WordPress, plugins y temas: actualizaciones pendientes, plugins y temas cerrados o abandonados en WordPress.org y, si se activa, vulnerabilidades conocidas (CVE) de las versiones instaladas.
 3. **Profiling** — mide el tiempo de carga del home (core, plugins, tema, SQL y HTTP) con histórico y gráficas.
 4. **Comprobar usuarios WP** — lista los usuarios (nombre, alta, rol) y permite eliminarlos con doble confirmación.
 5. **WPO** — chequeo rápido de rendimiento: plugins activos, basura en `wp_options`, WP-Cron, caché y versiones del entorno.
 6. **Espacio en disco** — informe de solo lectura del espacio que ocupan core, uploads (por año y mes), plugins, temas, otras carpetas y tablas de la base de datos.
-7. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
+7. **Medios no usados** — imágenes y archivos de la biblioteca sin referencias en el sitio y archivos huérfanos de uploads, con una **cuarentena reversible** antes de borrar nada.
+8. **Bloqueo de bots de IA** — opt-out en `robots.txt` y bloqueo real por User-Agent (403) para rastreadores de IA.
 
 > ⚠️ Herramienta de administración. Todas las acciones requieren capacidades de administrador y están protegidas con nonces. El plugin **no escribe ni borra nada dentro de los directorios del core** (`wp-admin`, `wp-includes`, raíz). Las operaciones que sí cambian algo (borrar un usuario, limpiar transitorios caducados, eliminar tareas cron huérfanas) actúan sobre la base de datos y piden confirmación.
 
@@ -21,14 +22,16 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - Comprueba **solo el core real**: `wp-admin/`, `wp-includes/` y los archivos sueltos de la raíz. Ignora `wp-content/` (temas y plugins) para evitar falsos positivos.
 - Clasifica los hallazgos en **Modificados**, **Faltantes** y **Extra** (archivos no reconocidos por el core).
 - Mensajes separados: el estado del core no se mezcla con el de los archivos extra.
-- **Ver diferencias** (diff) de cualquier archivo modificado contra el original del ZIP oficial, descargado según el **idioma** del sitio (p. ej. `es_ES`) con *fallback* al internacional.
+- **Ver diferencias** (diff unificado real, con 3 líneas de contexto, mediante el motor `Text_Diff` de WordPress) de cualquier archivo modificado contra el original del ZIP oficial, descargado según el **idioma** del sitio (p. ej. `es_ES`) con *fallback* al internacional.
 - Los ficheros ocultos y de configuración de la raíz (`.user.ini`, `ads.txt`, verificaciones de buscadores…) no se marcan como intrusos.
 - Para **reparar** el core, enlaza a *Escritorio → Actualizaciones → Reinstalar ahora*, que es el mecanismo propio de WordPress.
 
-### 🔎 Auditoría de plugins
+### 🔎 Auditoría (core, plugins y temas)
+- **Core**: versión instalada, actualización disponible y, si se activa, vulnerabilidades conocidas de esa versión.
+- **Temas**: los instalados (activo, padre e inactivos), con su actualización pendiente, su estado en WordPress.org (cerrado, abandonado, no está en el directorio) y sus vulnerabilidades.
 - Lista todos los plugins instalados (activos e inactivos) con su **actualización pendiente**, leída de los datos que WordPress ya mantiene.
 - Consulta la API de plugins de **WordPress.org** para detectar plugins **cerrados** (con fecha y motivo), **posiblemente abandonados** (más de 2 años sin versión nueva), la versión con la que se han probado y los que **no están en el directorio** (premium o propios).
-- **Vulnerabilidades conocidas** (opcional, **desactivado por defecto**): consulta la base de datos libre y gratuita [WPVulnerability](https://www.wpvulnerability.com/). Solo se envía el *slug* de cada plugin, nunca la versión ni la URL del sitio: la comparación de versiones se hace en local. Muestra la gravedad (CVSS), si hay parche y las referencias (CVE, Wordfence, WPScan, Patchstack…).
+- **Vulnerabilidades conocidas** (opcional, **desactivado por defecto**): consulta la base de datos libre y gratuita [WPVulnerability](https://www.wpvulnerability.com/). De plugins y temas solo se envía el *slug*, nunca la versión (la comparación se hace en local); del core se envía la versión de WordPress, porque el servicio solo permite consultarlo por versión. La URL del sitio nunca se envía. Muestra la gravedad (CVSS), si hay parche y las referencias (CVE, Wordfence, WPScan, Patchstack…).
 - El escaneo se hace **por lotes vía AJAX** con barra de progreso, para no agotar el tiempo de ejecución en sitios con muchos plugins.
 - No actualiza ni instala nada: enlaza a *Escritorio → Actualizaciones*.
 
@@ -56,6 +59,11 @@ Plugin de WordPress para **administradores** que reúne, en un panel con estéti
 - **Espacio libre del disco** del servidor, si el hosting permite consultarlo.
 - Medición **por lotes vía AJAX** con límite de tiempo por petición y por carpeta: no se agota el tiempo de ejecución en sitios grandes. No sigue enlaces simbólicos; las carpetas ilegibles se señalan.
 - En multisite mide la red completa y requiere permisos de administrador de red.
+
+### 🖼️ Medios no usados (con cuarentena)
+- **Escaneo por lotes** de todas las referencias: contenido de entradas, páginas y plantillas (Gutenberg, Divi, `[gallery]`…), metadatos (imagen destacada, ACF, Elementor, galerías de WooCommerce), opciones (logo, icono, widgets, ajustes del tema), metadatos de términos y avatares. Busca por ID y por archivo en cualquier tamaño (`-300x200`, `-scaled`…). Es **conservador**: ante la duda, un medio se considera en uso.
+- **Archivos huérfanos** en `uploads/AAAA/MM` que no pertenecen a ningún adjunto (miniaturas de tamaños ya no registrados, restos, subidas por FTP). Las copias WebP/AVIF de los optimizadores no cuentan, y las **copias de los originales** de LiteSpeed (`nombre.bk.ext`) se muestran aparte, porque se gestionan desde ese plugin.
+- **Cuarentena reversible**: mueve todos los archivos del adjunto (tamaños, original, copias `.bk` y WebP) a una carpeta de uploads con **clave aleatoria** y oculta el adjunto de la biblioteca, sin borrar su registro. Antes de mover vuelve a comprobar en vivo que no tenga referencias. **Restaurar** lo deja exactamente como estaba, sin sobrescribir nunca; **Vaciar** borra con `wp_delete_attachment()` tras doble confirmación. Al desinstalar se restaura todo.
 
 ### 🤖 Bloqueo de bots de IA
 - **Toggle Permitir/Bloquear por bot** (por defecto *Permitido*), con botones para **aplicar a todos**.
@@ -99,6 +107,7 @@ El plugin está internacionalizado con **inglés como idioma base**. Solo se inc
 
 ## Uso
 
+- **Medios no usados → Escanear medios**: revisa la lista, envía a cuarentena lo que tengas claro, comprueba la web y, pasados unos días, vacía la cuarentena.
 - **Integridad → Analizar ahora**: ejecuta la verificación. Revisa modificados/faltantes/extra y usa *Mostrar cambios* para ver el diff. *Purgar Caché* borra la caché interna del plugin (transient y ZIP descargados).
 - **Auditoría de plugins → Escanear plugins**: revisa actualizaciones, plugins cerrados/abandonados y, si lo has activado, vulnerabilidades conocidas.
 - **Profiling → Lanzar prueba**: genera una medición del home y actualiza las gráficas.
@@ -112,7 +121,7 @@ El plugin está internacionalizado con **inglés como idioma base**. Solo se inc
 ## Seguridad
 
 - Todas las acciones comprueban capacidades (`manage_options`, `list_users`, `delete_users`) y **nonces**.
-- **No se escribe ni se borra nada en `wp-admin`, `wp-includes` ni la raíz del sitio.** Lo único que el plugin escribe es la caché del paquete oficial, en su propia carpeta dentro de `uploads/` (resuelta en tiempo de ejecución con `wp_upload_dir()`) y protegida frente a acceso directo con `.htaccess` e `index.php`.
+- **No se escribe ni se borra nada en `wp-admin`, `wp-includes` ni la raíz del sitio.** El plugin solo escribe en `uploads/` (resuelto con `wp_upload_dir()`): la caché del paquete oficial (pública, con `.htaccess` e `index.php` contra el listado) y, cuando lo pides, la cuarentena de medios. El `.htaccess` no lo aplican todos los servidores (nginx no lo lee y LiteSpeed sirve los estáticos sin aplicarlo), por eso la carpeta de cuarentena lleva una **clave aleatoria** en su nombre.
 - Las rutas se resuelven con un helper propio (`stsuite_resolve_site_path()`) que normaliza `.`/`..` de forma léxica, valida el prefijo `ABSPATH` y comprueba `realpath` del directorio padre para impedir escapes por enlaces simbólicos. La validación se hace **después** de normalizar, de modo que `wp-admin/../wp-content/...` se rechaza.
 - El diff se limita a rutas del **core real** (`stsuite_is_core_path()`).
 - El visor de diferencias inserta el contenido del archivo con `textContent`/nodos DOM, **nunca como HTML**: un archivo del core manipulado con `<script>` no puede ejecutarse en el panel.
@@ -142,6 +151,8 @@ includes/
   aibots.php               # robots.txt + bloqueo 403 por User-Agent de bots de IA
   audit.php                # Auditoría de plugins: WordPress.org + WPVulnerability, AJAX por lotes
   disk.php                 # Espacio en disco: medición de carpetas por lotes + tablas de la BD
+  media.php                # Medios no usados: escaneo de referencias por lotes y huérfanos
+  media-quarantine.php     # Cuarentena reversible: mover, restaurar, vaciar
 admin/
   dashboard.php            # Página Integridad
   profiler.php             # Página Profiling
@@ -150,6 +161,7 @@ admin/
   aibots.php               # Página Bloqueo de bots de IA
   audit.php                # Página Auditoría de plugins
   disk.php                 # Página Espacio en disco
+  media.php                # Página Medios no usados
   assets/
     admin.css              # Tema del panel (paleta en variables CSS)
     admin.js               # Lógica de UI (AJAX, modales, confirmaciones)
@@ -173,6 +185,7 @@ Convenciones: todas las funciones, opciones, transitorios, nonces y acciones AJA
 
 ## Changelog
 
+- **5.4** — Nueva sección **Medios no usados** con **cuarentena reversible** (y copias `.bk` de optimizadores aparte). La auditoría cubre también **core y temas**. El diff es un **diff unificado real** (`Text_Diff`). URLs de assets con fecha de modificación (sin JS en caché tras actualizar). Nombres de bots traducibles. Readme aclarado sobre qué se escribe en uploads y cómo se protege.
 - **5.3** — Nuevas secciones **Auditoría de plugins** (actualizaciones, plugins cerrados/abandonados y vulnerabilidades conocidas vía WPVulnerability, opcional) y **Espacio en disco** (solo lectura). `readme.txt` sin menciones a la restauración del core y con todos los servicios externos documentados. La caché del diff borra los paquetes oficiales de versiones anteriores de WordPress. Probado hasta WordPress 7.1.
 - **5.2** — Corregido un falso positivo: los sitios con el paquete internacional de WordPress y un idioma traducido marcaban como modificados archivos como `wp-includes/version.php`. Ahora, antes de marcar un archivo, se compara también con los checksums del paquete internacional (`en_US`).
 - **5.1** — Prefijo `stsuite_` en las variables de las vistas del admin, para que el análisis estático no las detecte como globales sin prefijo.

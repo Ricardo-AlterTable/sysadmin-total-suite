@@ -7,6 +7,14 @@ if (!current_user_can('manage_options')) {
 
 $stsuite_analysis = get_transient('stsuite_last_analysis');
 
+// Valores por defecto de la paginación (se recalculan si hay análisis). El
+// modal de extras se pinta fuera del bloque del análisis, así que deben existir.
+$stsuite_per_page = $stsuite_extras_per_page = 20;
+$stsuite_current_page = $stsuite_extras_current_page = 1;
+$stsuite_total_pages = $stsuite_extras_total_pages = 1;
+$stsuite_total_items = $stsuite_extras_total_items = 0;
+$stsuite_paged_files = $stsuite_paged_extras = [];
+
 ?>
 <div class="wrap">
     <h1><?php esc_html_e('Core integrity', 'sysadmin-total-suite'); ?></h1>
@@ -93,7 +101,7 @@ $stsuite_analysis = get_transient('stsuite_last_analysis');
                 $stsuite_total_pages = 1;
             } else {
                 $stsuite_per_page_int = intval($stsuite_per_page);
-                $stsuite_total_pages = ceil($stsuite_total_items / $stsuite_per_page_int);
+                $stsuite_total_pages = (int) ceil($stsuite_total_items / $stsuite_per_page_int);
                 $stsuite_current_page = min($stsuite_current_page, $stsuite_total_pages);
                 $stsuite_paged_files = array_slice($stsuite_all_files, ($stsuite_current_page - 1) * $stsuite_per_page_int, $stsuite_per_page_int);
             }
@@ -110,7 +118,7 @@ $stsuite_analysis = get_transient('stsuite_last_analysis');
                 $stsuite_extras_total_pages = 1;
             } else {
                 $stsuite_extras_per_page_int = intval($stsuite_extras_per_page);
-                $stsuite_extras_total_pages = ceil($stsuite_extras_total_items / $stsuite_extras_per_page_int);
+                $stsuite_extras_total_pages = (int) ceil($stsuite_extras_total_items / $stsuite_extras_per_page_int);
                 $stsuite_extras_current_page = min($stsuite_extras_current_page, $stsuite_extras_total_pages);
                 $stsuite_paged_extras = array_slice($stsuite_extras, ($stsuite_extras_current_page - 1) * $stsuite_extras_per_page_int, $stsuite_extras_per_page_int);
             }

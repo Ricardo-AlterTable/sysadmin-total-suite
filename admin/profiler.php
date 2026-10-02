@@ -38,7 +38,7 @@ if (empty($stsuite_history)) {
 
 $stsuite_last = end($stsuite_history);
 
-$stsuite_sql_time_ms  = isset($stsuite_last['sql_time']) && $stsuite_last['sql_time'] !== null ? round($stsuite_last['sql_time'] * 1000, 2) : null;
+$stsuite_sql_time_ms  = isset($stsuite_last['sql_time']) ? round($stsuite_last['sql_time'] * 1000, 2) : null; // isset() ya descarta null
 $stsuite_http_time_ms = round(($stsuite_last['http_time'] ?? 0) * 1000, 2);
 
 $stsuite_profile_data = [
@@ -90,7 +90,7 @@ $stsuite_totals = array_map(fn($stsuite_d) => round($stsuite_d['total']*1000,2),
                     );
                     ?>
                 <?php else: ?>
-                    <?php echo esc_html($stsuite_v); ?> ms
+                    <?php echo esc_html(number_format_i18n((float) $stsuite_v, 2)); ?> ms
                 <?php endif; ?>
             </li>
         <?php endforeach; ?>

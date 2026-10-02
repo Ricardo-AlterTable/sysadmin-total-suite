@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sysadmin Total Suite 5.3\n"
+"Project-Id-Version: Sysadmin Total Suite 5.4\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sysadmin-total-suite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T13:29:04+00:00\n"
+"POT-Creation-Date: 2026-10-02T13:45:14+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #. Description of the plugin
 #: sysadmin-total-suite.php
-msgid "Core integrity checks, plugin vulnerability audit, load-time profiling, disk usage, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel."
+msgid "Core integrity, vulnerability audit of core, plugins and themes, unused media cleanup, disk usage, profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel."
 msgstr ""
 
 #. Author of the plugin
@@ -42,31 +42,31 @@ msgstr ""
 #: admin/profiler.php:5
 #: admin/users.php:5
 #: admin/wpo.php:5
-#: includes/aibots.php:119
-#: includes/audit.php:298
-#: includes/audit.php:327
-#: includes/audit.php:371
-#: includes/diff.php:37
+#: includes/aibots.php:121
+#: includes/audit.php:374
+#: includes/audit.php:412
+#: includes/audit.php:466
+#: includes/diff.php:106
 #: includes/disk.php:309
 #: includes/disk.php:336
-#: includes/media-quarantine.php:340
-#: includes/media-quarantine.php:377
-#: includes/media-quarantine.php:424
+#: includes/media-quarantine.php:359
+#: includes/media-quarantine.php:396
+#: includes/media-quarantine.php:444
 #: includes/media.php:421
 #: includes/media.php:453
 #: includes/users.php:11
 #: includes/wpo.php:262
 #: includes/wpo.php:289
 #: includes/wpo.php:326
-#: sysadmin-total-suite.php:511
-#: sysadmin-total-suite.php:659
-#: sysadmin-total-suite.php:683
+#: sysadmin-total-suite.php:502
+#: sysadmin-total-suite.php:650
+#: sysadmin-total-suite.php:674
 msgid "Insufficient permissions"
 msgstr ""
 
 #: admin/aibots.php:14
-#: sysadmin-total-suite.php:332
-#: sysadmin-total-suite.php:333
+#: sysadmin-total-suite.php:323
+#: sysadmin-total-suite.php:324
 msgid "AI bot blocking"
 msgstr ""
 
@@ -75,7 +75,7 @@ msgid "Mark as Blocked every AI crawler you do not want to allow. A blocked bot 
 msgstr ""
 
 #: admin/aibots.php:18
-#: admin/audit.php:53
+#: admin/audit.php:165
 msgid "Settings saved."
 msgstr ""
 
@@ -159,288 +159,328 @@ msgstr ""
 msgid "Save changes"
 msgstr ""
 
-#: admin/audit.php:20
+#: admin/audit.php:24
 msgid "Critical"
 msgstr ""
 
-#: admin/audit.php:21
+#: admin/audit.php:25
 msgid "High"
 msgstr ""
 
-#: admin/audit.php:22
+#: admin/audit.php:26
 msgid "Medium"
 msgstr ""
 
-#: admin/audit.php:23
+#: admin/audit.php:27
 msgid "Low"
 msgstr ""
 
-#: admin/audit.php:24
+#: admin/audit.php:28
 msgid "None"
 msgstr ""
 
-#: admin/audit.php:25
+#: admin/audit.php:29
 msgid "Unrated"
 msgstr ""
 
-#: admin/audit.php:49
-#: sysadmin-total-suite.php:278
-#: sysadmin-total-suite.php:279
-msgid "Plugin audit"
+#: admin/audit.php:64
+#: admin/audit.php:249
+msgid "Up to date"
 msgstr ""
 
-#: admin/audit.php:50
-msgid "Checks the installed plugins for pending updates, plugins closed or abandoned on WordPress.org and, optionally, publicly known vulnerabilities."
-msgstr ""
-
-#: admin/audit.php:58
-msgid "Vulnerability database"
-msgstr ""
-
-#: admin/audit.php:65
-msgid "Check installed plugins against the WPVulnerability database"
-msgstr ""
-
-#. translators: 1: link to the WPVulnerability website, 2: link to its privacy policy.
-#: admin/audit.php:72
+#. translators: %s: human-readable time difference, e.g. "3 months".
+#: admin/audit.php:77
 #, php-format
-msgid "When enabled, each scan sends the slug of every installed plugin (not its version, nor your site address) to %1$s, a free external service, to look up known vulnerabilities. The version comparison is done on your site. See its %2$s."
+msgid "Updated %s ago"
 msgstr ""
 
-#: admin/audit.php:74
-msgid "privacy policy"
+#: admin/audit.php:79
+msgid "Possibly abandoned"
 msgstr ""
 
-#: admin/audit.php:78
-msgid "Save"
-msgstr ""
-
-#. translators: %s: the button label in bold.
-#: admin/audit.php:83
-#: admin/audit.php:88
-#: sysadmin-total-suite.php:405
-msgid "Scan plugins"
-msgstr ""
-
-#. translators: %s: the button label in bold.
-#: admin/audit.php:88
-#: admin/media.php:125
+#. translators: %s: WordPress version.
+#: admin/audit.php:84
 #, php-format
-msgid "No scan available. Run %s to get results."
+msgid "Tested up to %s"
 msgstr ""
 
-#. translators: %s: date and time of the last scan.
+#: admin/audit.php:88
+msgid "Closed"
+msgstr ""
+
+#: admin/audit.php:92
+msgid "Not in the directory (premium or custom)"
+msgstr ""
+
 #: admin/audit.php:95
-#: admin/media.php:132
-#, php-format
-msgid "Last scan: %s"
+#: admin/audit.php:109
+msgid "Could not be checked"
 msgstr ""
 
-#: admin/audit.php:102
-msgid "Plugins:"
+#: admin/audit.php:105
+msgid "Not checked"
 msgstr ""
 
-#. translators: %d: number of plugins.
-#: admin/audit.php:104
+#: admin/audit.php:113
+msgid "None known"
+msgstr ""
+
+#: admin/audit.php:123
+msgid "No fix available"
+msgstr ""
+
+#. translators: %d: number of items.
+#: admin/audit.php:141
 #, php-format
 msgid "%d with an update"
 msgid_plural "%d with updates"
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: %d: number of plugins.
-#: admin/audit.php:108
+#. translators: %d: number of items.
+#: admin/audit.php:145
 #, php-format
 msgid "%d vulnerable"
 msgid_plural "%d vulnerable"
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: %d: number of plugins.
-#: admin/audit.php:112
+#. translators: %d: number of items.
+#: admin/audit.php:149
 #, php-format
 msgid "%d closed"
 msgid_plural "%d closed"
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: %d: number of plugins.
-#: admin/audit.php:115
+#. translators: %d: number of items.
+#: admin/audit.php:152
 #, php-format
 msgid "%d possibly abandoned"
 msgid_plural "%d possibly abandoned"
 msgstr[0] ""
 msgstr[1] ""
 
-#. translators: %d: number of plugins.
-#: admin/audit.php:119
+#. translators: %d: number of items.
+#: admin/audit.php:156
 #, php-format
 msgid "%d not in the directory"
 msgid_plural "%d not in the directory"
 msgstr[0] ""
 msgstr[1] ""
 
+#: admin/audit.php:161
+msgid "Plugin, theme and core audit"
+msgstr ""
+
+#: admin/audit.php:162
+msgid "Checks WordPress, the installed plugins and the installed themes for pending updates, items closed or abandoned on WordPress.org and, optionally, publicly known vulnerabilities."
+msgstr ""
+
+#: admin/audit.php:170
+msgid "Vulnerability database"
+msgstr ""
+
+#: admin/audit.php:177
+msgid "Check WordPress, plugins and themes against the WPVulnerability database"
+msgstr ""
+
+#. translators: 1: link to the WPVulnerability website, 2: link to its privacy policy.
+#: admin/audit.php:184
+#, php-format
+msgid "When enabled, each scan sends to %1$s, a free external service, the slug of every installed plugin and theme (not their versions: that comparison is done on your site) and your WordPress version, because the service can only look up the core by version. Your site address is never sent. See its %2$s."
+msgstr ""
+
+#: admin/audit.php:186
+msgid "privacy policy"
+msgstr ""
+
+#: admin/audit.php:190
+msgid "Save"
+msgstr ""
+
+#. translators: %s: the button label in bold.
+#: admin/audit.php:195
+#: admin/audit.php:200
+#: sysadmin-total-suite.php:396
+msgid "Scan now"
+msgstr ""
+
+#. translators: %s: the button label in bold.
+#: admin/audit.php:200
+#: admin/media.php:125
+#, php-format
+msgid "No scan available. Run %s to get results."
+msgstr ""
+
+#. translators: %s: date and time of the last scan.
+#: admin/audit.php:207
+#: admin/media.php:132
+#, php-format
+msgid "Last scan: %s"
+msgstr ""
+
 #. translators: %s: link to the WordPress updates screen.
-#: admin/audit.php:129
+#: admin/audit.php:218
 #, php-format
 msgid "Install pending updates from %s."
 msgstr ""
 
-#: admin/audit.php:130
+#: admin/audit.php:219
 msgid "Dashboard → Updates"
 msgstr ""
 
-#: admin/audit.php:139
-msgid "Plugin"
+#: admin/audit.php:228
+#: admin/disk.php:12
+msgid "WordPress core"
 msgstr ""
 
-#: admin/audit.php:140
+#: admin/audit.php:232
+#: admin/wpo.php:37
+msgid "Version"
+msgstr ""
+
+#: admin/audit.php:233
+#: admin/audit.php:267
+#: admin/audit.php:308
 msgid "Update"
 msgstr ""
 
-#: admin/audit.php:141
-msgid "WordPress.org"
-msgstr ""
-
-#: admin/audit.php:142
+#: admin/audit.php:234
+#: admin/audit.php:269
+#: admin/audit.php:310
 msgid "Known vulnerabilities"
 msgstr ""
 
+#. translators: %s: currently installed version.
+#: admin/audit.php:242
+#: admin/audit.php:287
+#: admin/audit.php:330
+#, php-format
+msgid "Now %s: scan again to refresh."
+msgstr ""
+
+#: admin/audit.php:261
+#: admin/disk.php:14
+#: admin/profiler.php:46
+msgid "Plugins"
+msgstr ""
+
+#: admin/audit.php:266
+msgid "Plugin"
+msgstr ""
+
+#: admin/audit.php:268
+#: admin/audit.php:309
+msgid "WordPress.org"
+msgstr ""
+
 #. translators: %s: the word "Active" in bold.
-#: admin/audit.php:156
+#: admin/audit.php:280
+#: admin/audit.php:321
 #: admin/disk.php:222
 #: admin/wpo.php:35
 msgid "Active"
 msgstr ""
 
-#: admin/audit.php:158
+#: admin/audit.php:282
+#: admin/audit.php:325
 #: admin/disk.php:226
 msgid "Inactive"
 msgstr ""
 
-#: admin/audit.php:161
+#: admin/audit.php:285
+#: admin/audit.php:328
 msgid "Removed since the last scan."
 msgstr ""
 
-#. translators: %s: currently installed version.
-#: admin/audit.php:164
-#, php-format
-msgid "Now %s: scan again to refresh."
+#: admin/audit.php:302
+#: admin/disk.php:15
+msgid "Themes"
 msgstr ""
 
-#: admin/audit.php:173
-msgid "Up to date"
+#: admin/audit.php:307
+#: admin/profiler.php:47
+msgid "Theme"
 msgstr ""
 
-#. translators: %s: human-readable time difference, e.g. "3 months".
-#: admin/audit.php:183
-#, php-format
-msgid "Updated %s ago"
+#: admin/audit.php:323
+#: admin/disk.php:224
+msgid "Parent theme"
 msgstr ""
 
-#: admin/audit.php:185
-msgid "Possibly abandoned"
-msgstr ""
-
-#. translators: %s: WordPress version.
-#: admin/audit.php:189
-#, php-format
-msgid "Tested up to %s"
-msgstr ""
-
-#: admin/audit.php:193
-msgid "Closed"
-msgstr ""
-
-#: admin/audit.php:199
-msgid "Not in the directory (premium or custom plugin)"
-msgstr ""
-
-#: admin/audit.php:202
-#: admin/audit.php:213
-msgid "Could not be checked"
-msgstr ""
-
-#: admin/audit.php:211
-msgid "Not checked"
-msgstr ""
-
-#: admin/audit.php:215
-msgid "None known"
-msgstr ""
-
-#: admin/audit.php:225
-msgid "No fix available"
+#: admin/audit.php:340
+msgid "Inactive themes are not loaded, but their files are still on the server: if you do not need them, delete them from Appearance → Themes (keep one default theme as a fallback)."
 msgstr ""
 
 #. translators: %d: number of years.
-#: admin/audit.php:247
+#: admin/audit.php:348
 #, php-format
-msgid "\"Possibly abandoned\" means no release on WordPress.org in more than %d years. Plugins that are not in the directory cannot be checked for updates or closure. The absence of known vulnerabilities does not guarantee that a plugin is secure."
+msgid "\"Possibly abandoned\" means no release on WordPress.org in more than %d years. Items that are not in the directory cannot be checked for updates or closure. The absence of known vulnerabilities does not guarantee that something is secure."
 msgstr ""
 
-#: admin/dashboard.php:12
+#: admin/dashboard.php:20
 msgid "Core integrity"
 msgstr ""
 
-#: admin/dashboard.php:16
+#: admin/dashboard.php:24
 msgid "Plugin cache purged. The next analysis will start from scratch."
 msgstr ""
 
 #. translators: %s: the "Analyze now" button label in bold.
-#: admin/dashboard.php:24
-#: admin/dashboard.php:169
+#: admin/dashboard.php:32
+#: admin/dashboard.php:177
 msgid "Analyze now"
 msgstr ""
 
-#: admin/dashboard.php:30
+#: admin/dashboard.php:38
 msgid "Purge cache"
 msgstr ""
 
-#: admin/dashboard.php:56
+#: admin/dashboard.php:64
 msgid "Result"
 msgstr ""
 
-#: admin/dashboard.php:58
+#: admin/dashboard.php:66
 msgid "⚠ Issues were detected in the WordPress core"
 msgstr ""
 
-#: admin/dashboard.php:60
+#: admin/dashboard.php:68
 msgid "✔ No issues were detected in the WordPress core"
 msgstr ""
 
-#: admin/dashboard.php:63
+#: admin/dashboard.php:71
 msgid "⚠ Files not recognized by WordPress were detected"
 msgstr ""
 
 #. translators: %s: link to the WordPress core reinstall screen.
-#: admin/dashboard.php:71
+#: admin/dashboard.php:79
 #, php-format
 msgid "To repair the core, use %s, which is WordPress's own mechanism and replaces the original files safely."
 msgstr ""
 
-#: admin/dashboard.php:72
+#: admin/dashboard.php:80
 msgid "Dashboard → Updates → Reinstall now"
 msgstr ""
 
-#: admin/dashboard.php:121
-#: admin/dashboard.php:159
+#: admin/dashboard.php:129
+#: admin/dashboard.php:167
 msgid "Modified / missing files"
 msgstr ""
 
-#: admin/dashboard.php:130
-#: admin/dashboard.php:200
+#: admin/dashboard.php:138
+#: admin/dashboard.php:208
 msgid "All"
 msgstr ""
 
-#: admin/dashboard.php:132
-#: admin/dashboard.php:202
+#: admin/dashboard.php:140
+#: admin/dashboard.php:210
 msgid "Apply"
 msgstr ""
 
 #. translators: %s: number of items.
-#: admin/dashboard.php:137
-#: admin/dashboard.php:207
+#: admin/dashboard.php:145
+#: admin/dashboard.php:215
 #: admin/disk.php:136
 #, php-format
 msgid "%s item"
@@ -448,68 +488,55 @@ msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/dashboard.php:148
+#: admin/dashboard.php:156
 #: admin/media.php:239
 msgid "Modified"
 msgstr ""
 
-#: admin/dashboard.php:150
+#: admin/dashboard.php:158
 msgid "Show changes"
 msgstr ""
 
-#: admin/dashboard.php:152
+#: admin/dashboard.php:160
 msgid "Missing"
 msgstr ""
 
-#: admin/dashboard.php:160
+#: admin/dashboard.php:168
 msgid "No modified or missing files were detected."
 msgstr ""
 
-#: admin/dashboard.php:164
+#: admin/dashboard.php:172
 msgid "Extra files"
 msgstr ""
 
-#: admin/dashboard.php:165
+#: admin/dashboard.php:173
 msgid "View detected extra files"
 msgstr ""
 
 #. translators: %s: the "Analyze now" button label in bold.
-#: admin/dashboard.php:169
+#: admin/dashboard.php:177
 #, php-format
 msgid "No analysis available. Run %s to get results."
 msgstr ""
 
-#: admin/dashboard.php:178
+#: admin/dashboard.php:186
 msgid "File differences"
 msgstr ""
 
-#: admin/dashboard.php:187
+#: admin/dashboard.php:195
 msgid "Extra files detected"
 msgstr ""
 
-#: admin/dashboard.php:188
+#: admin/dashboard.php:196
 msgid "These files are not part of the official WordPress core. Review them and remove any you do not recognise using your hosting file manager or FTP client."
 msgstr ""
 
-#: admin/dashboard.php:228
+#: admin/dashboard.php:236
 msgid "Close"
-msgstr ""
-
-#: admin/disk.php:12
-msgid "WordPress core"
 msgstr ""
 
 #: admin/disk.php:13
 msgid "Uploads (media library)"
-msgstr ""
-
-#: admin/disk.php:14
-#: admin/profiler.php:46
-msgid "Plugins"
-msgstr ""
-
-#: admin/disk.php:15
-msgid "Themes"
 msgstr ""
 
 #: admin/disk.php:16
@@ -527,8 +554,8 @@ msgid "Loose files"
 msgstr ""
 
 #: admin/disk.php:107
-#: sysadmin-total-suite.php:314
-#: sysadmin-total-suite.php:315
+#: sysadmin-total-suite.php:305
+#: sysadmin-total-suite.php:306
 msgid "Disk usage"
 msgstr ""
 
@@ -539,7 +566,7 @@ msgstr ""
 #. translators: %s: the "Measure now" button label in bold.
 #: admin/disk.php:111
 #: admin/disk.php:116
-#: sysadmin-total-suite.php:411
+#: sysadmin-total-suite.php:402
 msgid "Measure now"
 msgstr ""
 
@@ -627,10 +654,6 @@ msgstr ""
 msgid "Files"
 msgstr ""
 
-#: admin/disk.php:224
-msgid "Parent theme"
-msgstr ""
-
 #. translators: %s: link to the Unused media screen.
 #: admin/disk.php:236
 #, php-format
@@ -639,8 +662,8 @@ msgstr ""
 
 #: admin/disk.php:237
 #: admin/media.php:36
-#: sysadmin-total-suite.php:323
-#: sysadmin-total-suite.php:324
+#: sysadmin-total-suite.php:314
+#: sysadmin-total-suite.php:315
 msgid "Unused media"
 msgstr ""
 
@@ -766,7 +789,7 @@ msgstr ""
 #. translators: %s: the button label in bold.
 #: admin/media.php:120
 #: admin/media.php:125
-#: sysadmin-total-suite.php:417
+#: sysadmin-total-suite.php:408
 msgid "Scan media"
 msgstr ""
 
@@ -867,8 +890,8 @@ msgid "File"
 msgstr ""
 
 #: admin/profiler.php:11
-#: sysadmin-total-suite.php:287
-#: sysadmin-total-suite.php:288
+#: sysadmin-total-suite.php:278
+#: sysadmin-total-suite.php:279
 msgid "Profiling"
 msgstr ""
 
@@ -893,10 +916,6 @@ msgstr ""
 
 #: admin/profiler.php:45
 msgid "Core"
-msgstr ""
-
-#: admin/profiler.php:47
-msgid "Theme"
 msgstr ""
 
 #: admin/profiler.php:48
@@ -951,8 +970,8 @@ msgid "Total time (ms)"
 msgstr ""
 
 #: admin/users.php:15
-#: sysadmin-total-suite.php:296
-#: sysadmin-total-suite.php:297
+#: sysadmin-total-suite.php:287
+#: sysadmin-total-suite.php:288
 msgid "Check WP users"
 msgstr ""
 
@@ -992,13 +1011,13 @@ msgstr ""
 
 #: admin/users.php:67
 #: admin/wpo.php:142
-#: sysadmin-total-suite.php:378
+#: sysadmin-total-suite.php:369
 msgid "Delete"
 msgstr ""
 
 #: admin/wpo.php:22
-#: sysadmin-total-suite.php:305
-#: sysadmin-total-suite.php:306
+#: sysadmin-total-suite.php:296
+#: sysadmin-total-suite.php:297
 msgid "WPO"
 msgstr ""
 
@@ -1040,10 +1059,6 @@ msgstr ""
 msgid "Active plugin"
 msgstr ""
 
-#: admin/wpo.php:37
-msgid "Version"
-msgstr ""
-
 #: admin/wpo.php:51
 msgid "Autoload options and wp_options junk"
 msgstr ""
@@ -1074,7 +1089,7 @@ msgid "Expired (junk):"
 msgstr ""
 
 #: admin/wpo.php:66
-#: sysadmin-total-suite.php:384
+#: sysadmin-total-suite.php:375
 msgid "Clean up expired transients"
 msgstr ""
 
@@ -1131,7 +1146,7 @@ msgid "Junk from removed plugins"
 msgstr ""
 
 #: admin/wpo.php:110
-#: sysadmin-total-suite.php:393
+#: sysadmin-total-suite.php:384
 msgid "Clean up all orphan cron tasks"
 msgstr ""
 
@@ -1244,60 +1259,71 @@ msgstr ""
 msgid "Environment versions"
 msgstr ""
 
-#: includes/aibots.php:109
+#. translators: %s: name of an AI crawler.
+#: includes/aibots.php:36
+#: includes/aibots.php:38
+#, php-format
+msgid "%s (robots.txt only)"
+msgstr ""
+
+#: includes/aibots.php:111
 msgid "403 Forbidden"
 msgstr ""
 
-#: includes/audit.php:333
+#: includes/audit.php:418
 #: includes/disk.php:342
 #: includes/media.php:459
 msgid "No scan in progress."
 msgstr ""
 
-#: includes/diff.php:43
+#: includes/diff.php:112
 msgid "Invalid path"
 msgstr ""
 
 #. translators: %s: file path.
-#: includes/diff.php:51
+#: includes/diff.php:120
 #, php-format
 msgid "File not found: %s"
 msgstr ""
 
-#: includes/diff.php:55
+#: includes/diff.php:124
 msgid "Only WordPress core files can be compared."
 msgstr ""
 
 #. translators: %s: file path.
-#: includes/diff.php:61
+#: includes/diff.php:130
 #, php-format
 msgid "Could not read the current file: %s"
 msgstr ""
 
-#: includes/diff.php:70
-#: includes/diff.php:191
+#: includes/diff.php:139
+#: includes/diff.php:263
 msgid "Could not fetch the original file."
 msgstr ""
 
-#: includes/diff.php:76
+#: includes/diff.php:145
 msgid "No differences found."
 msgstr ""
 
-#: includes/diff.php:123
+#: includes/diff.php:150
+msgid "The contents are identical: the files only differ in their line endings (Windows/Unix)."
+msgstr ""
+
+#: includes/diff.php:195
 msgid "The ZipArchive class is not available in your PHP version."
 msgstr ""
 
-#: includes/diff.php:131
+#: includes/diff.php:203
 msgid "Could not create the cache directory. Check permissions."
 msgstr ""
 
-#: includes/diff.php:166
-#: includes/diff.php:174
+#: includes/diff.php:238
+#: includes/diff.php:246
 msgid "corrupt ZIP"
 msgstr ""
 
 #. translators: %s: file path inside the ZIP.
-#: includes/diff.php:188
+#: includes/diff.php:260
 #, php-format
 msgid "does not contain %s"
 msgstr ""
@@ -1360,60 +1386,65 @@ msgstr ""
 msgid "Expired transients removed: %d"
 msgstr ""
 
-#: sysadmin-total-suite.php:269
-#: sysadmin-total-suite.php:270
+#: sysadmin-total-suite.php:260
+#: sysadmin-total-suite.php:261
 msgid "Integrity"
 msgstr ""
 
-#: sysadmin-total-suite.php:371
+#: sysadmin-total-suite.php:269
+#: sysadmin-total-suite.php:270
+msgid "Audit"
+msgstr ""
+
+#: sysadmin-total-suite.php:362
 msgid "The operation timed out."
 msgstr ""
 
-#: sysadmin-total-suite.php:372
+#: sysadmin-total-suite.php:363
 msgid "Communication error with the server."
 msgstr ""
 
 #. translators: %s: error message.
-#: sysadmin-total-suite.php:374
+#: sysadmin-total-suite.php:365
 #, php-format
 msgid "Error: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:375
+#: sysadmin-total-suite.php:366
 msgid "Loading diff..."
 msgstr ""
 
-#: sysadmin-total-suite.php:376
+#: sysadmin-total-suite.php:367
 msgid "STSUITE_AJAX is not defined. Make sure wp_localize_script() ran."
 msgstr ""
 
-#: sysadmin-total-suite.php:377
+#: sysadmin-total-suite.php:368
 msgid "Deleting..."
 msgstr ""
 
-#: sysadmin-total-suite.php:380
+#: sysadmin-total-suite.php:371
 msgid ""
 "Clean up expired transients?\n"
 "\n"
 "This is safe: they are expired temporary data and WordPress regenerates them when needed."
 msgstr ""
 
-#: sysadmin-total-suite.php:381
+#: sysadmin-total-suite.php:372
 msgid "Cleaning..."
 msgstr ""
 
 #. translators: %d: number of transients removed.
-#: sysadmin-total-suite.php:383
+#: sysadmin-total-suite.php:374
 #, php-format
 msgid "Expired transients removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:385
+#: sysadmin-total-suite.php:376
 msgid "Could not clean up"
 msgstr ""
 
 #. translators: %s: cron hook name.
-#: sysadmin-total-suite.php:388
+#: sysadmin-total-suite.php:379
 #, php-format
 msgid ""
 "Remove the cron tasks for this hook?\n"
@@ -1423,7 +1454,7 @@ msgid ""
 "It appears orphaned (no code attached right now), but a plugin may register it only on the front end. A copy of the schedule is saved beforehand so it can be restored manually."
 msgstr ""
 
-#: sysadmin-total-suite.php:389
+#: sysadmin-total-suite.php:380
 msgid ""
 "Remove ALL cron tasks detected as orphaned?\n"
 "\n"
@@ -1431,17 +1462,17 @@ msgid ""
 msgstr ""
 
 #. translators: %s: value.
-#: sysadmin-total-suite.php:391
+#: sysadmin-total-suite.php:382
 #, php-format
 msgid "Orphan cron tasks removed: %s"
 msgstr ""
 
-#: sysadmin-total-suite.php:392
+#: sysadmin-total-suite.php:383
 msgid "Cleaned hooks:"
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:396
+#: sysadmin-total-suite.php:387
 #, php-format
 msgid ""
 "Are you sure you want to DELETE the user?\n"
@@ -1452,7 +1483,7 @@ msgid ""
 msgstr ""
 
 #. translators: %s: user login name.
-#: sysadmin-total-suite.php:398
+#: sysadmin-total-suite.php:389
 #, php-format
 msgid ""
 "Final confirmation.\n"
@@ -1462,52 +1493,52 @@ msgid ""
 "Continue with permanent deletion?"
 msgstr ""
 
-#: sysadmin-total-suite.php:399
+#: sysadmin-total-suite.php:390
 msgid "Could not delete the user"
 msgstr ""
 
-#: sysadmin-total-suite.php:401
-#: sysadmin-total-suite.php:413
+#: sysadmin-total-suite.php:392
+#: sysadmin-total-suite.php:404
 msgid "Preparing the scan..."
 msgstr ""
 
-#. translators: 1: plugins checked so far, 2: total plugins.
-#: sysadmin-total-suite.php:403
+#. translators: 1: items checked so far, 2: total items (core, themes and plugins).
+#: sysadmin-total-suite.php:394
 #, php-format
-msgid "Checking plugins: %1$s of %2$s..."
+msgid "Checking: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:404
-#: sysadmin-total-suite.php:416
+#: sysadmin-total-suite.php:395
+#: sysadmin-total-suite.php:407
 msgid "Scan complete. Reloading..."
 msgstr ""
 
-#: sysadmin-total-suite.php:407
+#: sysadmin-total-suite.php:398
 msgid "Listing folders..."
 msgstr ""
 
 #. translators: 1: folders measured so far, 2: total folders.
-#: sysadmin-total-suite.php:409
+#: sysadmin-total-suite.php:400
 #, php-format
 msgid "Measuring folders: %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:410
+#: sysadmin-total-suite.php:401
 msgid "Measurement complete. Reloading..."
 msgstr ""
 
 #. translators: 1: current step, 2: total steps.
-#: sysadmin-total-suite.php:415
+#: sysadmin-total-suite.php:406
 #, php-format
 msgid "Looking for references: step %1$s of %2$s..."
 msgstr ""
 
-#: sysadmin-total-suite.php:418
+#: sysadmin-total-suite.php:409
 msgid "Select at least one item first."
 msgstr ""
 
 #. translators: %s: number of selected media items.
-#: sysadmin-total-suite.php:420
+#: sysadmin-total-suite.php:411
 #, php-format
 msgid ""
 "Move %s media item(s) to quarantine?\n"
@@ -1515,14 +1546,14 @@ msgid ""
 "They will be hidden from the media library and their files moved to a protected folder. Any page that still uses them will show a broken image until you restore them. Nothing is deleted."
 msgstr ""
 
-#: sysadmin-total-suite.php:421
+#: sysadmin-total-suite.php:412
 msgid ""
 "Empty the quarantine?\n"
 "\n"
 "Every media item in it and all its files will be PERMANENTLY deleted."
 msgstr ""
 
-#: sysadmin-total-suite.php:422
+#: sysadmin-total-suite.php:413
 msgid ""
 "Final confirmation.\n"
 "\n"

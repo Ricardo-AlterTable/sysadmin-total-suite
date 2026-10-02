@@ -293,6 +293,25 @@ function stsuite_quarantine_list(): array {
 }
 
 /**
+ * Elimina la carpeta de cuarentena del nombre antiguo (sin clave aleatoria)
+ * cuando ya no guarda ningún medio: solo sus ficheros de protección y
+ * subcarpetas vacías. Se llama tras restaurar o vaciar.
+ */
+function stsuite_quarantine_cleanup_legacy(): void {
+    $legacy = stsuite_quarantine_dir(STSUITE_QUARANTINE_DIR, false);
+    if ($legacy === '' || !is_dir($legacy)) return;
+    foreach (stsuite_quarantine_list() as $item) {
+        $data = get_post_meta($item['id'], STSUITE_QUARANTINE_META, true);
+        if (is_array($data) && stsuite_quarantine_valid_dirname($data['qdir'] ?? '') === STSUITE_QUARANTINE_DIR) return; // aún se usa
+    }
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($legacy, FilesystemIterator::SKIP_DOTS));
+    foreach ($it as $f) {
+        if ($f->isFile() && !in_array($f->getFilename(), ['.htaccess', 'index.php'], true)) return;
+    }
+    stsuite_delete_dir($legacy);
+}
+
+/**
  * Ocultar los adjuntos en cuarentena de la biblioteca de medios (rejilla y lista).
  */
 function stsuite_quarantine_exclude(array $meta_query): array {
@@ -416,6 +435,7 @@ add_action('admin_post_stsuite_media_restore', function () {
         }
         update_option(STSUITE_MEDIA_OPTION, $scan, false);
     }
+    stsuite_quarantine_cleanup_legacy();
     stsuite_quarantine_redirect('restore', $counts);
 });
 
@@ -431,5 +451,6 @@ add_action('admin_post_stsuite_media_purge', function () {
         if (stsuite_quarantine_delete($item['id'])) $counts['done']++;
         else $counts['failed']++;
     }
+    stsuite_quarantine_cleanup_legacy();
     stsuite_quarantine_redirect('purge', $counts);
 });

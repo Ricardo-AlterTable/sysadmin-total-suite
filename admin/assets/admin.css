@@ -543,6 +543,7 @@ body {
 .diff-add { color: #6cff5c; }
 .diff-del { color: #ff5c5c; }
 .diff-ctx { color: #8aa0b4; }
+.diff-hunk { color: var(--stsuite-primary-2); font-weight: 600; }
 
 /* ---- Espacio en disco ---- */
 .stsuite-table .stsuite-num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
