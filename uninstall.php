@@ -20,6 +20,7 @@ $stsuite_options = [
     'stsuite_audit_results',
     'stsuite_audit_settings',
     'stsuite_disk_results',
+    'stsuite_media_scan',
 ];
 
 /**

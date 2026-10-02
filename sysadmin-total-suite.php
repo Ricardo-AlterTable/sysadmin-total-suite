@@ -30,6 +30,7 @@ require_once STSUITE_PLUGIN_DIR . 'includes/wpo.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/aibots.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/audit.php';
 require_once STSUITE_PLUGIN_DIR . 'includes/disk.php';
+require_once STSUITE_PLUGIN_DIR . 'includes/media.php';
 
 /**
  * Migración única de los datos guardados con el prefijo anterior ('wps_'),
@@ -316,6 +317,15 @@ add_action('admin_menu', function () {
 
     add_submenu_page(
         'sysadmin-total-suite',
+        esc_html__('Unused media', 'sysadmin-total-suite'),
+        esc_html__('Unused media', 'sysadmin-total-suite'),
+        stsuite_media_capability(),
+        'sysadmin-total-suite-media',
+        'stsuite_profiler_media_page'
+    );
+
+    add_submenu_page(
+        'sysadmin-total-suite',
         esc_html__('AI bot blocking', 'sysadmin-total-suite'),
         esc_html__('AI bot blocking', 'sysadmin-total-suite'),
         'manage_options',
@@ -385,6 +395,12 @@ add_action('admin_enqueue_scripts', function ($hook) {
             'diskProgress'     => __('Measuring folders: %1$s of %2$s...', 'sysadmin-total-suite'),
             'diskDone'         => __('Measurement complete. Reloading...', 'sysadmin-total-suite'),
             'diskScan'         => __('Measure now', 'sysadmin-total-suite'),
+            // Unused media
+            'mediaStarting'    => __('Preparing the scan...', 'sysadmin-total-suite'),
+            /* translators: 1: current step, 2: total steps. */
+            'mediaProgress'    => __('Looking for references: step %1$s of %2$s...', 'sysadmin-total-suite'),
+            'mediaDone'        => __('Scan complete. Reloading...', 'sysadmin-total-suite'),
+            'mediaScan'        => __('Scan media', 'sysadmin-total-suite'),
         ],
     ]);
 });
@@ -414,6 +430,10 @@ function stsuite_profiler_wpo_page() {
 
 function stsuite_profiler_disk_page() {
     include STSUITE_PLUGIN_DIR . 'admin/disk.php';
+}
+
+function stsuite_profiler_media_page() {
+    include STSUITE_PLUGIN_DIR . 'admin/media.php';
 }
 
 function stsuite_profiler_aibots_page() {

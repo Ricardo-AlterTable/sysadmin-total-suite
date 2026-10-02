@@ -278,6 +278,16 @@ jQuery(document).ready(function ($) {
         });
     });
 
+    $(document).on('click', '.stsuite-media-scan', function (e) {
+        e.preventDefault();
+        runBatches($(this), {
+            start: 'stsuite_media_start',
+            step: 'stsuite_media_step',
+            progress: '#stsuiteMediaProgress',
+            labels: { starting: T.mediaStarting, progress: T.mediaProgress, done: T.mediaDone, button: T.mediaScan }
+        });
+    });
+
     // Bloqueo bots IA: aplicar a todos (bloquear / permitir)
     $(document).on('click', '.stsuite-bots-block-all', function (e) {
         e.preventDefault();
