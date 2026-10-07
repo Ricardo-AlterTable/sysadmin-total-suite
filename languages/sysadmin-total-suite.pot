@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Sysadmin Total Suite 5.4\n"
+"Project-Id-Version: Sysadmin Total Suite 5.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/sysadmin-total-suite\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-02T13:50:24+00:00\n"
+"POT-Creation-Date: 2026-10-07T12:56:39+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: sysadmin-total-suite\n"
@@ -58,9 +58,9 @@ msgstr ""
 #: includes/wpo.php:262
 #: includes/wpo.php:289
 #: includes/wpo.php:326
-#: sysadmin-total-suite.php:502
-#: sysadmin-total-suite.php:650
-#: sysadmin-total-suite.php:674
+#: sysadmin-total-suite.php:518
+#: sysadmin-total-suite.php:685
+#: sysadmin-total-suite.php:709
 msgid "Insufficient permissions"
 msgstr ""
 
@@ -433,7 +433,7 @@ msgstr ""
 
 #. translators: %s: the "Analyze now" button label in bold.
 #: admin/dashboard.php:32
-#: admin/dashboard.php:177
+#: admin/dashboard.php:211
 msgid "Analyze now"
 msgstr ""
 
@@ -445,46 +445,64 @@ msgstr ""
 msgid "Result"
 msgstr ""
 
-#: admin/dashboard.php:66
+#. translators: 1: WordPress version, 2: site locale.
+#: admin/dashboard.php:71
+#, php-format
+msgid "⚠ The core could not be verified: WordPress.org did not provide the official checksums for WordPress %1$s (%2$s nor the international package). Try again later."
+msgstr ""
+
+#: admin/dashboard.php:78
 msgid "⚠ Issues were detected in the WordPress core"
 msgstr ""
 
-#: admin/dashboard.php:68
+#: admin/dashboard.php:80
 msgid "✔ No issues were detected in the WordPress core"
 msgstr ""
 
-#: admin/dashboard.php:71
+#. translators: 1: WordPress version, 2: site locale.
+#: admin/dashboard.php:88
+#, php-format
+msgid "Compared with the official checksums of WordPress %1$s (international package): WordPress.org has not published the %2$s ones for this version. Both packages are identical except for the language line of wp-includes/version.php, which is taken into account."
+msgstr ""
+
+#. translators: 1: WordPress version, 2: site locale, 3: date and time of the analysis.
+#: admin/dashboard.php:95
+#, php-format
+msgid "Compared with the official checksums of WordPress %1$s (%2$s) on %3$s."
+msgstr ""
+
+#: admin/dashboard.php:105
 msgid "⚠ Files not recognized by WordPress were detected"
 msgstr ""
 
 #. translators: %s: link to the WordPress core reinstall screen.
-#: admin/dashboard.php:79
+#: admin/dashboard.php:113
 #, php-format
 msgid "To repair the core, use %s, which is WordPress's own mechanism and replaces the original files safely."
 msgstr ""
 
-#: admin/dashboard.php:80
+#: admin/dashboard.php:114
 msgid "Dashboard → Updates → Reinstall now"
 msgstr ""
 
-#: admin/dashboard.php:129
-#: admin/dashboard.php:167
+#: admin/dashboard.php:163
+#: admin/dashboard.php:201
 msgid "Modified / missing files"
 msgstr ""
 
-#: admin/dashboard.php:138
-#: admin/dashboard.php:208
+#: admin/dashboard.php:172
+#: admin/dashboard.php:242
 msgid "All"
 msgstr ""
 
-#: admin/dashboard.php:140
-#: admin/dashboard.php:210
+#: admin/dashboard.php:174
+#: admin/dashboard.php:244
 msgid "Apply"
 msgstr ""
 
 #. translators: %s: number of items.
-#: admin/dashboard.php:145
-#: admin/dashboard.php:215
+#: admin/dashboard.php:179
+#: admin/dashboard.php:249
 #: admin/disk.php:136
 #, php-format
 msgid "%s item"
@@ -492,50 +510,50 @@ msgid_plural "%s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: admin/dashboard.php:156
+#: admin/dashboard.php:190
 #: admin/media.php:239
 msgid "Modified"
 msgstr ""
 
-#: admin/dashboard.php:158
+#: admin/dashboard.php:192
 msgid "Show changes"
 msgstr ""
 
-#: admin/dashboard.php:160
+#: admin/dashboard.php:194
 msgid "Missing"
 msgstr ""
 
-#: admin/dashboard.php:168
+#: admin/dashboard.php:202
 msgid "No modified or missing files were detected."
 msgstr ""
 
-#: admin/dashboard.php:172
+#: admin/dashboard.php:206
 msgid "Extra files"
 msgstr ""
 
-#: admin/dashboard.php:173
+#: admin/dashboard.php:207
 msgid "View detected extra files"
 msgstr ""
 
 #. translators: %s: the "Analyze now" button label in bold.
-#: admin/dashboard.php:177
+#: admin/dashboard.php:211
 #, php-format
 msgid "No analysis available. Run %s to get results."
 msgstr ""
 
-#: admin/dashboard.php:186
+#: admin/dashboard.php:220
 msgid "File differences"
 msgstr ""
 
-#: admin/dashboard.php:195
+#: admin/dashboard.php:229
 msgid "Extra files detected"
 msgstr ""
 
-#: admin/dashboard.php:196
+#: admin/dashboard.php:230
 msgid "These files are not part of the official WordPress core. Review them and remove any you do not recognise using your hosting file manager or FTP client."
 msgstr ""
 
-#: admin/dashboard.php:236
+#: admin/dashboard.php:270
 msgid "Close"
 msgstr ""
 

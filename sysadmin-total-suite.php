@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Sysadmin Total Suite
  * Description: Core integrity, vulnerability audit of core, plugins and themes, unused media cleanup, disk usage, profiling, user review, performance (WPO) diagnostics and AI bot blocking in a single admin panel.
- * Version: 5.4
+ * Version: 5.4.1
  * Requires at least: 5.3
  * Requires PHP: 7.4
  * Author: Ricardo Morales
@@ -15,7 +15,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('STSUITE_VERSION', '5.4');
+define('STSUITE_VERSION', '5.4.1');
 define('STSUITE_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('STSUITE_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -494,6 +494,22 @@ function stsuite_fallback_checksums($version, $locale) {
     return $cache;
 }
 
+/**
+ * md5 de wp-includes/version.php sin la línea que añaden los paquetes
+ * traducidos. Un paquete es_ES es idéntico al internacional salvo ese archivo,
+ * que termina con una línea en blanco y "$wp_local_package = 'es_ES';"
+ * (comprobado con los ZIP oficiales). Así se puede verificar contra los
+ * checksums internacionales cuando WordPress.org no publica los del idioma.
+ *
+ * @return string|false
+ */
+function stsuite_md5_without_local_package($path) {
+    $content = @file_get_contents($path); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Lectura de un archivo local del core; si falla se trata como no coincidente.
+    if ($content === false) return false;
+    $normalized = preg_replace('/\R\$wp_local_package\s*=\s*[\'"][A-Za-z_@-]+[\'"];\R?/', '', $content, 1, $count);
+    return $count ? md5((string) $normalized) : false;
+}
+
 // =============================
 // Acción de análisis (integridad)
 // =============================
@@ -547,7 +563,20 @@ add_action('admin_post_stsuite_run_analysis', function () {
     $errors = [];
     $modified_files = [];
 
+    // Checksums del idioma del sitio. WordPress.org no siempre los publica
+    // (p. ej. es_ES de 7.0.6, 7.1.1, 7.1.2 y 7.1.3): entonces se usan los del
+    // paquete internacional, que es idéntico salvo wp-includes/version.php.
+    // Antes, sin checksums del idioma, el análisis fallaba y el informe decía
+    // "sin problemas".
+    $reference = 'locale';
     $checksums = stsuite_fetch_checksums($version, $locale);
+    if (!is_array($checksums) && strpos($locale, 'en_US') !== 0) {
+        $international = stsuite_fallback_checksums($version, $locale);
+        if (!empty($international)) {
+            $checksums = $international;
+            $reference = 'international';
+        }
+    }
 
     if (is_array($checksums)) {
 
@@ -561,6 +590,11 @@ add_action('admin_post_stsuite_run_analysis', function () {
                 $path = ABSPATH . $file;
                 if (file_exists($path)) {
                     $actual = @md5_file($path);
+                    // Paquete traducido comparado con los checksums internacionales:
+                    // version.php solo difiere en $wp_local_package.
+                    if ($actual !== $md5 && $file === 'wp-includes/version.php' && stsuite_md5_without_local_package($path) === $md5) {
+                        $actual = $md5;
+                    }
                     if ($actual !== $md5) {
                         // Puede tratarse del paquete internacional en un sitio
                         // traducido: solo se marca si tampoco coincide con él.
@@ -634,6 +668,7 @@ add_action('admin_post_stsuite_run_analysis', function () {
         'modified_files' => array_values(array_unique($modified_files)),
         'version' => $version,
         'locale' => $locale,
+        'reference' => $reference, // 'locale' | 'international'
         'checked_at' => time(),
     ];
     set_transient('stsuite_last_analysis', $analysis_data, HOUR_IN_SECONDS);

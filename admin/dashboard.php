@@ -62,10 +62,44 @@ $stsuite_paged_files = $stsuite_paged_extras = [];
         ?>
 
         <h2><?php esc_html_e('Result', 'sysadmin-total-suite'); ?></h2>
-        <?php if ($stsuite_core_issues > 0): ?>
+        <?php if (($stsuite_analysis['checksum'] ?? '') === 'core_check_failed'): ?>
+            <?php /* Sin checksums no se ha verificado nada: nunca debe mostrarse como "sin problemas". */ ?>
+            <p class="stsuite-status stsuite-status--bad">
+                <?php
+                printf(
+                    /* translators: 1: WordPress version, 2: site locale. */
+                    esc_html__('⚠ The core could not be verified: WordPress.org did not provide the official checksums for WordPress %1$s (%2$s nor the international package). Try again later.', 'sysadmin-total-suite'),
+                    esc_html((string) ($stsuite_analysis['version'] ?? '')),
+                    esc_html((string) ($stsuite_analysis['locale'] ?? ''))
+                );
+                ?>
+            </p>
+        <?php elseif ($stsuite_core_issues > 0): ?>
             <p class="stsuite-status stsuite-status--bad"><?php esc_html_e('⚠ Issues were detected in the WordPress core', 'sysadmin-total-suite'); ?></p>
         <?php else: ?>
             <p class="stsuite-status stsuite-status--ok"><?php esc_html_e('✔ No issues were detected in the WordPress core', 'sysadmin-total-suite'); ?></p>
+        <?php endif; ?>
+        <?php if (($stsuite_analysis['checksum'] ?? '') !== 'core_check_failed'): ?>
+            <p class="stsuite-kv stsuite-muted">
+                <?php
+                if (($stsuite_analysis['reference'] ?? 'locale') === 'international') {
+                    printf(
+                        /* translators: 1: WordPress version, 2: site locale. */
+                        esc_html__('Compared with the official checksums of WordPress %1$s (international package): WordPress.org has not published the %2$s ones for this version. Both packages are identical except for the language line of wp-includes/version.php, which is taken into account.', 'sysadmin-total-suite'),
+                        esc_html((string) ($stsuite_analysis['version'] ?? '')),
+                        esc_html((string) ($stsuite_analysis['locale'] ?? ''))
+                    );
+                } else {
+                    printf(
+                        /* translators: 1: WordPress version, 2: site locale, 3: date and time of the analysis. */
+                        esc_html__('Compared with the official checksums of WordPress %1$s (%2$s) on %3$s.', 'sysadmin-total-suite'),
+                        esc_html((string) ($stsuite_analysis['version'] ?? '')),
+                        esc_html((string) ($stsuite_analysis['locale'] ?? '')),
+                        esc_html(wp_date(get_option('date_format') . ' ' . get_option('time_format'), (int) ($stsuite_analysis['checked_at'] ?? time())))
+                    );
+                }
+                ?>
+            </p>
         <?php endif; ?>
         <?php if (!empty($stsuite_extras)): ?>
             <p class="stsuite-status stsuite-status--warn"><?php esc_html_e('⚠ Files not recognized by WordPress were detected', 'sysadmin-total-suite'); ?></p>

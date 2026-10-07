@@ -4,7 +4,7 @@ Tags: security, performance, integrity, profiling, ai-bots
 Requires at least: 5.3
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 5.4
+Stable tag: 5.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,10 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 
 == Changelog ==
 
+= 5.4.1 =
+* Fixed (important): when WordPress.org has not published the checksums for your site language and WordPress version (common for minor releases, for example es_ES for 7.0.6, 7.1.1, 7.1.2 and 7.1.3), the integrity analysis could not run but the report said "No issues were detected". It now compares against the official checksums of the international package, which is identical except for the language line of wp-includes/version.php (taken into account), and the report says which package was used.
+* If no official checksums are available at all, the report now clearly says that the core could not be verified instead of reporting no issues.
+
 = 5.4 =
 * New "Unused media" section: finds media items that are not referenced anywhere on the site and files in the year/month upload folders that do not belong to any media item; copies of original images kept by optimization plugins (name.bk.ext) are listed apart. Unused items can be moved to a reversible quarantine (hidden from the library, files moved aside) and restored at any time; only emptying the quarantine deletes them, with a double confirmation. Uninstalling restores anything still in quarantine.
 * The audit now covers WordPress core and themes too: pending updates, themes closed or abandoned on WordPress.org and, if enabled, known vulnerabilities of the installed versions. The section is now called "Audit".
@@ -217,6 +221,9 @@ No. It only reports. Updates are installed from Dashboard > Updates, which is Wo
 * Integrity limited to the real core; locale alignment in diff and restore; nonce and interface fixes.
 
 == Upgrade Notice ==
+
+= 5.4.1 =
+Important fix: on sites whose language has no published checksums for the installed WordPress version, the integrity report said "No issues" without checking anything. Run the analysis again after updating.
 
 = 5.4 =
 New Unused media section with a reversible quarantine, core and theme audit, and a real unified diff in the integrity report.
